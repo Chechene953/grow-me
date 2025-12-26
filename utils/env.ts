@@ -1,0 +1,6 @@
+export const ENV = {
+  STRIPE_PUBLISHABLE_KEY: process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY || '',
+  STRIPE_BACKEND_URL: process.env.EXPO_PUBLIC_STRIPE_BACKEND_URL || '',
+};
+
+
