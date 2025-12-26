@@ -2,6 +2,8 @@ import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { Plant, Order, Accessory } from '../types';
 
+const AR_MODEL_URL = 'https://growme-9e45f.web.app/models/Peaceful_Elegance_1105145247_texture.usdz';
+
 const ACCESSORIES: Accessory[] = [
   {
     id: 'acc1',
@@ -50,6 +52,7 @@ const PLANTS: Omit<Plant, 'id'>[] = [
     careLevel: 'Easy',
     airPurifying: true,
     featured: true,
+    modelUsdzUrl: AR_MODEL_URL,
   },
   {
     name: 'Snake Plant',
@@ -62,10 +65,10 @@ const PLANTS: Omit<Plant, 'id'>[] = [
     ],
     sizes: ['Small', 'Medium'],
     colors: [
-      { 
-        name: 'White Ceramic', 
-        material: 'Ceramic', 
-        hexCode: '#FFFFFF', 
+      {
+        name: 'White Ceramic',
+        material: 'Ceramic',
+        hexCode: '#FFFFFF',
         priceModifier: 5,
         images: [
           'https://images.unsplash.com/photo-1593691509546-c4a29642233c?w=800',
@@ -74,10 +77,10 @@ const PLANTS: Omit<Plant, 'id'>[] = [
           'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=800',
         ],
       },
-      { 
-        name: 'Terracotta', 
-        material: 'Terracotta', 
-        hexCode: '#E2725B', 
+      {
+        name: 'Terracotta',
+        material: 'Terracotta',
+        hexCode: '#E2725B',
         priceModifier: 0,
         images: [
           'https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=800',
@@ -86,10 +89,10 @@ const PLANTS: Omit<Plant, 'id'>[] = [
           'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=800',
         ],
       },
-      { 
-        name: 'Black Ceramic', 
-        material: 'Ceramic', 
-        hexCode: '#2C2C2C', 
+      {
+        name: 'Black Ceramic',
+        material: 'Ceramic',
+        hexCode: '#2C2C2C',
         priceModifier: 8,
         images: [
           'https://images.unsplash.com/photo-1574178611456-9c8eab9c83e4?w=800',
@@ -103,6 +106,7 @@ const PLANTS: Omit<Plant, 'id'>[] = [
     careLevel: 'Easy',
     airPurifying: true,
     featured: true,
+    modelUsdzUrl: AR_MODEL_URL,
   },
   {
     name: 'Fiddle Leaf Fig',
@@ -123,6 +127,7 @@ const PLANTS: Omit<Plant, 'id'>[] = [
     careLevel: 'Medium',
     airPurifying: true,
     featured: true,
+    modelUsdzUrl: AR_MODEL_URL,
   },
   {
     name: 'Pothos Golden',
@@ -143,6 +148,7 @@ const PLANTS: Omit<Plant, 'id'>[] = [
     careLevel: 'Easy',
     airPurifying: true,
     featured: true,
+    modelUsdzUrl: AR_MODEL_URL,
   },
   {
     name: 'ZZ Plant',
@@ -163,6 +169,7 @@ const PLANTS: Omit<Plant, 'id'>[] = [
     careLevel: 'Easy',
     airPurifying: true,
     featured: false,
+    modelUsdzUrl: AR_MODEL_URL,
   },
   {
     name: 'Peace Lily',
@@ -175,10 +182,10 @@ const PLANTS: Omit<Plant, 'id'>[] = [
     ],
     sizes: ['Small', 'Medium'],
     colors: [
-      { 
-        name: 'White Ceramic', 
-        material: 'Ceramic', 
-        hexCode: '#FFFFFF', 
+      {
+        name: 'White Ceramic',
+        material: 'Ceramic',
+        hexCode: '#FFFFFF',
         priceModifier: 5,
         images: [
           'https://growme-9e45f.web.app/images/plants/peace-lily/white-ceramic/1.jpg',
@@ -187,10 +194,10 @@ const PLANTS: Omit<Plant, 'id'>[] = [
           'https://growme-9e45f.web.app/images/plants/peace-lily/white-ceramic/4.jpg',
         ],
       },
-      { 
-        name: 'Terracotta', 
-        material: 'Terracotta', 
-        hexCode: '#E2725B', 
+      {
+        name: 'Terracotta',
+        material: 'Terracotta',
+        hexCode: '#E2725B',
         priceModifier: 0,
         images: [
           'https://growme-9e45f.web.app/images/plants/peace-lily/terracotta/1.jpg',
@@ -204,7 +211,7 @@ const PLANTS: Omit<Plant, 'id'>[] = [
     careLevel: 'Easy',
     airPurifying: true,
     featured: false,
-    modelUsdzUrl: 'https://growme-9e45f.web.app/models/Peaceful_Elegance_1105145247_texture.usdz',
+    modelUsdzUrl: AR_MODEL_URL,
   },
   {
     name: 'Aloe Vera',
@@ -224,6 +231,7 @@ const PLANTS: Omit<Plant, 'id'>[] = [
     careLevel: 'Easy',
     airPurifying: false,
     featured: false,
+    modelUsdzUrl: AR_MODEL_URL,
   },
   {
     name: 'Spider Plant',
@@ -244,6 +252,7 @@ const PLANTS: Omit<Plant, 'id'>[] = [
     careLevel: 'Easy',
     airPurifying: true,
     featured: false,
+    modelUsdzUrl: AR_MODEL_URL,
   },
   {
     name: 'Rubber Plant',
@@ -264,6 +273,7 @@ const PLANTS: Omit<Plant, 'id'>[] = [
     careLevel: 'Medium',
     airPurifying: true,
     featured: true,
+    modelUsdzUrl: AR_MODEL_URL,
   },
   {
     name: 'Philodendron Heartleaf',
@@ -284,6 +294,7 @@ const PLANTS: Omit<Plant, 'id'>[] = [
     careLevel: 'Easy',
     airPurifying: true,
     featured: false,
+    modelUsdzUrl: AR_MODEL_URL,
   },
   {
     name: 'String of Pearls',
@@ -304,6 +315,7 @@ const PLANTS: Omit<Plant, 'id'>[] = [
     careLevel: 'Medium',
     airPurifying: false,
     featured: false,
+    modelUsdzUrl: AR_MODEL_URL,
   },
   {
     name: 'Bird of Paradise',
@@ -324,6 +336,7 @@ const PLANTS: Omit<Plant, 'id'>[] = [
     careLevel: 'Medium',
     airPurifying: true,
     featured: true,
+    modelUsdzUrl: AR_MODEL_URL,
   },
   {
     name: 'Chinese Money Plant',
@@ -344,6 +357,7 @@ const PLANTS: Omit<Plant, 'id'>[] = [
     careLevel: 'Easy',
     airPurifying: true,
     featured: false,
+    modelUsdzUrl: AR_MODEL_URL,
   },
   {
     name: 'Calathea Medallion',
@@ -363,6 +377,7 @@ const PLANTS: Omit<Plant, 'id'>[] = [
     careLevel: 'Medium',
     airPurifying: true,
     featured: false,
+    modelUsdzUrl: AR_MODEL_URL,
   },
   {
     name: 'Echeveria',
@@ -382,6 +397,7 @@ const PLANTS: Omit<Plant, 'id'>[] = [
     careLevel: 'Easy',
     airPurifying: false,
     featured: false,
+    modelUsdzUrl: AR_MODEL_URL,
   },
   {
     name: 'Jade Plant',
@@ -401,6 +417,7 @@ const PLANTS: Omit<Plant, 'id'>[] = [
     careLevel: 'Easy',
     airPurifying: false,
     featured: false,
+    modelUsdzUrl: AR_MODEL_URL,
   },
   {
     name: 'Boston Fern',
@@ -420,6 +437,7 @@ const PLANTS: Omit<Plant, 'id'>[] = [
     careLevel: 'Medium',
     airPurifying: true,
     featured: false,
+    modelUsdzUrl: AR_MODEL_URL,
   },
   {
     name: 'Anthurium',
@@ -439,6 +457,7 @@ const PLANTS: Omit<Plant, 'id'>[] = [
     careLevel: 'Medium',
     airPurifying: true,
     featured: true,
+    modelUsdzUrl: AR_MODEL_URL,
   },
   {
     name: 'Bamboo Palm',
@@ -459,14 +478,15 @@ const PLANTS: Omit<Plant, 'id'>[] = [
     careLevel: 'Medium',
     airPurifying: true,
     featured: false,
+    modelUsdzUrl: AR_MODEL_URL,
   },
 ];
 
 export const seedPlants = async () => {
   try {
-    console.log('🌱 Starting to seed plants...');
+    console.log('Starting to seed plants...');
     const plantsRef = collection(db, 'plants');
-    
+
     let count = 0;
     for (const plant of PLANTS) {
       await addDoc(plantsRef, {
@@ -474,22 +494,22 @@ export const seedPlants = async () => {
         createdAt: Timestamp.now(),
       });
       count++;
-      console.log(`✅ Added plant ${count}/${PLANTS.length}: ${plant.name}`);
+      console.log(`Added plant ${count}/${PLANTS.length}: ${plant.name}`);
     }
-    
-    console.log(`\n🎉 Successfully added ${count} plants!`);
+
+    console.log(`Successfully added ${count} plants`);
     return count;
   } catch (error) {
-    console.error('❌ Error seeding plants:', error);
+    console.error('Error seeding plants:', error);
     throw error;
   }
 };
 
 export const seedAccessories = async () => {
   try {
-    console.log('🎁 Starting to seed accessories...');
+    console.log('Starting to seed accessories...');
     const accessoriesRef = collection(db, 'accessories');
-    
+
     let count = 0;
     for (const accessory of ACCESSORIES) {
       await addDoc(accessoriesRef, {
@@ -497,18 +517,17 @@ export const seedAccessories = async () => {
         createdAt: Timestamp.now(),
       });
       count++;
-      console.log(`✅ Added accessory ${count}/${ACCESSORIES.length}: ${accessory.name}`);
+      console.log(`Added accessory ${count}/${ACCESSORIES.length}: ${accessory.name}`);
     }
-    
-    console.log(`\n🎉 Successfully added ${count} accessories!`);
+
+    console.log(`Successfully added ${count} accessories`);
     return count;
   } catch (error) {
-    console.error('❌ Error seeding accessories:', error);
+    console.error('Error seeding accessories:', error);
     throw error;
   }
 };
 
-// Helper function to create test orders (requires existing plants and users)
 export const createTestOrder = async (
   userId: string,
   plantIds: string[],
@@ -521,13 +540,11 @@ export const createTestOrder = async (
   }
 ) => {
   try {
-    // Note: This is a simplified version. In production, you'd fetch actual plants
-    // and calculate prices properly
     const ordersRef = collection(db, 'orders');
-    
+
     const order = {
       userId,
-      items: [], // Would need actual plant data here
+      items: [],
       subtotal: 49.99,
       deliveryFee: 5.99,
       total: 55.98,
@@ -536,12 +553,12 @@ export const createTestOrder = async (
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
     };
-    
+
     const docRef = await addDoc(ordersRef, order);
-    console.log(`✅ Created test order: ${docRef.id}`);
+    console.log(`Created test order: ${docRef.id}`);
     return docRef.id;
   } catch (error) {
-    console.error('❌ Error creating test order:', error);
+    console.error('Error creating test order:', error);
     throw error;
   }
 };
