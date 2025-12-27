@@ -1,10 +1,10 @@
-import React, { useRef, useEffect } from 'react';
-import { View, TouchableOpacity, StyleSheet, Platform, Animated, Text } from 'react-native';
+import React, { useRef, useEffect, useState } from 'react';
+import { View, TouchableOpacity, StyleSheet, Platform, Animated, Text, LayoutChangeEvent } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors, shadows, spacing, borderRadius } from '../theme';
+import { colors, spacing, borderRadius } from '../theme';
 
 interface GlassTabBarProps {
   state: any;
@@ -27,6 +27,7 @@ interface TabItemProps {
   isFocused: boolean;
   onPress: () => void;
   onLongPress: () => void;
+  onLayout: (event: LayoutChangeEvent) => void;
   badgeCount?: number;
 }
 
@@ -35,36 +36,40 @@ const TabItem: React.FC<TabItemProps> = ({
   isFocused,
   onPress,
   onLongPress,
+  onLayout,
   badgeCount,
 }) => {
   const scaleAnim = useRef(new Animated.Value(1)).current;
-  const bgOpacity = useRef(new Animated.Value(0)).current;
 
-  useEffect(() => {
-    Animated.parallel([
-      Animated.spring(scaleAnim, {
-        toValue: isFocused ? 1.1 : 1,
-        friction: 8,
-        tension: 120,
-        useNativeDriver: true,
-      }),
-      Animated.timing(bgOpacity, {
-        toValue: isFocused ? 1 : 0,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [isFocused]);
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.9,
+      friction: 8,
+      tension: 200,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      friction: 8,
+      tension: 150,
+      useNativeDriver: true,
+    }).start();
+  };
 
   return (
     <TouchableOpacity
       style={styles.tabItem}
       onPress={onPress}
       onLongPress={onLongPress}
-      activeOpacity={0.7}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      onLayout={onLayout}
+      activeOpacity={1}
     >
       <Animated.View style={[styles.iconContainer, { transform: [{ scale: scaleAnim }] }]}>
-        <Animated.View style={[styles.iconBackground, { opacity: bgOpacity }]} />
         <MaterialCommunityIcons
           name={iconName as any}
           size={26}
@@ -89,6 +94,50 @@ export const GlassTabBar: React.FC<GlassTabBarProps> = ({
 }) => {
   const insets = useSafeAreaInsets();
   const bottomPadding = Math.max(insets.bottom, spacing.sm);
+
+  // Animated values for liquid slider
+  const sliderPosition = useRef(new Animated.Value(0)).current;
+  const sliderScale = useRef(new Animated.Value(1)).current;
+  const [tabLayouts, setTabLayouts] = useState<{ x: number; width: number }[]>([]);
+
+  // Update slider position when tab changes
+  useEffect(() => {
+    if (tabLayouts.length > 0 && tabLayouts[state.index]) {
+      const targetX = tabLayouts[state.index].x + (tabLayouts[state.index].width / 2) - 32;
+
+      // Scale animation for liquid effect
+      Animated.sequence([
+        Animated.timing(sliderScale, {
+          toValue: 1.15,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+        Animated.parallel([
+          Animated.spring(sliderPosition, {
+            toValue: targetX,
+            friction: 6,
+            tension: 80,
+            useNativeDriver: true,
+          }),
+          Animated.spring(sliderScale, {
+            toValue: 1,
+            friction: 5,
+            tension: 100,
+            useNativeDriver: true,
+          }),
+        ]),
+      ]).start();
+    }
+  }, [state.index, tabLayouts]);
+
+  const handleTabLayout = (index: number, event: LayoutChangeEvent) => {
+    const { x, width } = event.nativeEvent.layout;
+    setTabLayouts(prev => {
+      const newLayouts = [...prev];
+      newLayouts[index] = { x, width };
+      return newLayouts;
+    });
+  };
 
   return (
     <View style={[styles.container, { paddingBottom: bottomPadding }]}>
@@ -124,6 +173,48 @@ export const GlassTabBar: React.FC<GlassTabBarProps> = ({
           style={styles.topHighlight}
         />
 
+        {/* Liquid slider indicator */}
+        {tabLayouts.length > 0 && (
+          <Animated.View
+            style={[
+              styles.liquidSlider,
+              {
+                transform: [
+                  { translateX: sliderPosition },
+                  { scaleX: sliderScale },
+                  { scaleY: Animated.multiply(sliderScale, 0.95) },
+                ],
+              },
+            ]}
+          >
+            {/* Slider glass effect layers */}
+            <BlurView
+              intensity={Platform.OS === 'ios' ? 20 : 40}
+              tint="light"
+              style={styles.sliderBlur}
+            />
+            <LinearGradient
+              colors={[
+                'rgba(255, 255, 255, 0.9)',
+                'rgba(255, 255, 255, 0.6)',
+              ]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0, y: 1 }}
+              style={styles.sliderGradient}
+            />
+            {/* Specular highlight */}
+            <View style={styles.sliderSpecular} />
+            {/* Inner glow */}
+            <LinearGradient
+              colors={[
+                `${colors.primary[400]}30`,
+                'transparent',
+              ]}
+              style={styles.sliderInnerGlow}
+            />
+          </Animated.View>
+        )}
+
         {/* Tab items */}
         <View style={styles.tabContainer}>
           {state.routes.map((route: any, index: number) => {
@@ -158,6 +249,7 @@ export const GlassTabBar: React.FC<GlassTabBarProps> = ({
                 isFocused={isFocused}
                 onPress={onPress}
                 onLongPress={onLongPress}
+                onLayout={(e) => handleTabLayout(index, e)}
                 badgeCount={badgeCount}
               />
             );
@@ -225,12 +317,65 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 35,
     borderTopRightRadius: 35,
   },
+  liquidSlider: {
+    position: 'absolute',
+    top: 10,
+    left: 0,
+    width: 64,
+    height: 50,
+    borderRadius: 25,
+    overflow: 'hidden',
+    zIndex: 1,
+    ...Platform.select({
+      ios: {
+        shadowColor: 'rgba(0, 30, 63, 0.15)',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 1,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
+  },
+  sliderBlur: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 25,
+  },
+  sliderGradient: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 25,
+  },
+  sliderSpecular: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.8)',
+    ...Platform.select({
+      ios: {
+        shadowColor: 'rgba(255, 255, 255, 0.6)',
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 1,
+        shadowRadius: 12,
+      },
+    }),
+  },
+  sliderInnerGlow: {
+    position: 'absolute',
+    top: '50%',
+    left: 10,
+    right: 10,
+    height: '50%',
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+  },
   tabContainer: {
     flexDirection: 'row',
     height: 70,
     alignItems: 'center',
     justifyContent: 'space-around',
     paddingHorizontal: spacing.md,
+    zIndex: 2,
   },
   innerBorder: {
     ...StyleSheet.absoluteFillObject,
@@ -263,11 +408,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: 52,
     height: 52,
-  },
-  iconBackground: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 26,
-    backgroundColor: colors.primary[50],
   },
   badge: {
     position: 'absolute',
