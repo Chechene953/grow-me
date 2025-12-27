@@ -30,13 +30,6 @@ export const PlantDetailScreen = () => {
   const { addItem } = useCartStore();
   const { user } = useAuthStore();
   
-  const goToCare = () => {
-    (navigation as any).navigate('PlantCare', { plantId });
-  };
-
-  const goToDeviceSetup = () => {
-    (navigation as any).navigate('DeviceSetup', { plantId });
-  };
 
   const [plant, setPlant] = useState<Plant | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
@@ -381,13 +374,6 @@ export const PlantDetailScreen = () => {
           icon="augmented-reality"
         />
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Care & Monitoring</Text>
-          <View style={{ gap: 8 }}>
-            <Button title="View care tips for this plant" onPress={goToCare} variant="outline" />
-            <Button title="Add monitoring device" onPress={goToDeviceSetup} variant="secondary" />
-          </View>
-        </View>
       </View>
 
       {plant && (

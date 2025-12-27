@@ -19,7 +19,7 @@ export const CartItem: React.FC<CartItemProps> = ({
     if (item.potColor?.images && item.potColor.images.length > 0) {
       return item.potColor.images[0];
     }
-    return item.plant.images[0] || 'https://via.placeholder.com/100';
+    return item.plant.images[0];
   };
 
   return (

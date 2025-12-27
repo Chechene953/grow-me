@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
@@ -17,6 +17,7 @@ export const FavoritesScreen = () => {
   const { getAllPlants } = usePlantStore();
   const navigation = useNavigation<FavoritesScreenNavigationProp>();
   const [favoritePlants, setFavoritePlants] = useState<Plant[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadFavorites();
@@ -25,6 +26,7 @@ export const FavoritesScreen = () => {
   const loadFavorites = async () => {
     if (!user?.favorites || user.favorites.length === 0) {
       setFavoritePlants([]);
+      setLoading(false);
       return;
     }
 
@@ -34,6 +36,8 @@ export const FavoritesScreen = () => {
       setFavoritePlants(favorites);
     } catch (error) {
       console.error('Failed to load favorites:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -51,6 +55,14 @@ export const FavoritesScreen = () => {
       console.error('Failed to toggle favorite:', error);
     }
   };
+
+  if (loading) {
+    return (
+      <View style={styles.emptyContainer}>
+        <ActivityIndicator size="large" color="#2E7D32" />
+      </View>
+    );
+  }
 
   if (favoritePlants.length === 0) {
     return (

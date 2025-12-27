@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useAuthStore } from '../stores/authStore';
 import { orderService } from '../services/orderService';
 import { Order } from '../types';
@@ -51,7 +51,7 @@ export const OrdersScreen = () => {
   if (loading) {
     return (
       <View style={styles.center}>
-        <Text>Loading orders...</Text>
+        <ActivityIndicator size="large" color="#2E7D32" />
       </View>
     );
   }

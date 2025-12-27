@@ -19,9 +19,18 @@ export const SignUpScreen = () => {
   const { signUp, loading } = useAuthStore();
   const navigation = useNavigation<SignUpScreenNavigationProp>();
 
+  const isValidEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
   const handleSignUp = async () => {
     if (!name || !email || !password || !confirmPassword) {
       setError('Please fill in all fields');
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      setError('Please enter a valid email address');
       return;
     }
 
@@ -38,7 +47,6 @@ export const SignUpScreen = () => {
     try {
       setError('');
       await signUp(email, password, name);
-      // Navigation will happen automatically via auth state listener
     } catch (err: any) {
       setError(getFirebaseErrorMessage(err));
     }

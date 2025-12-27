@@ -82,9 +82,18 @@ export const LoginScreen = () => {
     run();
   }, [response, signInWithGoogle]);
 
+  const isValidEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
   const handleLogin = async () => {
     if (!email || !password) {
       setError('Please fill in all fields');
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      setError('Please enter a valid email address');
       return;
     }
 
@@ -172,7 +181,11 @@ export const LoginScreen = () => {
                 style={styles.appleButton}
                 onPress={async () => {
                   try {
-                    const nonce = Math.random().toString(36).substring(2);
+                    const array = new Uint8Array(32);
+                    for (let i = 0; i < 32; i++) {
+                      array[i] = Math.floor(Math.random() * 256);
+                    }
+                    const nonce = Array.from(array, b => b.toString(16).padStart(2, '0')).join('');
                     const credential = await AppleAuthentication.signInAsync({
                       requestedScopes: [
                         AppleAuthentication.AppleAuthenticationScope.FULL_NAME,

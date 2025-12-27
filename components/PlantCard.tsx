@@ -24,7 +24,7 @@ export const PlantCard: React.FC<PlantCardProps> = ({
         return firstColor.images[0];
       }
     }
-    return plant.images[0] || 'https://via.placeholder.com/200';
+    return plant.images[0];
   };
 
   return (

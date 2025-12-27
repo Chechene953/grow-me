@@ -29,8 +29,7 @@ export const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
     if (plant.images && plant.images.length > 0) {
       return plant.images[0];
     }
-    // Final fallback
-    return 'https://via.placeholder.com/60';
+    return plant.images[0];
   };
 
   return (
