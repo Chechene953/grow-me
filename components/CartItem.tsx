@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { colors, spacing, borderRadius, shadows, typography } from '../theme';
 import { CartItem as CartItemType } from '../types';
 
 interface CartItemProps {
@@ -14,7 +15,6 @@ export const CartItem: React.FC<CartItemProps> = ({
   onRemove,
   onUpdateQuantity,
 }) => {
-  // Get image from selected pot color if available, otherwise use plant default image
   const getImageUrl = () => {
     if (item.potColor?.images && item.potColor.images.length > 0) {
       return item.potColor.images[0];
@@ -24,43 +24,69 @@ export const CartItem: React.FC<CartItemProps> = ({
 
   return (
     <View style={styles.container}>
-      <Image
-        source={{ uri: getImageUrl() }}
-        style={styles.image}
-        resizeMode="cover"
-      />
+      <View style={styles.imageContainer}>
+        <Image
+          source={{ uri: getImageUrl() }}
+          style={styles.image}
+          resizeMode="cover"
+        />
+      </View>
       <View style={styles.content}>
-        <Text style={styles.name}>{item.plant.name}</Text>
-        <Text style={styles.details}>
-          {item.size} • {item.potColor.name} {item.potColor.material}
-        </Text>
+        <View style={styles.header}>
+          <Text style={styles.name} numberOfLines={1}>{item.plant.name}</Text>
+          <TouchableOpacity
+            style={styles.removeButton}
+            onPress={onRemove}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <MaterialCommunityIcons name="close" size={18} color={colors.neutral[400]} />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.detailsRow}>
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>{item.size}</Text>
+          </View>
+          <View style={styles.badge}>
+            <View style={[styles.colorDot, { backgroundColor: item.potColor.hex || colors.neutral[400] }]} />
+            <Text style={styles.badgeText}>{item.potColor.name}</Text>
+          </View>
+        </View>
+
         {item.accessories.length > 0 && (
-          <Text style={styles.accessories}>
+          <Text style={styles.accessories} numberOfLines={1}>
             + {item.accessories.map(a => a.name).join(', ')}
           </Text>
         )}
+
         <View style={styles.footer}>
-          <Text style={styles.price}>${item.price.toFixed(2)}</Text>
+          <Text style={styles.price}>
+            <Text style={styles.currencySymbol}>$</Text>
+            {item.price.toFixed(2)}
+          </Text>
+
           <View style={styles.quantityContainer}>
             <TouchableOpacity
-              style={styles.quantityButton}
-              onPress={() => onUpdateQuantity(item.quantity - 1)}
+              style={[styles.quantityButton, item.quantity <= 1 && styles.quantityButtonDisabled]}
+              onPress={() => item.quantity > 1 && onUpdateQuantity(item.quantity - 1)}
+              disabled={item.quantity <= 1}
             >
-              <MaterialCommunityIcons name="minus" size={20} color="#2E7D32" />
+              <MaterialCommunityIcons
+                name="minus"
+                size={16}
+                color={item.quantity <= 1 ? colors.neutral[300] : colors.primary[600]}
+              />
             </TouchableOpacity>
             <Text style={styles.quantity}>{item.quantity}</Text>
             <TouchableOpacity
               style={styles.quantityButton}
               onPress={() => onUpdateQuantity(item.quantity + 1)}
             >
-              <MaterialCommunityIcons name="plus" size={20} color="#2E7D32" />
+              <MaterialCommunityIcons name="plus" size={16} color={colors.primary[600]} />
             </TouchableOpacity>
           </View>
         </View>
       </View>
-      <TouchableOpacity style={styles.removeButton} onPress={onRemove}>
-        <MaterialCommunityIcons name="close" size={20} color="#f44336" />
-      </TouchableOpacity>
     </View>
   );
 };
@@ -68,76 +94,108 @@ export const CartItem: React.FC<CartItemProps> = ({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    backgroundColor: colors.neutral[0],
+    borderRadius: borderRadius.xl,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    ...shadows.sm,
+  },
+  imageContainer: {
+    width: 90,
+    height: 90,
+    borderRadius: borderRadius.lg,
+    overflow: 'hidden',
+    backgroundColor: colors.neutral[100],
   },
   image: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
-    marginRight: 12,
+    width: '100%',
+    height: '100%',
   },
   content: {
     flex: 1,
+    marginLeft: spacing.md,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
   name: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
+    ...typography.bodyMedium,
+    color: colors.neutral[900],
+    flex: 1,
+    marginRight: spacing.sm,
   },
-  details: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 4,
+  removeButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: colors.neutral[100],
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  detailsRow: {
+    flexDirection: 'row',
+    marginTop: spacing.xs,
+    gap: spacing.xs,
+  },
+  badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.neutral[100],
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: borderRadius.sm,
+    gap: spacing.xs,
+  },
+  badgeText: {
+    ...typography.caption,
+    color: colors.neutral[600],
+  },
+  colorDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
   accessories: {
-    fontSize: 12,
-    color: '#999',
-    marginBottom: 8,
+    ...typography.caption,
+    color: colors.primary[600],
+    marginTop: spacing.xs,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginTop: spacing.sm,
   },
   price: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#2E7D32',
+    color: colors.primary[700],
+  },
+  currencySymbol: {
+    fontSize: 14,
+    fontWeight: '500',
   },
   quantityContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F5F5F5',
-    borderRadius: 8,
-    paddingVertical: 4,
+    backgroundColor: colors.primary[50],
+    borderRadius: borderRadius.lg,
+    borderWidth: 1,
+    borderColor: colors.primary[100],
   },
   quantityButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  quantityButtonDisabled: {
+    opacity: 0.5,
   },
   quantity: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    minWidth: 30,
+    ...typography.bodyMedium,
+    color: colors.neutral[900],
+    minWidth: 24,
     textAlign: 'center',
   },
-  removeButton: {
-    padding: 8,
-    marginLeft: 8,
-  },
 });
-
-
-
-
-

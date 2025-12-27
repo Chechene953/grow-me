@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuthStore } from '../stores/authStore';
 import { useCartStore } from '../stores/cartStore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { initAuth } from '../services/firebase';
-import { Badge } from '../components/Badge';
+import { GlassTabBar } from '../components/GlassTabBar';
+import { ModernHeader } from '../components/ModernHeader';
+import { colors } from '../theme';
 
 import { SplashScreen } from '../screens/SplashScreen';
 import { LoginScreen } from '../screens/LoginScreen';
@@ -60,8 +61,22 @@ const Stack = createStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
 const AuthStack = createStackNavigator<AuthStackParamList>();
 
+// Modern iOS-style screen transitions
+const screenOptions = {
+  headerShown: false,
+  gestureEnabled: true,
+  cardOverlayEnabled: true,
+  ...Platform.select({
+    ios: TransitionPresets.SlideFromRightIOS,
+    android: TransitionPresets.SlideFromRightIOS,
+  }),
+  cardStyle: {
+    backgroundColor: colors.neutral[100],
+  },
+};
+
 const AuthNavigator = () => (
-  <AuthStack.Navigator screenOptions={{ headerShown: false }}>
+  <AuthStack.Navigator screenOptions={screenOptions}>
     <AuthStack.Screen name="Login" component={LoginScreen} />
     <AuthStack.Screen name="SignUp" component={SignUpScreen} />
     <AuthStack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
@@ -70,59 +85,24 @@ const AuthNavigator = () => (
 
 const MainTabs = () => {
   const { items } = useCartStore();
-  const { user } = useAuthStore();
-
   const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
-  const favoritesCount = user?.favorites?.length || 0;
 
   return (
     <Tab.Navigator
+      tabBar={(props) => <GlassTabBar {...props} />}
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#2E7D32',
-        tabBarInactiveTintColor: '#999',
-        tabBarStyle: {
-          borderTopWidth: 1,
-          borderTopColor: '#E0E0E0',
-          paddingBottom: 8,
-          paddingTop: 8,
-          height: 60,
-        },
       }}
     >
-      <Tab.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="home" size={size} color={color} />
-          ),
-        }}
-      />
+      <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen
         name="Cart"
         component={CartScreen}
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <View>
-              <MaterialCommunityIcons name="cart" size={size} color={color} />
-              <Badge count={cartItemCount} />
-            </View>
-          ),
+          tabBarBadge: cartItemCount > 0 ? cartItemCount : undefined,
         }}
       />
-      <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <View>
-              <MaterialCommunityIcons name="account" size={size} color={color} />
-              {favoritesCount > 0 && <Badge count={favoritesCount} />}
-            </View>
-          ),
-        }}
-      />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );
 };
@@ -168,62 +148,22 @@ export const AppNavigator = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator screenOptions={screenOptions}>
         {!user ? (
           <Stack.Screen name="Auth" component={AuthNavigator} />
         ) : (
           <>
             <Stack.Screen name="Main" component={MainTabs} />
-            <Stack.Screen
-              name="PlantDetail"
-              component={PlantDetailScreen}
-              options={{ headerShown: true, title: 'Plant Details' }}
-            />
-            <Stack.Screen
-              name="Checkout"
-              component={CheckoutScreen}
-              options={{ headerShown: true, title: 'Checkout' }}
-            />
-            <Stack.Screen
-              name="OrderConfirmation"
-              component={OrderConfirmationScreen}
-              options={{ headerShown: true, title: 'Order Confirmed' }}
-            />
-            <Stack.Screen
-              name="Orders"
-              component={OrdersScreen}
-              options={{ headerShown: true, title: 'My Orders' }}
-            />
-            <Stack.Screen
-              name="Favorites"
-              component={FavoritesScreen}
-              options={{ headerShown: true, title: 'Favorites' }}
-            />
-            <Stack.Screen
-              name="CareTips"
-              component={CareTipsScreen}
-              options={{ headerShown: true, title: 'Care Tips' }}
-            />
-            <Stack.Screen
-              name="PlantCare"
-              component={PlantCareScreen}
-              options={{ headerShown: true, title: 'Plant Care' }}
-            />
-            <Stack.Screen
-              name="DeviceSetup"
-              component={DeviceSetupScreen}
-              options={{ headerShown: true, title: 'Device Setup' }}
-            />
-            <Stack.Screen
-              name="EditProfile"
-              component={EditProfileScreen}
-              options={{ headerShown: true, title: 'Edit Profile' }}
-            />
-            <Stack.Screen
-              name="SubscriptionManage"
-              component={SubscriptionManageScreen}
-              options={{ headerShown: true, title: 'Subscription' }}
-            />
+            <Stack.Screen name="PlantDetail" component={PlantDetailScreen} />
+            <Stack.Screen name="Checkout" component={CheckoutScreen} />
+            <Stack.Screen name="OrderConfirmation" component={OrderConfirmationScreen} />
+            <Stack.Screen name="Orders" component={OrdersScreen} />
+            <Stack.Screen name="Favorites" component={FavoritesScreen} />
+            <Stack.Screen name="CareTips" component={CareTipsScreen} />
+            <Stack.Screen name="PlantCare" component={PlantCareScreen} />
+            <Stack.Screen name="DeviceSetup" component={DeviceSetupScreen} />
+            <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+            <Stack.Screen name="SubscriptionManage" component={SubscriptionManageScreen} />
           </>
         )}
       </Stack.Navigator>

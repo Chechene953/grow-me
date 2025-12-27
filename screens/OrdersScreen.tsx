@@ -4,6 +4,8 @@ import { useAuthStore } from '../stores/authStore';
 import { orderService } from '../services/orderService';
 import { Order } from '../types';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { ModernHeader } from '../components/ModernHeader';
+import { colors, spacing, borderRadius, shadows, typography } from '../theme';
 
 export const OrdersScreen = () => {
   const { user } = useAuthStore();
@@ -68,6 +70,7 @@ export const OrdersScreen = () => {
 
   return (
     <View style={styles.container}>
+      <ModernHeader title="My Orders" />
       <FlatList
         data={orders}
         keyExtractor={(item) => item.id}

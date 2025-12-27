@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
-import { PlantCard } from '../components/PlantCard';
+import { PlantCardPremium } from '../components/PlantCardPremium';
 import { SearchBar } from '../components/SearchBar';
 import { SearchSuggestions } from '../components/SearchSuggestions';
 import { CategoryChip } from '../components/CategoryChip';
-import { Logo } from '../components/Logo';
+import { PremiumHeader } from '../components/PremiumHeader';
 import { usePlantStore } from '../stores/plantStore';
 import { useAuthStore } from '../stores/authStore';
 import { favoriteService } from '../services/favoriteService';
 import { Plant, PlantCategory } from '../types';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { colors, spacing } from '../theme';
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -58,19 +59,18 @@ export const HomeScreen = () => {
   }, [searchTerm, selectedCategory, featuredPlants]);
 
   const handlePlantPress = (plantId: string) => {
-    setSearchTerm(''); // Clear search when navigating
+    setSearchTerm('');
     (navigation as any).navigate('PlantDetail', { plantId });
   };
 
   const toggleFavorite = async (plantId: string) => {
     if (!user) return;
-    const isFavorite = user.favorites?.includes(plantId) || false;
+    const isFav = user.favorites?.includes(plantId) || false;
     try {
-      await favoriteService.toggleFavorite(user.id, plantId, isFavorite);
-      // Reload user to update favorites
+      await favoriteService.toggleFavorite(user.id, plantId, isFav);
       await useAuthStore.getState().loadUser();
     } catch (error) {
-      console.error('Failed to toggle favorite:', error);
+      // Silent fail
     }
   };
 
@@ -80,17 +80,11 @@ export const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <Logo size="medium" />
-        </View>
-        <View style={styles.headerRight}>
-          <Text style={styles.greeting}>Hello {user?.name || 'User'} 👋</Text>
-          <Text style={styles.subtitle}>Find your perfect plant</Text>
-        </View>
-      </View>
+      <PremiumHeader userName={user?.name} />
 
-      <SearchBar value={searchTerm} onChangeText={setSearchTerm} />
+      <View style={styles.searchContainer}>
+        <SearchBar value={searchTerm} onChangeText={setSearchTerm} />
+      </View>
 
       <SearchSuggestions
         plants={searchResults}
@@ -104,6 +98,7 @@ export const HomeScreen = () => {
           showsHorizontalScrollIndicator={false}
           data={CATEGORIES}
           keyExtractor={(item) => item}
+          contentContainerStyle={styles.categoriesList}
           renderItem={({ item }) => (
             <CategoryChip
               label={item}
@@ -116,14 +111,16 @@ export const HomeScreen = () => {
 
       {loading ? (
         <View style={styles.center}>
-          <ActivityIndicator size="large" color="#2E7D32" />
+          <ActivityIndicator size="large" color={colors.primary[600]} />
         </View>
       ) : (
         <FlatList
           data={filteredPlants}
           keyExtractor={(item) => item.id}
+          numColumns={2}
+          columnWrapperStyle={styles.columnWrapper}
           renderItem={({ item }) => (
-            <PlantCard
+            <PlantCardPremium
               plant={item}
               onPress={() => handlePlantPress(item.id)}
               onFavorite={() => toggleFavorite(item.id)}
@@ -134,7 +131,7 @@ export const HomeScreen = () => {
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <MaterialCommunityIcons name="leaf-off" size={64} color="#ccc" />
+              <MaterialCommunityIcons name="leaf-off" size={64} color={colors.neutral[300]} />
               <Text style={styles.emptyText}>No plants found</Text>
             </View>
           }
@@ -147,41 +144,26 @@ export const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: colors.neutral[100],
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 24,
-    paddingTop: 60,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#F5F5F5',
-  },
-  headerLeft: {
-    marginRight: 16,
-  },
-  headerRight: {
-    flex: 1,
-  },
-  greeting: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#333',
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginTop: 4,
+  searchContainer: {
+    backgroundColor: colors.neutral[0],
+    paddingBottom: spacing.sm,
   },
   categoriesContainer: {
-    paddingVertical: 16,
-    paddingLeft: 24,
-    backgroundColor: '#fff',
+    backgroundColor: colors.neutral[0],
+    paddingBottom: spacing.md,
+  },
+  categoriesList: {
+    paddingHorizontal: spacing.xl,
+  },
+  columnWrapper: {
+    justifyContent: 'space-between',
   },
   listContent: {
-    padding: 24,
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing.lg,
+    paddingBottom: 120,
   },
   center: {
     flex: 1,
@@ -195,8 +177,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#999',
-    marginTop: 16,
+    color: colors.neutral[400],
+    marginTop: spacing.lg,
   },
 });
-

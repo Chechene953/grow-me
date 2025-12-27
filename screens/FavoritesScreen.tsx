@@ -4,11 +4,13 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { PlantCard } from '../components/PlantCard';
+import { ModernHeader } from '../components/ModernHeader';
 import { useAuthStore } from '../stores/authStore';
 import { usePlantStore } from '../stores/plantStore';
 import { favoriteService } from '../services/favoriteService';
 import { Plant } from '../types';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { colors, spacing } from '../theme';
 
 type FavoritesScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -76,6 +78,7 @@ export const FavoritesScreen = () => {
 
   return (
     <View style={styles.container}>
+      <ModernHeader title="Favorites" />
       <FlatList
         data={favoritePlants}
         keyExtractor={(item) => item.id}
