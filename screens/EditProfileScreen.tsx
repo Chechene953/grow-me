@@ -1,29 +1,66 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
+import React, { useState, useRef } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+  Alert,
+  Animated,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as Haptics from 'expo-haptics';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
+import { ModernHeader } from '../components/ModernHeader';
+import { PremiumPicker, COUNTRIES, getStatesForCountry } from '../components/PremiumPicker';
 import { useAuthStore } from '../stores/authStore';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import { colors, spacing, borderRadius, shadows, typography } from '../theme';
 
 export const EditProfileScreen = () => {
   const { user, updateProfile } = useAuthStore();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
+  const [phone, setPhone] = useState('');
   const [street, setStreet] = useState(user?.address?.street || '');
   const [city, setCity] = useState(user?.address?.city || '');
-  const [state, setState] = useState(user?.address?.state || '');
+  const [stateValue, setStateValue] = useState(user?.address?.state || '');
   const [zipCode, setZipCode] = useState(user?.address?.zipCode || '');
-  const [country, setCountry] = useState(user?.address?.country || 'United States');
+  const [countryCode, setCountryCode] = useState('US');
   const [avatar, setAvatar] = useState(user?.avatar || '');
   const [loading, setLoading] = useState(false);
 
+  const avatarScaleAnim = useRef(new Animated.Value(1)).current;
+
+  const getCountryName = (code: string): string => {
+    const country = COUNTRIES.find((c) => c.value === code);
+    return country?.label || 'United States';
+  };
+
+  const getStateName = (stateCode: string, countryCode: string): string => {
+    const states = getStatesForCountry(countryCode);
+    const state = states.find((s) => s.value === stateCode);
+    return state?.label || stateCode;
+  };
+
   const pickImage = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Permission needed', 'Please grant camera roll permissions to upload an image.');
+      Alert.alert(
+        'Permission Needed',
+        'Please grant camera roll permissions to upload an image.'
+      );
       return;
     }
 
@@ -35,225 +72,560 @@ export const EditProfileScreen = () => {
     });
 
     if (!result.canceled && result.assets[0]) {
+      // Animate avatar change
+      Animated.sequence([
+        Animated.timing(avatarScaleAnim, {
+          toValue: 0.9,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+        Animated.spring(avatarScaleAnim, {
+          toValue: 1,
+          friction: 5,
+          tension: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
       setAvatar(result.assets[0].uri);
     }
   };
 
   const handleSave = async () => {
     if (!name.trim()) {
-      Alert.alert('Error', 'Please enter your name');
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert('Required Field', 'Please enter your name');
       return;
     }
 
     setLoading(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
     try {
       await updateProfile({
         name: name.trim(),
         address: {
           street,
           city,
-          state,
+          state: stateValue,
           zipCode,
-          country,
+          country: getCountryName(countryCode),
         },
         avatar: avatar || undefined,
       });
+
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert('Success', 'Profile updated successfully', [
         { text: 'OK', onPress: () => router.back() },
       ]);
     } catch (error: any) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       Alert.alert('Error', error.message || 'Failed to update profile');
     } finally {
       setLoading(false);
     }
   };
 
+  const states = getStatesForCountry(countryCode);
+
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Edit Profile</Text>
-        <Text style={styles.subtitle}>Update your personal information</Text>
-      </View>
+    <View style={styles.container}>
+      <ModernHeader title="Edit Profile" />
 
-      <View style={styles.avatarSection}>
-        {avatar ? (
-          <Image source={{ uri: avatar }} style={styles.avatar} />
-        ) : (
-          <View style={styles.avatarPlaceholder}>
-            <MaterialCommunityIcons name="account" size={40} color="#666" />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{ flex: 1 }}
+      >
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={[
+            styles.content,
+            { paddingBottom: insets.bottom + spacing.xl },
+          ]}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* Avatar Section */}
+          <View style={styles.avatarSection}>
+            <TouchableOpacity
+              onPress={pickImage}
+              activeOpacity={0.9}
+              style={styles.avatarTouchable}
+            >
+              <Animated.View
+                style={[
+                  styles.avatarContainer,
+                  { transform: [{ scale: avatarScaleAnim }] },
+                ]}
+              >
+                {avatar ? (
+                  <Image source={{ uri: avatar }} style={styles.avatar} />
+                ) : (
+                  <LinearGradient
+                    colors={[colors.primary[300], colors.primary[500]]}
+                    style={styles.avatarPlaceholder}
+                  >
+                    <MaterialCommunityIcons
+                      name="account"
+                      size={48}
+                      color={colors.neutral[0]}
+                    />
+                  </LinearGradient>
+                )}
+                <View style={styles.cameraButton}>
+                  <MaterialCommunityIcons
+                    name="camera"
+                    size={16}
+                    color={colors.neutral[0]}
+                  />
+                </View>
+              </Animated.View>
+            </TouchableOpacity>
+            <Text style={styles.avatarHint}>Tap to change photo</Text>
           </View>
-        )}
-        <TouchableOpacity style={styles.changeAvatarButton} onPress={pickImage}>
-          <MaterialCommunityIcons name="camera" size={20} color="#fff" />
-          <Text style={styles.changeAvatarText}>Change Photo</Text>
-        </TouchableOpacity>
-      </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Personal Information</Text>
-        <Input
-          label="Name"
-          placeholder="Enter your name"
-          value={name}
-          onChangeText={setName}
-          icon="account"
-        />
-        <Input
-          label="Email"
-          placeholder="Enter your email"
-          value={email}
-          onChangeText={setEmail}
-          icon="email"
-          editable={false}
-          style={styles.disabledInput}
-        />
-        <Text style={styles.disabledNote}>Email cannot be changed</Text>
-      </View>
+          {/* Personal Information */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionIconContainer}>
+                <MaterialCommunityIcons
+                  name="account-circle-outline"
+                  size={20}
+                  color={colors.primary[600]}
+                />
+              </View>
+              <Text style={styles.sectionTitle}>Personal Information</Text>
+            </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Address</Text>
-        <Input
-          label="Street Address"
-          placeholder="Enter street address"
-          value={street}
-          onChangeText={setStreet}
-          icon="map-marker-outline"
-        />
-        <View style={styles.row}>
-          <View style={styles.half}>
             <Input
-              label="City"
-              placeholder="Enter city"
-              value={city}
-              onChangeText={setCity}
+              label="Full Name"
+              placeholder="Enter your full name"
+              value={name}
+              onChangeText={setName}
+              icon="account-outline"
+            />
+
+            <Input
+              label="Email Address"
+              placeholder="Enter your email"
+              value={email}
+              onChangeText={setEmail}
+              icon="email-outline"
+              editable={false}
+              style={styles.disabledInput}
+            />
+            <View style={styles.infoNote}>
+              <MaterialCommunityIcons
+                name="information-outline"
+                size={14}
+                color={colors.neutral[400]}
+              />
+              <Text style={styles.infoNoteText}>
+                Email is linked to your account and cannot be changed
+              </Text>
+            </View>
+
+            <Input
+              label="Phone Number"
+              placeholder="Enter your phone number"
+              value={phone}
+              onChangeText={setPhone}
+              icon="phone-outline"
+              keyboardType="phone-pad"
             />
           </View>
-          <View style={styles.half}>
+
+          {/* Address */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionIconContainer}>
+                <MaterialCommunityIcons
+                  name="map-marker-outline"
+                  size={20}
+                  color={colors.primary[600]}
+                />
+              </View>
+              <Text style={styles.sectionTitle}>Delivery Address</Text>
+            </View>
+
             <Input
-              label="State"
-              placeholder="Enter state"
-              value={state}
-              onChangeText={setState}
+              label="Street Address"
+              placeholder="Enter street address"
+              value={street}
+              onChangeText={setStreet}
+              icon="home-outline"
             />
-          </View>
-        </View>
-        <View style={styles.row}>
-          <View style={styles.half}>
+
             <Input
-              label="Zip Code"
-              placeholder="Enter zip code"
-              value={zipCode}
-              onChangeText={setZipCode}
-              keyboardType="numeric"
+              label="Apartment, Suite, etc. (optional)"
+              placeholder="Apt, Suite, Unit, Building"
+              value=""
+              onChangeText={() => {}}
+              icon="door"
             />
-          </View>
-          <View style={styles.half}>
-            <Input
+
+            <View style={styles.row}>
+              <View style={styles.flex1}>
+                <Input
+                  label="City"
+                  placeholder="Enter city"
+                  value={city}
+                  onChangeText={setCity}
+                />
+              </View>
+              <View style={styles.flex1}>
+                <Input
+                  label="ZIP / Postal Code"
+                  placeholder="Enter ZIP code"
+                  value={zipCode}
+                  onChangeText={setZipCode}
+                  keyboardType="numeric"
+                />
+              </View>
+            </View>
+
+            <PremiumPicker
               label="Country"
-              placeholder="Enter country"
-              value={country}
-              onChangeText={setCountry}
+              value={countryCode}
+              options={COUNTRIES}
+              onChange={(value) => {
+                setCountryCode(value);
+                setStateValue(''); // Reset state when country changes
+              }}
+              placeholder="Select country"
             />
-          </View>
-        </View>
-      </View>
 
-      <Button
-        title="Save Changes"
-        onPress={handleSave}
-        loading={loading}
-        style={styles.saveButton}
-      />
-    </ScrollView>
+            {states.length > 0 && (
+              <PremiumPicker
+                label={countryCode === 'CA' ? 'Province' : 'State'}
+                value={stateValue}
+                options={states}
+                onChange={setStateValue}
+                placeholder={`Select ${countryCode === 'CA' ? 'province' : 'state'}`}
+              />
+            )}
+          </View>
+
+          {/* Password Section */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionIconContainer}>
+                <MaterialCommunityIcons
+                  name="lock-outline"
+                  size={20}
+                  color={colors.primary[600]}
+                />
+              </View>
+              <Text style={styles.sectionTitle}>Security</Text>
+            </View>
+
+            <TouchableOpacity
+              style={styles.securityItem}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                Alert.alert('Change Password', 'Password change coming soon!');
+              }}
+              activeOpacity={0.7}
+            >
+              <View style={styles.securityItemLeft}>
+                <MaterialCommunityIcons
+                  name="key-outline"
+                  size={22}
+                  color={colors.neutral[600]}
+                />
+                <View style={styles.securityItemText}>
+                  <Text style={styles.securityItemTitle}>Change Password</Text>
+                  <Text style={styles.securityItemSubtitle}>
+                    Update your account password
+                  </Text>
+                </View>
+              </View>
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={22}
+                color={colors.neutral[300]}
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.securityItem}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                Alert.alert('Two-Factor Auth', '2FA setup coming soon!');
+              }}
+              activeOpacity={0.7}
+            >
+              <View style={styles.securityItemLeft}>
+                <MaterialCommunityIcons
+                  name="shield-check-outline"
+                  size={22}
+                  color={colors.neutral[600]}
+                />
+                <View style={styles.securityItemText}>
+                  <Text style={styles.securityItemTitle}>
+                    Two-Factor Authentication
+                  </Text>
+                  <Text style={styles.securityItemSubtitle}>
+                    Add extra security to your account
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.securityBadge}>
+                <Text style={styles.securityBadgeText}>Off</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+
+          {/* Save Button */}
+          <TouchableOpacity
+            style={[styles.saveButton, loading && styles.saveButtonDisabled]}
+            onPress={handleSave}
+            disabled={loading}
+            activeOpacity={0.85}
+          >
+            <LinearGradient
+              colors={
+                loading
+                  ? [colors.neutral[400], colors.neutral[500]]
+                  : [colors.primary[500], colors.primary[700]]
+              }
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.saveButtonGradient}
+            >
+              {loading ? (
+                <Text style={styles.saveButtonText}>Saving...</Text>
+              ) : (
+                <>
+                  <MaterialCommunityIcons
+                    name="check"
+                    size={20}
+                    color={colors.neutral[0]}
+                  />
+                  <Text style={styles.saveButtonText}>Save Changes</Text>
+                </>
+              )}
+            </LinearGradient>
+          </TouchableOpacity>
+
+          {/* Delete Account */}
+          <TouchableOpacity
+            style={styles.dangerButton}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              Alert.alert(
+                'Delete Account',
+                'Are you sure you want to delete your account? This action cannot be undone.',
+                [
+                  { text: 'Cancel', style: 'cancel' },
+                  {
+                    text: 'Delete',
+                    style: 'destructive',
+                    onPress: () =>
+                      Alert.alert('Coming Soon', 'Account deletion coming soon'),
+                  },
+                ]
+              );
+            }}
+            activeOpacity={0.7}
+          >
+            <MaterialCommunityIcons
+              name="delete-outline"
+              size={18}
+              color={colors.semantic.error}
+            />
+            <Text style={styles.dangerButtonText}>Delete Account</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: colors.neutral[50],
+  },
+  scrollView: {
+    flex: 1,
   },
   content: {
-    padding: 24,
+    padding: spacing.xl,
   },
-  header: {
-    marginBottom: 24,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#333',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-  },
+
+  // Avatar Section
   avatarSection: {
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: spacing.xl,
+  },
+  avatarTouchable: {
+    position: 'relative',
+  },
+  avatarContainer: {
+    position: 'relative',
   },
   avatar: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    marginBottom: 16,
+    borderWidth: 4,
+    borderColor: colors.neutral[0],
+    ...shadows.md,
   },
   avatarPlaceholder: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#E0E0E0',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
+    borderWidth: 4,
+    borderColor: colors.neutral[0],
+    ...shadows.md,
   },
-  changeAvatarButton: {
+  cameraButton: {
+    position: 'absolute',
+    bottom: 4,
+    right: 4,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: colors.primary[600],
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: colors.neutral[0],
+  },
+  avatarHint: {
+    ...typography.footnote,
+    color: colors.neutral[500],
+    marginTop: spacing.md,
+  },
+
+  // Sections
+  section: {
+    backgroundColor: colors.neutral[0],
+    borderRadius: borderRadius.xl,
+    padding: spacing.lg,
+    marginBottom: spacing.lg,
+    ...shadows.sm,
+  },
+  sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#2E7D32',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 12,
-    gap: 8,
+    marginBottom: spacing.lg,
+    gap: spacing.sm,
   },
-  changeAvatarText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  section: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 16,
+  sectionIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: colors.primary[50],
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#333',
-    marginBottom: 16,
+    ...typography.title3,
+    color: colors.neutral[900],
   },
-  row: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  half: {
-    flex: 1,
-  },
+
+  // Input Styles
   disabledInput: {
     opacity: 0.6,
   },
-  disabledNote: {
-    fontSize: 12,
-    color: '#999',
-    marginTop: 4,
-    fontStyle: 'italic',
+  infoNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginTop: -spacing.sm,
+    marginBottom: spacing.md,
   },
+  infoNoteText: {
+    ...typography.caption,
+    color: colors.neutral[400],
+    flex: 1,
+  },
+  row: {
+    flexDirection: 'row',
+    gap: spacing.md,
+  },
+  flex1: {
+    flex: 1,
+  },
+
+  // Security Section
+  securityItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.neutral[100],
+  },
+  securityItemLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    flex: 1,
+  },
+  securityItemText: {
+    flex: 1,
+  },
+  securityItemTitle: {
+    ...typography.callout,
+    fontWeight: '600',
+    color: colors.neutral[800],
+  },
+  securityItemSubtitle: {
+    ...typography.footnote,
+    color: colors.neutral[500],
+    marginTop: 2,
+  },
+  securityBadge: {
+    backgroundColor: colors.neutral[200],
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    borderRadius: borderRadius.sm,
+  },
+  securityBadgeText: {
+    ...typography.caption,
+    fontWeight: '600',
+    color: colors.neutral[600],
+  },
+
+  // Save Button
   saveButton: {
-    marginTop: 8,
-    marginBottom: 24,
+    borderRadius: borderRadius.xl,
+    overflow: 'hidden',
+    marginTop: spacing.md,
+  },
+  saveButtonDisabled: {
+    opacity: 0.7,
+  },
+  saveButtonGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: spacing.md + 4,
+    gap: spacing.sm,
+  },
+  saveButtonText: {
+    ...typography.callout,
+    fontWeight: '700',
+    color: colors.neutral[0],
+  },
+
+  // Danger Button
+  dangerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: spacing.lg,
+    marginTop: spacing.lg,
+    gap: spacing.xs,
+  },
+  dangerButtonText: {
+    ...typography.callout,
+    fontWeight: '600',
+    color: colors.semantic.error,
   },
 });
-
-

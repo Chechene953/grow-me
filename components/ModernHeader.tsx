@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Platform, Animated } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { colors, spacing, typography, borderRadius } from '../theme';
@@ -27,7 +27,7 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
   rightAction,
   leftAction,
 }) => {
-  const navigation = useNavigation();
+  const router = useRouter();
   const insets = useSafeAreaInsets();
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
@@ -53,7 +53,7 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <TouchableOpacity
         style={styles.backButton}
-        onPress={() => navigation.goBack()}
+        onPress={() => router.back()}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         activeOpacity={1}
@@ -86,7 +86,7 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
   const headerContent = (
     <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
       <View style={styles.leftContainer}>
-        {showBackButton && navigation.canGoBack() ? (
+        {showBackButton ? (
           <BackButton />
         ) : leftAction ? (
           <ActionButton icon={leftAction.icon} onPress={leftAction.onPress} />

@@ -1,5 +1,15 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert, Platform } from 'react-native';
+import React, { useState, useMemo } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Alert,
+  Platform,
+  TouchableOpacity,
+  Image,
+  TextInput,
+} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -9,11 +19,28 @@ import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { PaymentForm } from '../components/PaymentForm';
 import { ModernHeader } from '../components/ModernHeader';
+import { PremiumPicker, COUNTRIES, getStatesForCountry } from '../components/PremiumPicker';
 import { useCartStore } from '../stores/cartStore';
 import { useAuthStore } from '../stores/authStore';
 import { orderService } from '../services/orderService';
 import { Address } from '../types';
 import { colors, spacing, borderRadius, shadows, typography } from '../theme';
+
+type PaymentMethod = 'card' | 'apple_pay' | 'google_pay' | 'paypal';
+
+interface PaymentMethodConfig {
+  id: PaymentMethod;
+  label: string;
+  iconName: keyof typeof MaterialCommunityIcons.glyphMap;
+  available: boolean;
+}
+
+const PAYMENT_METHODS: PaymentMethodConfig[] = [
+  { id: 'apple_pay', label: 'Apple Pay', iconName: 'apple', available: Platform.OS === 'ios' },
+  { id: 'google_pay', label: 'Google Pay', iconName: 'google', available: Platform.OS === 'android' },
+  { id: 'paypal', label: 'PayPal', iconName: 'paypal', available: true },
+  { id: 'card', label: 'Credit Card', iconName: 'credit-card-outline', available: true },
+];
 
 export const CheckoutScreen = () => {
   const insets = useSafeAreaInsets();
@@ -21,19 +48,85 @@ export const CheckoutScreen = () => {
   const { user } = useAuthStore();
   const router = useRouter();
 
+  // Address state
   const [street, setStreet] = useState(user?.address?.street || '');
   const [city, setCity] = useState(user?.address?.city || '');
   const [state, setState] = useState(user?.address?.state || '');
   const [zipCode, setZipCode] = useState(user?.address?.zipCode || '');
-  const [country, setCountry] = useState(user?.address?.country || 'United States');
+  const [country, setCountry] = useState(user?.address?.country || 'US');
+  const [phone, setPhone] = useState('');
+
+  // Payment state
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>('card');
   const [loading, setLoading] = useState(false);
   const [paymentCompleted, setPaymentCompleted] = useState(false);
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
 
+  // Promo code
+  const [promoCode, setPromoCode] = useState('');
+  const [promoApplied, setPromoApplied] = useState(false);
+  const [promoDiscount, setPromoDiscount] = useState(0);
+  const [promoLoading, setPromoLoading] = useState(false);
+
+  // Get states for selected country
+  const stateOptions = useMemo(() => getStatesForCountry(country), [country]);
+
+  // Calculate totals
+  const subtotal = getSubtotal();
+  const deliveryFee = getDeliveryFee();
+  const discount = promoApplied ? promoDiscount : 0;
+  const total = Math.max(0, subtotal + deliveryFee - discount);
+
+  const handleApplyPromo = async () => {
+    if (!promoCode.trim()) return;
+
+    setPromoLoading(true);
+    // Simulate API call
+    setTimeout(() => {
+      if (promoCode.toUpperCase() === 'PLANT20') {
+        setPromoDiscount(subtotal * 0.2);
+        setPromoApplied(true);
+        Alert.alert('Promo Applied!', '20% discount has been applied to your order.');
+      } else if (promoCode.toUpperCase() === 'FREESHIP') {
+        setPromoDiscount(deliveryFee);
+        setPromoApplied(true);
+        Alert.alert('Promo Applied!', 'Free shipping has been applied to your order.');
+      } else {
+        Alert.alert('Invalid Code', 'This promo code is not valid or has expired.');
+      }
+      setPromoLoading(false);
+    }, 1000);
+  };
+
+  const handlePaymentMethodSelect = (method: PaymentMethod) => {
+    setSelectedPaymentMethod(method);
+    if (method !== 'card') {
+      // Handle digital wallet payments
+      handleDigitalWalletPayment(method);
+    }
+  };
+
+  const handleDigitalWalletPayment = async (method: PaymentMethod) => {
+    // In a real app, this would integrate with the native payment APIs
+    Alert.alert(
+      `${method === 'apple_pay' ? 'Apple Pay' : method === 'google_pay' ? 'Google Pay' : 'PayPal'}`,
+      'This would open the native payment sheet. For demo purposes, we\'ll simulate a successful payment.',
+      [
+        { text: 'Cancel', style: 'cancel', onPress: () => setSelectedPaymentMethod('card') },
+        {
+          text: 'Simulate Payment',
+          onPress: () => {
+            setPaymentIntentId(`${method}_${Date.now()}`);
+            setPaymentCompleted(true);
+          }
+        },
+      ]
+    );
+  };
+
   const handlePaymentSuccess = async (paymentIntentId: string) => {
     setPaymentIntentId(paymentIntentId);
     setPaymentCompleted(true);
-    await handlePlaceOrder();
   };
 
   const handlePaymentError = (error: string) => {
@@ -41,8 +134,13 @@ export const CheckoutScreen = () => {
   };
 
   const handlePlaceOrder = async () => {
-    if (!street || !city || !state || !zipCode) {
-      Alert.alert('Error', 'Please fill in all address fields');
+    if (!street || !city || !zipCode) {
+      Alert.alert('Error', 'Please fill in all required address fields');
+      return;
+    }
+
+    if (stateOptions.length > 0 && !state) {
+      Alert.alert('Error', 'Please select your state/province');
       return;
     }
 
@@ -59,20 +157,21 @@ export const CheckoutScreen = () => {
     setLoading(true);
 
     try {
+      const countryLabel = COUNTRIES.find(c => c.value === country)?.label || country;
       const address: Address = {
         street,
         city,
         state,
         zipCode,
-        country,
+        country: countryLabel,
       };
 
       const orderId = await orderService.createOrder({
         userId: user.id,
         items,
-        subtotal: getSubtotal(),
-        deliveryFee: getDeliveryFee(),
-        total: getTotal(),
+        subtotal,
+        deliveryFee,
+        total,
         status: 'Processing',
         address,
       });
@@ -86,38 +185,64 @@ export const CheckoutScreen = () => {
     }
   };
 
-  const isAddressComplete = street && city && state && zipCode;
+  const isAddressComplete = street && city && zipCode && (stateOptions.length === 0 || state);
+
+  const availablePaymentMethods = PAYMENT_METHODS.filter(m => m.available);
 
   return (
     <View style={styles.container}>
       <ModernHeader title="Checkout" />
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={[styles.content, { paddingBottom: 200, paddingTop: spacing.md }]}
+        contentContainerStyle={[styles.content, { paddingBottom: 220 }]}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         {/* Progress Steps */}
         <View style={styles.progressContainer}>
           <View style={styles.progressStep}>
-            <View style={[styles.progressDot, styles.progressDotActive]}>
+            <LinearGradient
+              colors={[colors.primary[500], colors.primary[600]]}
+              style={styles.progressDotActive}
+            >
               <MaterialCommunityIcons name="check" size={14} color={colors.neutral[0]} />
-            </View>
+            </LinearGradient>
             <Text style={[styles.progressLabel, styles.progressLabelActive]}>Cart</Text>
           </View>
           <View style={[styles.progressLine, styles.progressLineActive]} />
           <View style={styles.progressStep}>
-            <View style={[styles.progressDot, styles.progressDotActive]}>
-              <Text style={styles.progressDotText}>2</Text>
-            </View>
+            <LinearGradient
+              colors={[colors.primary[500], colors.primary[600]]}
+              style={styles.progressDotActive}
+            >
+              <Text style={styles.progressDotTextActive}>2</Text>
+            </LinearGradient>
             <Text style={[styles.progressLabel, styles.progressLabelActive]}>Checkout</Text>
           </View>
           <View style={[styles.progressLine, paymentCompleted && styles.progressLineActive]} />
           <View style={styles.progressStep}>
-            <View style={[styles.progressDot, paymentCompleted && styles.progressDotActive]}>
-              <Text style={[styles.progressDotText, paymentCompleted && styles.progressDotTextActive]}>3</Text>
+            <View style={[styles.progressDot, paymentCompleted && styles.progressDotCompleted]}>
+              {paymentCompleted ? (
+                <MaterialCommunityIcons name="check" size={14} color={colors.neutral[0]} />
+              ) : (
+                <Text style={styles.progressDotText}>3</Text>
+              )}
             </View>
             <Text style={[styles.progressLabel, paymentCompleted && styles.progressLabelActive]}>Confirm</Text>
           </View>
+        </View>
+
+        {/* Order Items Preview */}
+        <View style={styles.itemsPreview}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {items.map((item, index) => (
+              <View key={index} style={styles.itemPreviewCard}>
+                <Image source={{ uri: item.plant.images[0] }} style={styles.itemPreviewImage} />
+                <Text style={styles.itemPreviewName} numberOfLines={1}>{item.plant.name}</Text>
+                <Text style={styles.itemPreviewPrice}>${item.price.toFixed(2)}</Text>
+              </View>
+            ))}
+          </ScrollView>
         </View>
 
         {/* Delivery Address Section */}
@@ -126,16 +251,21 @@ export const CheckoutScreen = () => {
             <View style={styles.sectionIconContainer}>
               <MaterialCommunityIcons name="map-marker-outline" size={20} color={colors.primary[600]} />
             </View>
-            <Text style={styles.sectionTitle}>Delivery Address</Text>
+            <View style={styles.sectionTitleContainer}>
+              <Text style={styles.sectionTitle}>Delivery Address</Text>
+              <Text style={styles.sectionSubtitle}>Where should we deliver your plants?</Text>
+            </View>
           </View>
+
           <Input
             label="Street Address"
-            placeholder="123 Plant Street"
+            placeholder="123 Plant Street, Apt 4B"
             value={street}
             onChangeText={setStreet}
             icon="home-outline"
             required
           />
+
           <View style={styles.row}>
             <View style={styles.half}>
               <Input
@@ -148,17 +278,6 @@ export const CheckoutScreen = () => {
             </View>
             <View style={styles.half}>
               <Input
-                label="State"
-                placeholder="CA"
-                value={state}
-                onChangeText={setState}
-                required
-              />
-            </View>
-          </View>
-          <View style={styles.row}>
-            <View style={styles.half}>
-              <Input
                 label="Zip Code"
                 placeholder="94102"
                 value={zipCode}
@@ -167,15 +286,74 @@ export const CheckoutScreen = () => {
                 required
               />
             </View>
-            <View style={styles.half}>
-              <Input
-                label="Country"
-                placeholder="United States"
-                value={country}
-                onChangeText={setCountry}
-              />
-            </View>
           </View>
+
+          <PremiumPicker
+            label="Country"
+            placeholder="Select your country"
+            value={country}
+            options={COUNTRIES}
+            onValueChange={(value) => {
+              setCountry(value);
+              setState(''); // Reset state when country changes
+            }}
+            searchable
+            icon="earth"
+          />
+
+          {stateOptions.length > 0 && (
+            <PremiumPicker
+              label="State / Province"
+              placeholder="Select your state"
+              value={state}
+              options={stateOptions}
+              onValueChange={setState}
+              searchable
+              icon="map-outline"
+            />
+          )}
+
+          <Input
+            label="Phone Number"
+            placeholder="+1 (555) 123-4567"
+            value={phone}
+            onChangeText={setPhone}
+            keyboardType="phone-pad"
+            icon="phone-outline"
+          />
+        </View>
+
+        {/* Promo Code Section */}
+        <View style={styles.promoSection}>
+          <View style={styles.promoInputContainer}>
+            <MaterialCommunityIcons name="ticket-percent-outline" size={20} color={colors.neutral[400]} />
+            <TextInput
+              style={styles.promoInput}
+              placeholder="Enter promo code"
+              placeholderTextColor={colors.neutral[400]}
+              value={promoCode}
+              onChangeText={setPromoCode}
+              autoCapitalize="characters"
+              editable={!promoApplied}
+            />
+            {promoApplied ? (
+              <View style={styles.promoAppliedBadge}>
+                <MaterialCommunityIcons name="check" size={14} color={colors.neutral[0]} />
+                <Text style={styles.promoAppliedText}>Applied</Text>
+              </View>
+            ) : (
+              <TouchableOpacity
+                style={[styles.promoButton, !promoCode.trim() && styles.promoButtonDisabled]}
+                onPress={handleApplyPromo}
+                disabled={!promoCode.trim() || promoLoading}
+              >
+                <Text style={styles.promoButtonText}>
+                  {promoLoading ? 'Applying...' : 'Apply'}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          <Text style={styles.promoHint}>Try "PLANT20" for 20% off or "FREESHIP" for free shipping</Text>
         </View>
 
         {/* Order Summary Section */}
@@ -188,26 +366,35 @@ export const CheckoutScreen = () => {
           </View>
           <View style={styles.summary}>
             <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Subtotal ({items.length} items)</Text>
-              <Text style={styles.summaryValue}>${getSubtotal().toFixed(2)}</Text>
+              <Text style={styles.summaryLabel}>Subtotal ({items.reduce((sum, i) => sum + i.quantity, 0)} items)</Text>
+              <Text style={styles.summaryValue}>${subtotal.toFixed(2)}</Text>
             </View>
             <View style={styles.summaryRow}>
               <View style={styles.deliveryRow}>
                 <Text style={styles.summaryLabel}>Delivery</Text>
-                {getDeliveryFee() === 0 && (
+                {deliveryFee === 0 && (
                   <View style={styles.freeTag}>
                     <Text style={styles.freeTagText}>FREE</Text>
                   </View>
                 )}
               </View>
-              <Text style={[styles.summaryValue, getDeliveryFee() === 0 && styles.freeValue]}>
-                {getDeliveryFee() === 0 ? '$0.00' : `$${getDeliveryFee().toFixed(2)}`}
+              <Text style={[styles.summaryValue, deliveryFee === 0 && styles.freeValue]}>
+                {deliveryFee === 0 ? '$0.00' : `$${deliveryFee.toFixed(2)}`}
               </Text>
             </View>
+            {promoApplied && (
+              <View style={styles.summaryRow}>
+                <View style={styles.discountRow}>
+                  <MaterialCommunityIcons name="tag-outline" size={16} color={colors.semantic.success} />
+                  <Text style={styles.discountLabel}>Promo Discount</Text>
+                </View>
+                <Text style={styles.discountValue}>-${discount.toFixed(2)}</Text>
+              </View>
+            )}
             <View style={styles.divider} />
             <View style={styles.summaryRow}>
               <Text style={styles.summaryTotalLabel}>Total</Text>
-              <Text style={styles.summaryTotalValue}>${getTotal().toFixed(2)}</Text>
+              <Text style={styles.summaryTotalValue}>${total.toFixed(2)}</Text>
             </View>
           </View>
         </View>
@@ -218,16 +405,23 @@ export const CheckoutScreen = () => {
             <View style={styles.sectionIconContainer}>
               <MaterialCommunityIcons name="credit-card-outline" size={20} color={colors.primary[600]} />
             </View>
-            <Text style={styles.sectionTitle}>Payment</Text>
+            <View style={styles.sectionTitleContainer}>
+              <Text style={styles.sectionTitle}>Payment Method</Text>
+              <Text style={styles.sectionSubtitle}>All transactions are secure and encrypted</Text>
+            </View>
           </View>
+
           {paymentCompleted ? (
             <View style={styles.paymentSuccess}>
-              <View style={styles.paymentSuccessIcon}>
+              <LinearGradient
+                colors={[colors.semantic.success, '#45a049']}
+                style={styles.paymentSuccessIcon}
+              >
                 <MaterialCommunityIcons name="check" size={32} color={colors.neutral[0]} />
-              </View>
+              </LinearGradient>
               <Text style={styles.paymentSuccessText}>Payment Successful!</Text>
               <Text style={styles.paymentSuccessSubtext}>
-                ID: {paymentIntentId?.substring(0, 24)}...
+                {selectedPaymentMethod === 'card' ? 'Card ending in ****' : selectedPaymentMethod.replace('_', ' ').toUpperCase()}
               </Text>
             </View>
           ) : (
@@ -240,11 +434,60 @@ export const CheckoutScreen = () => {
                   </Text>
                 </View>
               )}
-              <PaymentForm
-                amount={getTotal()}
-                onPaymentSuccess={handlePaymentSuccess}
-                onPaymentError={handlePaymentError}
-              />
+
+              {/* Payment Method Selection */}
+              <View style={styles.paymentMethods}>
+                {availablePaymentMethods.map((method) => (
+                  <TouchableOpacity
+                    key={method.id}
+                    style={[
+                      styles.paymentMethodCard,
+                      selectedPaymentMethod === method.id && styles.paymentMethodCardSelected,
+                    ]}
+                    onPress={() => handlePaymentMethodSelect(method.id)}
+                    activeOpacity={0.7}
+                  >
+                    <MaterialCommunityIcons
+                      name={method.iconName}
+                      size={24}
+                      color={selectedPaymentMethod === method.id ? colors.primary[600] : colors.neutral[500]}
+                    />
+                    <Text style={[
+                      styles.paymentMethodLabel,
+                      selectedPaymentMethod === method.id && styles.paymentMethodLabelSelected,
+                    ]}>
+                      {method.label}
+                    </Text>
+                    {selectedPaymentMethod === method.id && (
+                      <MaterialCommunityIcons
+                        name="check-circle"
+                        size={20}
+                        color={colors.primary[600]}
+                        style={styles.paymentMethodCheck}
+                      />
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {/* Card Payment Form */}
+              {selectedPaymentMethod === 'card' && (
+                <View style={styles.cardFormContainer}>
+                  <PaymentForm
+                    amount={total}
+                    onPaymentSuccess={handlePaymentSuccess}
+                    onPaymentError={handlePaymentError}
+                  />
+                </View>
+              )}
+
+              {/* Security Badge */}
+              <View style={styles.securityBadge}>
+                <MaterialCommunityIcons name="shield-check" size={16} color={colors.semantic.success} />
+                <Text style={styles.securityText}>
+                  Secured by Stripe. Your payment info is encrypted.
+                </Text>
+              </View>
             </>
           )}
         </View>
@@ -254,8 +497,13 @@ export const CheckoutScreen = () => {
       <BlurView intensity={90} tint="light" style={[styles.footer, { paddingBottom: Math.max(spacing.lg, insets.bottom + spacing.md) }]}>
         <View style={styles.footerContent}>
           <View style={styles.footerTotal}>
-            <Text style={styles.footerTotalLabel}>Total</Text>
-            <Text style={styles.footerTotalValue}>${getTotal().toFixed(2)}</Text>
+            <View>
+              <Text style={styles.footerTotalLabel}>Total</Text>
+              {promoApplied && (
+                <Text style={styles.footerSavings}>You save ${discount.toFixed(2)}</Text>
+              )}
+            </View>
+            <Text style={styles.footerTotalValue}>${total.toFixed(2)}</Text>
           </View>
           {paymentCompleted && (
             <Button
@@ -282,13 +530,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: spacing.xl,
+    padding: spacing.lg,
   },
   progressContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.xl,
+    marginBottom: spacing.lg,
     paddingVertical: spacing.md,
   },
   progressStep: {
@@ -304,6 +552,14 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   progressDotActive: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: spacing.xs,
+  },
+  progressDotCompleted: {
     backgroundColor: colors.primary[600],
   },
   progressDotText: {
@@ -312,6 +568,8 @@ const styles = StyleSheet.create({
     color: colors.neutral[400],
   },
   progressDotTextActive: {
+    fontSize: 12,
+    fontWeight: '700',
     color: colors.neutral[0],
   },
   progressLabel: {
@@ -323,7 +581,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   progressLine: {
-    width: 48,
+    width: 40,
     height: 2,
     backgroundColor: colors.neutral[200],
     marginHorizontal: spacing.sm,
@@ -331,6 +589,31 @@ const styles = StyleSheet.create({
   },
   progressLineActive: {
     backgroundColor: colors.primary[600],
+  },
+  itemsPreview: {
+    marginBottom: spacing.lg,
+  },
+  itemPreviewCard: {
+    width: 80,
+    marginRight: spacing.sm,
+    alignItems: 'center',
+  },
+  itemPreviewImage: {
+    width: 60,
+    height: 60,
+    borderRadius: borderRadius.lg,
+    backgroundColor: colors.neutral[100],
+  },
+  itemPreviewName: {
+    ...typography.caption,
+    color: colors.neutral[700],
+    marginTop: spacing.xs,
+    textAlign: 'center',
+  },
+  itemPreviewPrice: {
+    ...typography.caption,
+    fontWeight: '600',
+    color: colors.primary[600],
   },
   section: {
     backgroundColor: colors.neutral[0],
@@ -341,7 +624,7 @@ const styles = StyleSheet.create({
   },
   sectionHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginBottom: spacing.lg,
     gap: spacing.sm,
   },
@@ -353,9 +636,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  sectionTitleContainer: {
+    flex: 1,
+  },
   sectionTitle: {
     ...typography.title3,
     color: colors.neutral[900],
+  },
+  sectionSubtitle: {
+    ...typography.caption,
+    color: colors.neutral[500],
+    marginTop: 2,
   },
   row: {
     flexDirection: 'row',
@@ -363,6 +654,60 @@ const styles = StyleSheet.create({
   },
   half: {
     flex: 1,
+  },
+  promoSection: {
+    backgroundColor: colors.neutral[0],
+    borderRadius: borderRadius.xl,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+  },
+  promoInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.neutral[50],
+    borderRadius: borderRadius.lg,
+    paddingHorizontal: spacing.md,
+    gap: spacing.sm,
+  },
+  promoInput: {
+    flex: 1,
+    ...typography.body,
+    color: colors.neutral[900],
+    paddingVertical: spacing.md,
+  },
+  promoButton: {
+    backgroundColor: colors.primary[600],
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.md,
+  },
+  promoButtonDisabled: {
+    backgroundColor: colors.neutral[300],
+  },
+  promoButtonText: {
+    ...typography.footnote,
+    fontWeight: '600',
+    color: colors.neutral[0],
+  },
+  promoAppliedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.semantic.success,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: borderRadius.md,
+    gap: 4,
+  },
+  promoAppliedText: {
+    ...typography.caption,
+    fontWeight: '600',
+    color: colors.neutral[0],
+  },
+  promoHint: {
+    ...typography.caption,
+    color: colors.neutral[400],
+    marginTop: spacing.sm,
+    textAlign: 'center',
   },
   summary: {
     marginTop: spacing.sm,
@@ -378,6 +723,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm,
   },
+  discountRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
   summaryLabel: {
     ...typography.body,
     color: colors.neutral[500],
@@ -388,6 +738,15 @@ const styles = StyleSheet.create({
     color: colors.neutral[800],
   },
   freeValue: {
+    color: colors.semantic.success,
+  },
+  discountLabel: {
+    ...typography.body,
+    color: colors.semantic.success,
+  },
+  discountValue: {
+    ...typography.body,
+    fontWeight: '600',
     color: colors.semantic.success,
   },
   freeTag: {
@@ -428,6 +787,59 @@ const styles = StyleSheet.create({
     color: colors.neutral[700],
     flex: 1,
   },
+  paymentMethods: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
+  },
+  paymentMethodCard: {
+    flex: 1,
+    minWidth: '45%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.neutral[50],
+    borderWidth: 1.5,
+    borderColor: colors.neutral[200],
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
+    gap: spacing.sm,
+  },
+  paymentMethodCardSelected: {
+    borderColor: colors.primary[600],
+    backgroundColor: colors.primary[50],
+  },
+  paymentMethodIcon: {
+    width: 32,
+    height: 20,
+  },
+  paymentMethodLabel: {
+    ...typography.footnote,
+    fontWeight: '500',
+    color: colors.neutral[600],
+    flex: 1,
+  },
+  paymentMethodLabelSelected: {
+    color: colors.primary[700],
+    fontWeight: '600',
+  },
+  paymentMethodCheck: {
+    marginLeft: 'auto',
+  },
+  cardFormContainer: {
+    marginTop: spacing.sm,
+  },
+  securityBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: spacing.lg,
+    gap: spacing.xs,
+  },
+  securityText: {
+    ...typography.caption,
+    color: colors.neutral[500],
+  },
   paymentSuccess: {
     alignItems: 'center',
     padding: spacing.xl,
@@ -438,7 +850,6 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: colors.semantic.success,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.md,
@@ -449,9 +860,8 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   paymentSuccessSubtext: {
-    ...typography.caption,
+    ...typography.footnote,
     color: colors.neutral[500],
-    fontFamily: 'monospace',
   },
   footer: {
     position: 'absolute',
@@ -460,7 +870,6 @@ const styles = StyleSheet.create({
     right: 0,
     borderTopWidth: 1,
     borderTopColor: colors.neutral[200],
-    ...shadows.lg,
   },
   footerContent: {
     paddingHorizontal: spacing.xl,
@@ -476,8 +885,13 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.neutral[500],
   },
+  footerSavings: {
+    ...typography.caption,
+    color: colors.semantic.success,
+    fontWeight: '500',
+  },
   footerTotalValue: {
-    ...typography.title2,
+    ...typography.title1,
     color: colors.primary[700],
   },
 });

@@ -78,6 +78,13 @@ export interface CartItem {
   price: number;
 }
 
+export interface OrderTrackingEvent {
+  status: OrderStatus;
+  timestamp: Date;
+  description: string;
+  location?: string;
+}
+
 export interface Order {
   id: string;
   userId: string;
@@ -89,9 +96,14 @@ export interface Order {
   address: Address;
   createdAt: Date;
   updatedAt: Date;
+  trackingNumber?: string;
+  carrier?: string;
+  estimatedDelivery?: Date;
+  trackingHistory?: OrderTrackingEvent[];
+  canCancel?: boolean;
 }
 
-export type OrderStatus = 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
+export type OrderStatus = 'Processing' | 'Shipped' | 'Out for Delivery' | 'Delivered' | 'Cancelled';
 
 export interface CareTip {
   plantId: string;
