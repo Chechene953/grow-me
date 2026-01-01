@@ -3,12 +3,8 @@ import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } fr
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { useAuthStore } from '../stores/authStore';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { AuthStackParamList } from '../navigation/AppNavigator';
+import { useRouter } from 'expo-router';
 import { getFirebaseErrorMessage } from '../utils/errorMessages';
-
-type SignUpScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'SignUp'>;
 
 export const SignUpScreen = () => {
   const [name, setName] = useState('');
@@ -17,7 +13,7 @@ export const SignUpScreen = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const { signUp, loading } = useAuthStore();
-  const navigation = useNavigation<SignUpScreenNavigationProp>();
+  const router = useRouter();
 
   const isValidEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -113,7 +109,7 @@ export const SignUpScreen = () => {
             <Text style={styles.footerText}>Already have an account? </Text>
             <Text
               style={styles.footerLink}
-              onPress={() => navigation.navigate('Login')}
+              onPress={() => router.push('/(auth)/login')}
             >
               Sign In
             </Text>

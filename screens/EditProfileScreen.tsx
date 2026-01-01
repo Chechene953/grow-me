@@ -1,19 +1,15 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
+import { useRouter } from 'expo-router';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { useAuthStore } from '../stores/authStore';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 
-type EditProfileScreenNavigationProp = StackNavigationProp<RootStackParamList>;
-
 export const EditProfileScreen = () => {
   const { user, updateProfile } = useAuthStore();
-  const navigation = useNavigation<EditProfileScreenNavigationProp>();
+  const router = useRouter();
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
   const [street, setStreet] = useState(user?.address?.street || '');
@@ -63,7 +59,7 @@ export const EditProfileScreen = () => {
         avatar: avatar || undefined,
       });
       Alert.alert('Success', 'Profile updated successfully', [
-        { text: 'OK', onPress: () => navigation.goBack() },
+        { text: 'OK', onPress: () => router.back() },
       ]);
     } catch (error: any) {
       Alert.alert('Error', error.message || 'Failed to update profile');

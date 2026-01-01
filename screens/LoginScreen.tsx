@@ -3,16 +3,12 @@ import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } fr
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { useAuthStore } from '../stores/authStore';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { AuthStackParamList } from '../navigation/AppNavigator';
+import { useRouter } from 'expo-router';
 import { getFirebaseErrorMessage } from '../utils/errorMessages';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import * as AuthSession from 'expo-auth-session';
-
-type LoginScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'Login'>;
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -21,7 +17,7 @@ export const LoginScreen = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { signIn, loading, signInWithGoogle, signInWithApple } = useAuthStore();
-  const navigation = useNavigation<LoginScreenNavigationProp>();
+  const router = useRouter();
 
   const expoClientId = process.env.EXPO_PUBLIC_GOOGLE_EXPO_CLIENT_ID;
   const iosClientIdEnv = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;
@@ -147,7 +143,7 @@ export const LoginScreen = () => {
 
           <Button
             title="Forgot Password?"
-            onPress={() => navigation.navigate('ForgotPassword')}
+            onPress={() => router.push('/(auth)/forgot-password')}
             variant="outline"
             style={styles.button}
           />
@@ -212,7 +208,7 @@ export const LoginScreen = () => {
             <Text style={styles.footerText}>Don't have an account? </Text>
             <Text
               style={styles.footerLink}
-              onPress={() => navigation.navigate('SignUp')}
+              onPress={() => router.push('/(auth)/sign-up')}
             >
               Sign Up
             </Text>

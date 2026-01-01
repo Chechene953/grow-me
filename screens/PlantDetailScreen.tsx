@@ -1,12 +1,9 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Alert, Platform, FlatList, Dimensions, Animated } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native';
-import { RouteProp } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
-import { RootStackParamList } from '../navigation/AppNavigator';
 import { Button } from '../components/Button';
 import { usePlantStore } from '../stores/plantStore';
 import { useCartStore } from '../stores/cartStore';
@@ -17,8 +14,9 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ARViewerScreen } from './ARViewerScreen';
 import { colors, spacing, borderRadius, shadows, typography } from '../theme';
 
-type PlantDetailScreenRouteProp = RouteProp<RootStackParamList, 'PlantDetail'>;
-type PlantDetailScreenNavigationProp = StackNavigationProp<RootStackParamList>;
+interface PlantDetailScreenProps {
+  plantId: string;
+}
 
 const AVAILABLE_ACCESSORIES: Accessory[] = [
   { id: '1', name: 'Decorative Stones', description: 'Add beautiful stones', price: 5.99 },
@@ -26,11 +24,9 @@ const AVAILABLE_ACCESSORIES: Accessory[] = [
   { id: '3', name: 'Plant Food', description: 'Nutrient-rich fertilizer', price: 8.99 },
 ];
 
-export const PlantDetailScreen = () => {
-  const route = useRoute<PlantDetailScreenRouteProp>();
-  const navigation = useNavigation<PlantDetailScreenNavigationProp>();
+export const PlantDetailScreen = ({ plantId }: PlantDetailScreenProps) => {
+  const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { plantId } = route.params;
   const { getPlantById } = usePlantStore();
   const { addItem } = useCartStore();
   const { user } = useAuthStore();
@@ -158,7 +154,7 @@ export const PlantDetailScreen = () => {
 
     addItem(cartItem);
     Alert.alert('Success', 'Added to cart!', [
-      { text: 'OK', onPress: () => navigation.goBack() },
+      { text: 'OK', onPress: () => router.back() },
     ]);
   };
 
@@ -277,7 +273,7 @@ export const PlantDetailScreen = () => {
           {/* Back button */}
           <TouchableOpacity
             style={[styles.backButton, { top: insets.top + spacing.sm }]}
-            onPress={() => navigation.goBack()}
+            onPress={() => router.back()}
             activeOpacity={0.8}
           >
             <BlurView intensity={Platform.OS === 'ios' ? 60 : 80} tint="light" style={styles.backButtonBlur}>

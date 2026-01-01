@@ -1,18 +1,14 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { useRouter } from 'expo-router';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { RootStackParamList } from '../navigation/AppNavigator';
 import { CartItem } from '../components/CartItem';
 import { Button } from '../components/Button';
 import { useCartStore } from '../stores/cartStore';
 import { colors, spacing, borderRadius, shadows, typography } from '../theme';
-
-type CartScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 // Tab bar height + bottom padding
 const TAB_BAR_HEIGHT = 90;
@@ -20,18 +16,18 @@ const TAB_BAR_HEIGHT = 90;
 export const CartScreen = () => {
   const insets = useSafeAreaInsets();
   const { items, removeItem, updateQuantity, getSubtotal, getDeliveryFee, getTotal } = useCartStore();
-  const navigation = useNavigation<CartScreenNavigationProp>();
+  const router = useRouter();
 
   const handleCheckout = () => {
     if (items.length === 0) {
       return;
     }
-    navigation.navigate('Checkout');
+    router.push('/checkout');
   };
 
   const handleBrowsePlants = () => {
     // Navigate to Home tab
-    navigation.getParent()?.navigate('Home');
+    router.replace('/(tabs)');
   };
 
   if (items.length === 0) {

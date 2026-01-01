@@ -3,18 +3,14 @@ import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } fr
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { useAuthStore } from '../stores/authStore';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { AuthStackParamList } from '../navigation/AppNavigator';
-
-type ForgotPasswordScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'ForgotPassword'>;
+import { useRouter } from 'expo-router';
 
 export const ForgotPasswordScreen = () => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const { resetPassword } = useAuthStore();
-  const navigation = useNavigation<ForgotPasswordScreenNavigationProp>();
+  const router = useRouter();
 
   const handleReset = async () => {
     if (!email) {
@@ -41,7 +37,7 @@ export const ForgotPasswordScreen = () => {
           </Text>
           <Button
             title="Back to Login"
-            onPress={() => navigation.navigate('Login')}
+            onPress={() => router.push('/(auth)/login')}
             style={styles.button}
           />
         </View>
@@ -83,7 +79,7 @@ export const ForgotPasswordScreen = () => {
 
           <Button
             title="Back to Login"
-            onPress={() => navigation.navigate('Login')}
+            onPress={() => router.push('/(auth)/login')}
             variant="outline"
             style={styles.button}
           />

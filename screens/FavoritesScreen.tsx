@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
+import { useRouter } from 'expo-router';
 import { PlantCard } from '../components/PlantCard';
 import { ModernHeader } from '../components/ModernHeader';
 import { useAuthStore } from '../stores/authStore';
@@ -12,12 +10,10 @@ import { Plant } from '../types';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { colors, spacing } from '../theme';
 
-type FavoritesScreenNavigationProp = StackNavigationProp<RootStackParamList>;
-
 export const FavoritesScreen = () => {
   const { user } = useAuthStore();
   const { getAllPlants } = usePlantStore();
-  const navigation = useNavigation<FavoritesScreenNavigationProp>();
+  const router = useRouter();
   const [favoritePlants, setFavoritePlants] = useState<Plant[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -44,7 +40,7 @@ export const FavoritesScreen = () => {
   };
 
   const handlePlantPress = (plantId: string) => {
-    (navigation as any).navigate('PlantDetail', { plantId });
+    router.push(`/plant/${plantId}`);
   };
 
   const toggleFavorite = async (plantId: string) => {

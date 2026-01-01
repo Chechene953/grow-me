@@ -1,19 +1,15 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native';
-import { RouteProp } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
+import { useRouter } from 'expo-router';
 import { Button } from '../components/Button';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-type OrderConfirmationScreenRouteProp = RouteProp<RootStackParamList, 'OrderConfirmation'>;
-type OrderConfirmationScreenNavigationProp = StackNavigationProp<RootStackParamList>;
+interface OrderConfirmationScreenProps {
+  orderId: string;
+}
 
-export const OrderConfirmationScreen = () => {
-  const route = useRoute<OrderConfirmationScreenRouteProp>();
-  const navigation = useNavigation<OrderConfirmationScreenNavigationProp>();
-  const { orderId } = route.params;
+export const OrderConfirmationScreen = ({ orderId }: OrderConfirmationScreenProps) => {
+  const router = useRouter();
 
   return (
     <View style={styles.container}>
@@ -39,15 +35,12 @@ export const OrderConfirmationScreen = () => {
         <View style={styles.buttons}>
           <Button
             title="View Orders"
-            onPress={() => {
-              (navigation as any).navigate('Main');
-              (navigation as any).navigate('Orders');
-            }}
+            onPress={() => router.replace('/orders')}
             style={styles.button}
           />
           <Button
             title="Continue Shopping"
-            onPress={() => (navigation as any).navigate('Main')}
+            onPress={() => router.replace('/(tabs)')}
             variant="outline"
             style={styles.button}
           />

@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert, Platform } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
-import { RootStackParamList } from '../navigation/AppNavigator';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { PaymentForm } from '../components/PaymentForm';
@@ -17,13 +15,11 @@ import { orderService } from '../services/orderService';
 import { Address } from '../types';
 import { colors, spacing, borderRadius, shadows, typography } from '../theme';
 
-type CheckoutScreenNavigationProp = StackNavigationProp<RootStackParamList>;
-
 export const CheckoutScreen = () => {
   const insets = useSafeAreaInsets();
   const { items, getSubtotal, getDeliveryFee, getTotal, clearCart } = useCartStore();
   const { user } = useAuthStore();
-  const navigation = useNavigation<CheckoutScreenNavigationProp>();
+  const router = useRouter();
 
   const [street, setStreet] = useState(user?.address?.street || '');
   const [city, setCity] = useState(user?.address?.city || '');
@@ -82,7 +78,7 @@ export const CheckoutScreen = () => {
       });
 
       clearCart();
-      (navigation as any).navigate('OrderConfirmation', { orderId });
+      router.replace(`/order-confirmation/${orderId}`);
     } catch (error: any) {
       Alert.alert('Error', error.message || 'Failed to place order');
     } finally {

@@ -1,17 +1,13 @@
 import React, { useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Animated, Platform } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { RootStackParamList } from '../navigation/AppNavigator';
 import { Button } from '../components/Button';
 import { Badge } from '../components/Badge';
 import { useAuthStore } from '../stores/authStore';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, shadows, typography } from '../theme';
-
-type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 // Tab bar height
 const TAB_BAR_HEIGHT = 100;
@@ -82,7 +78,7 @@ const MenuItem: React.FC<MenuItemProps> = ({ icon, label, onPress, badge, danger
 export const ProfileScreen = () => {
   const insets = useSafeAreaInsets();
   const { user, signOut } = useAuthStore();
-  const navigation = useNavigation<ProfileScreenNavigationProp>();
+  const router = useRouter();
 
   const handleSignOut = async () => {
     await signOut();
@@ -125,20 +121,20 @@ export const ProfileScreen = () => {
           <MenuItem
             icon="package-variant"
             label="My Orders"
-            onPress={() => navigation.navigate('Orders')}
+            onPress={() => router.push('/orders')}
           />
           <View style={styles.menuDivider} />
           <MenuItem
             icon="heart"
             label="Favorites"
-            onPress={() => navigation.navigate('Favorites')}
+            onPress={() => router.push('/favorites')}
             badge={user?.favorites?.length || 0}
           />
           <View style={styles.menuDivider} />
           <MenuItem
             icon="account-edit"
             label="Edit Profile"
-            onPress={() => navigation.navigate('EditProfile')}
+            onPress={() => router.push('/edit-profile')}
           />
         </View>
       </View>
@@ -149,7 +145,7 @@ export const ProfileScreen = () => {
           <MenuItem
             icon="book-open-page-variant"
             label="Care Tips"
-            onPress={() => navigation.navigate('CareTips')}
+            onPress={() => router.push('/care-tips')}
           />
         </View>
       </View>
@@ -160,7 +156,7 @@ export const ProfileScreen = () => {
           <MenuItem
             icon="shield-check"
             label="Subscription & Insurance"
-            onPress={() => navigation.navigate('SubscriptionManage')}
+            onPress={() => router.push('/subscription-manage')}
           />
         </View>
       </View>

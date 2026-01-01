@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
+import { useRouter } from 'expo-router';
 import { PlantCardPremium } from '../components/PlantCardPremium';
 import { SearchBar } from '../components/SearchBar';
 import { SearchSuggestions } from '../components/SearchSuggestions';
@@ -14,8 +12,6 @@ import { favoriteService } from '../services/favoriteService';
 import { Plant, PlantCategory } from '../types';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { colors, spacing } from '../theme';
-
-type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 const CATEGORIES: PlantCategory[] = [
   'Low Light',
@@ -34,7 +30,7 @@ export const HomeScreen = () => {
   const [searchResults, setSearchResults] = useState<Plant[]>([]);
   const { featuredPlants, loadFeaturedPlants, searchPlants, getPlantsByCategory, loading } = usePlantStore();
   const { user } = useAuthStore();
-  const navigation = useNavigation<HomeScreenNavigationProp>();
+  const router = useRouter();
 
   useEffect(() => {
     loadFeaturedPlants();
@@ -60,7 +56,7 @@ export const HomeScreen = () => {
 
   const handlePlantPress = (plantId: string) => {
     setSearchTerm('');
-    (navigation as any).navigate('PlantDetail', { plantId });
+    router.push(`/plant/${plantId}`);
   };
 
   const toggleFavorite = async (plantId: string) => {

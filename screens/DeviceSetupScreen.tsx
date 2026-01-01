@@ -1,8 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
+import { useRouter } from 'expo-router';
 import { Button } from '../components/Button';
 import { deviceService } from '../services/deviceService';
 import { InstallationChoice } from '../types';
@@ -10,13 +8,12 @@ import { subscriptionPlans } from '../utils/subscriptionPlans';
 import { subscriptionService } from '../services/subscriptionService';
 import { useAuthStore } from '../stores/authStore';
 
-type DeviceSetupRoute = RouteProp<RootStackParamList, 'DeviceSetup'>;
-type Nav = StackNavigationProp<RootStackParamList>;
+interface DeviceSetupScreenProps {
+  plantId: string;
+}
 
-export const DeviceSetupScreen = () => {
-  const route = useRoute<DeviceSetupRoute>();
-  const navigation = useNavigation<Nav>();
-  const { plantId } = route.params;
+export const DeviceSetupScreen = ({ plantId }: DeviceSetupScreenProps) => {
+  const router = useRouter();
   const [choice, setChoice] = useState<InstallationChoice>('self');
   const [loading, setLoading] = useState(false);
   const { user } = useAuthStore();
@@ -33,7 +30,7 @@ export const DeviceSetupScreen = () => {
       }
       const device = await deviceService.connectDevice(plantId, choice);
       Alert.alert('Device Connected', `Device ${device.name} connected successfully.`);
-      navigation.goBack();
+      router.back();
     } catch (e: any) {
       Alert.alert('Error', 'Could not connect the device.');
     } finally {
