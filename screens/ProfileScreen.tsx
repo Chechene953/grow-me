@@ -394,21 +394,21 @@ export const ProfileScreen = () => {
               icon="help-circle-outline"
               label="Help Center"
               subtitle="FAQs and support"
-              onPress={() => Alert.alert('Help', 'Help center coming soon!')}
+              onPress={() => router.push('/help-center')}
             />
             <View style={styles.menuDivider} />
             <MenuItem
               icon="message-text-outline"
               label="Contact Us"
               subtitle="Get in touch with our team"
-              onPress={() => Alert.alert('Contact', 'Contact form coming soon!')}
+              onPress={() => router.push('/contact')}
             />
             <View style={styles.menuDivider} />
             <MenuItem
               icon="file-document-outline"
               label="Terms & Privacy"
               subtitle="Legal information"
-              onPress={() => Alert.alert('Terms', 'Legal documents coming soon!')}
+              onPress={() => router.push('/terms-privacy')}
             />
           </View>
         </View>
