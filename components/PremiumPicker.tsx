@@ -138,15 +138,6 @@ export const PremiumPicker: React.FC<PremiumPickerProps> = ({
           />
 
           <View style={[styles.modalContent, { paddingBottom: insets.bottom + spacing.md }]}>
-            <View style={styles.modalBackground}>
-              {Platform.OS === 'ios' ? (
-                <BlurView
-                  intensity={90}
-                  tint="light"
-                  style={StyleSheet.absoluteFill}
-                />
-              ) : null}
-            </View>
             <View style={styles.modalInner}>
               <View style={styles.modalHeader}>
                 <View style={styles.modalHandle} />
@@ -225,7 +216,10 @@ export const PremiumPicker: React.FC<PremiumPickerProps> = ({
                   </TouchableOpacity>
                 )}
                 style={styles.optionsList}
-                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.optionsListContent}
+                showsVerticalScrollIndicator={true}
+                initialNumToRender={20}
+                maxToRenderPerBatch={20}
                 ListEmptyComponent={
                   <View style={styles.emptyList}>
                     <MaterialCommunityIcons
@@ -424,16 +418,15 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     maxHeight: '80%',
+    minHeight: 400,
     borderTopLeftRadius: borderRadius.xxl,
     borderTopRightRadius: borderRadius.xxl,
+    backgroundColor: colors.neutral[0],
     overflow: 'hidden',
-  },
-  modalBackground: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: Platform.OS === 'ios' ? 'rgba(255, 255, 255, 0.8)' : colors.neutral[0],
   },
   modalInner: {
     flex: 1,
+    backgroundColor: colors.neutral[0],
   },
   modalHeader: {
     alignItems: 'center',
@@ -478,6 +471,10 @@ const styles = StyleSheet.create({
   },
   optionsList: {
     flex: 1,
+    backgroundColor: colors.neutral[0],
+  },
+  optionsListContent: {
+    flexGrow: 1,
   },
   optionItem: {
     flexDirection: 'row',

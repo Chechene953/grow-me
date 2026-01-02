@@ -8,15 +8,18 @@ import { useAuthStore } from '../stores/authStore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { initAuth } from '../services/firebase';
 import { colors } from '../theme';
+import { ThemeProvider, useTheme } from '../contexts/ThemeContext';
 
 // Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+// Inner layout component that uses theme
+function RootLayoutContent() {
   const { user, loading, loadUser } = useAuthStore();
   const [authReady, setAuthReady] = useState(false);
   const segments = useSegments();
   const router = useRouter();
+  const { colors: themeColors, isDark } = useTheme();
 
   const [fontsLoaded] = useFonts({
     // Add any custom fonts here
@@ -80,21 +83,21 @@ export default function RootLayout() {
   // Show loading while initializing
   if (!authReady || !fontsLoaded) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.primary[600] }}>
-        <ActivityIndicator size="large" color={colors.neutral[0]} />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: themeColors.primary[600] }}>
+        <ActivityIndicator size="large" color={themeColors.neutral[0]} />
       </View>
     );
   }
 
   return (
     <>
-      <StatusBar style="auto" />
+      <StatusBar style={isDark ? 'light' : 'dark'} />
       <Stack
         screenOptions={{
           headerShown: false,
           animation: 'slide_from_right',
           contentStyle: {
-            backgroundColor: colors.neutral[100],
+            backgroundColor: themeColors.background?.secondary || themeColors.neutral[100],
           },
         }}
       >
@@ -112,5 +115,14 @@ export default function RootLayout() {
         <Stack.Screen name="subscription-manage" options={{ headerShown: false }} />
       </Stack>
     </>
+  );
+}
+
+// Root layout with ThemeProvider wrapper
+export default function RootLayout() {
+  return (
+    <ThemeProvider>
+      <RootLayoutContent />
+    </ThemeProvider>
   );
 }

@@ -1,51 +1,239 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { useRouter } from 'expo-router';
-import { Button } from '../components/Button';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withDelay,
+} from 'react-native-reanimated';
+import { Button } from '../components/Button';
+import { orderService } from '../services/orderService';
+import { useAuthStore } from '../stores/authStore';
+import { Order } from '../types';
+import { colors, spacing, borderRadius, shadows, typography } from '../theme';
 
-interface OrderConfirmationScreenProps {
-  orderId: string;
-}
-
-export const OrderConfirmationScreen = ({ orderId }: OrderConfirmationScreenProps) => {
+export const OrderConfirmationScreen = () => {
+  const { id: orderId } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const { user } = useAuthStore();
+
+  const [order, setOrder] = useState<Order | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Animation values
+  const checkScale = useSharedValue(0);
+  const cardOpacity = useSharedValue(0);
+  const cardTranslateY = useSharedValue(30);
+
+  useEffect(() => {
+    loadOrder();
+    // Trigger animations
+    checkScale.value = withSpring(1, { damping: 8, stiffness: 100 });
+    cardOpacity.value = withDelay(300, withSpring(1));
+    cardTranslateY.value = withDelay(300, withSpring(0));
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  }, []);
+
+  const loadOrder = async () => {
+    if (!orderId) return;
+    try {
+      const orderData = await orderService.getOrderById(orderId);
+      setOrder(orderData);
+    } catch (error) {
+      console.error('Error loading order:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const checkAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: checkScale.value }],
+  }));
+
+  const cardAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: cardOpacity.value,
+    transform: [{ translateY: cardTranslateY.value }],
+  }));
+
+  const handleContinueShopping = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.replace('/(tabs)/shop');
+  };
+
+  const handleViewOrders = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.replace('/my-orders');
+  };
+
+  if (loading) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <ActivityIndicator size="large" color={colors.primary[600]} />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.iconContainer}>
-          <MaterialCommunityIcons name="check-circle" size={80} color="#2E7D32" />
-        </View>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={[
+          styles.content,
+          { paddingTop: insets.top + spacing.xl, paddingBottom: insets.bottom + spacing.xl },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Success Animation */}
+        <Animated.View style={[styles.successContainer, checkAnimatedStyle]}>
+          <LinearGradient
+            colors={[colors.semantic.success, '#45a049']}
+            style={styles.successCircle}
+          >
+            <MaterialCommunityIcons name="check" size={56} color={colors.neutral[0]} />
+          </LinearGradient>
+        </Animated.View>
 
+        {/* Success Message */}
         <Text style={styles.title}>Order Confirmed!</Text>
         <Text style={styles.subtitle}>
           Thank you for your purchase. Your order has been placed successfully.
         </Text>
 
-        <View style={styles.orderInfo}>
-          <Text style={styles.orderLabel}>Order ID</Text>
-          <Text style={styles.orderId}>{orderId}</Text>
-        </View>
+        {/* Order Number */}
+        <Animated.View style={[styles.orderNumberCard, cardAnimatedStyle]}>
+          <Text style={styles.orderNumberLabel}>Order Number</Text>
+          <Text style={styles.orderNumber}>#{orderId?.slice(-8).toUpperCase()}</Text>
+        </Animated.View>
 
-        <Text style={styles.message}>
-          You will receive a confirmation email shortly. We'll notify you when your order ships.
-        </Text>
+        {/* Email Notification */}
+        <Animated.View style={[styles.infoCard, cardAnimatedStyle]}>
+          <View style={styles.infoIconContainer}>
+            <MaterialCommunityIcons name="email-check-outline" size={28} color={colors.primary[600]} />
+          </View>
+          <View style={styles.infoContent}>
+            <Text style={styles.infoTitle}>Confirmation Email Sent</Text>
+            <Text style={styles.infoText}>
+              We've sent a confirmation email to{' '}
+              <Text style={styles.infoEmail}>{user?.email || 'your email'}</Text> with your order details and receipt.
+            </Text>
+          </View>
+        </Animated.View>
 
-        <View style={styles.buttons}>
+        {/* Tracking Info */}
+        <Animated.View style={[styles.infoCard, cardAnimatedStyle]}>
+          <View style={[styles.infoIconContainer, { backgroundColor: colors.accent.gold + '20' }]}>
+            <MaterialCommunityIcons name="truck-fast-outline" size={28} color={colors.accent.gold} />
+          </View>
+          <View style={styles.infoContent}>
+            <Text style={styles.infoTitle}>Track Your Order</Text>
+            <Text style={styles.infoText}>
+              You can track your order status anytime from the "My Orders" section in your profile.
+            </Text>
+          </View>
+        </Animated.View>
+
+        {/* Order Summary */}
+        {order && (
+          <Animated.View style={[styles.summaryCard, cardAnimatedStyle]}>
+            <Text style={styles.sectionTitle}>Order Summary</Text>
+
+            {/* Items */}
+            <View style={styles.itemsList}>
+              {order.items.map((item, index) => (
+                <View key={index} style={styles.orderItem}>
+                  <Image source={{ uri: item.plant.images[0] }} style={styles.itemImage} />
+                  <View style={styles.itemDetails}>
+                    <Text style={styles.itemName}>{item.plant.name}</Text>
+                    <Text style={styles.itemMeta}>
+                      {item.size} / {item.potColor.name} / Qty: {item.quantity}
+                    </Text>
+                  </View>
+                  <Text style={styles.itemPrice}>${item.price.toFixed(2)}</Text>
+                </View>
+              ))}
+            </View>
+
+            <View style={styles.divider} />
+
+            {/* Totals */}
+            <View style={styles.totalsContainer}>
+              <View style={styles.totalRow}>
+                <Text style={styles.totalLabel}>Subtotal</Text>
+                <Text style={styles.totalValue}>${order.subtotal.toFixed(2)}</Text>
+              </View>
+              <View style={styles.totalRow}>
+                <Text style={styles.totalLabel}>Delivery</Text>
+                <Text style={[styles.totalValue, order.deliveryFee === 0 && styles.freeText]}>
+                  {order.deliveryFee === 0 ? 'FREE' : `$${order.deliveryFee.toFixed(2)}`}
+                </Text>
+              </View>
+              <View style={styles.divider} />
+              <View style={styles.totalRow}>
+                <Text style={styles.grandTotalLabel}>Total</Text>
+                <Text style={styles.grandTotalValue}>${order.total.toFixed(2)}</Text>
+              </View>
+            </View>
+
+            {/* Shipping Address */}
+            <View style={styles.addressContainer}>
+              <Text style={styles.addressTitle}>Shipping To</Text>
+              <Text style={styles.addressText}>
+                {order.address.street}{'\n'}
+                {order.address.city}, {order.address.state} {order.address.zipCode}{'\n'}
+                {order.address.country}
+              </Text>
+            </View>
+          </Animated.View>
+        )}
+
+        {/* Estimated Delivery */}
+        <Animated.View style={[styles.deliveryCard, cardAnimatedStyle]}>
+          <MaterialCommunityIcons name="calendar-clock" size={24} color={colors.primary[600]} />
+          <View style={styles.deliveryContent}>
+            <Text style={styles.deliveryTitle}>Estimated Delivery</Text>
+            <Text style={styles.deliveryDate}>
+              {new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', {
+                weekday: 'long',
+                month: 'long',
+                day: 'numeric',
+              })} - {new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', {
+                weekday: 'long',
+                month: 'long',
+                day: 'numeric',
+              })}
+            </Text>
+          </View>
+        </Animated.View>
+
+        {/* Action Buttons */}
+        <View style={styles.buttonsContainer}>
           <Button
-            title="View Orders"
-            onPress={() => router.replace('/orders')}
-            style={styles.button}
+            title="View My Orders"
+            onPress={handleViewOrders}
+            icon="package-variant"
+            size="large"
+            fullWidth
           />
-          <Button
-            title="Continue Shopping"
-            onPress={() => router.replace('/(tabs)')}
-            variant="outline"
-            style={styles.button}
-          />
+          <TouchableOpacity style={styles.secondaryButton} onPress={handleContinueShopping}>
+            <MaterialCommunityIcons name="shopping" size={20} color={colors.primary[600]} />
+            <Text style={styles.secondaryButtonText}>Continue Shopping</Text>
+          </TouchableOpacity>
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 };
@@ -53,62 +241,240 @@ export const OrderConfirmationScreen = ({ orderId }: OrderConfirmationScreenProp
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: colors.neutral[50],
   },
-  content: {
-    flex: 1,
+  loadingContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
   },
-  iconContainer: {
-    marginBottom: 24,
+  scrollView: {
+    flex: 1,
   },
+  content: {
+    padding: spacing.lg,
+  },
+
+  // Success Animation
+  successContainer: {
+    alignItems: 'center',
+    marginBottom: spacing.lg,
+  },
+  successCircle: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...shadows.lg,
+  },
+
+  // Title
   title: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: '#333',
-    marginBottom: 12,
+    ...typography.largeTitle,
+    color: colors.neutral[900],
     textAlign: 'center',
+    marginBottom: spacing.sm,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#666',
+    ...typography.body,
+    color: colors.neutral[600],
     textAlign: 'center',
-    marginBottom: 32,
-    lineHeight: 24,
+    marginBottom: spacing.xl,
+    paddingHorizontal: spacing.lg,
   },
-  orderInfo: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 12,
-    marginBottom: 24,
-    width: '100%',
+
+  // Order Number Card
+  orderNumberCard: {
+    backgroundColor: colors.primary[50],
+    borderRadius: borderRadius.xl,
+    padding: spacing.lg,
     alignItems: 'center',
+    marginBottom: spacing.lg,
   },
-  orderLabel: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 8,
+  orderNumberLabel: {
+    ...typography.footnote,
+    color: colors.primary[600],
+    marginBottom: spacing.xs,
   },
-  orderId: {
-    fontSize: 20,
+  orderNumber: {
+    ...typography.title1,
+    color: colors.primary[700],
     fontWeight: '700',
-    color: '#2E7D32',
   },
-  message: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 32,
+
+  // Info Cards
+  infoCard: {
+    flexDirection: 'row',
+    backgroundColor: colors.neutral[0],
+    borderRadius: borderRadius.xl,
+    padding: spacing.lg,
+    marginBottom: spacing.md,
+    ...shadows.sm,
+  },
+  infoIconContainer: {
+    width: 52,
+    height: 52,
+    borderRadius: 16,
+    backgroundColor: colors.primary[50],
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: spacing.md,
+  },
+  infoContent: {
+    flex: 1,
+  },
+  infoTitle: {
+    ...typography.callout,
+    fontWeight: '600',
+    color: colors.neutral[900],
+    marginBottom: spacing.xs,
+  },
+  infoText: {
+    ...typography.footnote,
+    color: colors.neutral[600],
     lineHeight: 20,
   },
-  buttons: {
-    width: '100%',
-    gap: 12,
+  infoEmail: {
+    fontWeight: '600',
+    color: colors.primary[600],
   },
-  button: {
-    width: '100%',
+
+  // Summary Card
+  summaryCard: {
+    backgroundColor: colors.neutral[0],
+    borderRadius: borderRadius.xl,
+    padding: spacing.lg,
+    marginBottom: spacing.md,
+    ...shadows.sm,
+  },
+  sectionTitle: {
+    ...typography.title3,
+    color: colors.neutral[900],
+    marginBottom: spacing.md,
+  },
+  itemsList: {
+    gap: spacing.md,
+  },
+  orderItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  itemImage: {
+    width: 56,
+    height: 56,
+    borderRadius: borderRadius.lg,
+    backgroundColor: colors.neutral[100],
+  },
+  itemDetails: {
+    flex: 1,
+    marginLeft: spacing.md,
+  },
+  itemName: {
+    ...typography.callout,
+    fontWeight: '600',
+    color: colors.neutral[900],
+  },
+  itemMeta: {
+    ...typography.caption,
+    color: colors.neutral[500],
+    marginTop: 2,
+  },
+  itemPrice: {
+    ...typography.callout,
+    fontWeight: '600',
+    color: colors.neutral[800],
+  },
+  divider: {
+    height: 1,
+    backgroundColor: colors.neutral[200],
+    marginVertical: spacing.md,
+  },
+  totalsContainer: {
+    gap: spacing.sm,
+  },
+  totalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  totalLabel: {
+    ...typography.body,
+    color: colors.neutral[600],
+  },
+  totalValue: {
+    ...typography.body,
+    fontWeight: '500',
+    color: colors.neutral[800],
+  },
+  freeText: {
+    color: colors.semantic.success,
+  },
+  grandTotalLabel: {
+    ...typography.title3,
+    color: colors.neutral[900],
+  },
+  grandTotalValue: {
+    ...typography.title2,
+    color: colors.primary[700],
+    fontWeight: '700',
+  },
+  addressContainer: {
+    marginTop: spacing.lg,
+    paddingTop: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: colors.neutral[100],
+  },
+  addressTitle: {
+    ...typography.footnote,
+    fontWeight: '600',
+    color: colors.neutral[600],
+    marginBottom: spacing.xs,
+  },
+  addressText: {
+    ...typography.body,
+    color: colors.neutral[800],
+    lineHeight: 22,
+  },
+
+  // Delivery Card
+  deliveryCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.primary[50],
+    borderRadius: borderRadius.xl,
+    padding: spacing.lg,
+    marginBottom: spacing.xl,
+    gap: spacing.md,
+  },
+  deliveryContent: {
+    flex: 1,
+  },
+  deliveryTitle: {
+    ...typography.footnote,
+    fontWeight: '600',
+    color: colors.primary[600],
+    marginBottom: 2,
+  },
+  deliveryDate: {
+    ...typography.body,
+    fontWeight: '600',
+    color: colors.primary[800],
+  },
+
+  // Buttons
+  buttonsContainer: {
+    gap: spacing.md,
+  },
+  secondaryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: spacing.md,
+    gap: spacing.sm,
+  },
+  secondaryButtonText: {
+    ...typography.body,
+    fontWeight: '600',
+    color: colors.primary[600],
   },
 });
-
