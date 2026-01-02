@@ -26,8 +26,8 @@ export const CartScreen = () => {
   };
 
   const handleBrowsePlants = () => {
-    // Navigate to Home tab
-    router.replace('/(tabs)');
+    // Navigate to Home tab (index)
+    router.push('/(tabs)');
   };
 
   if (items.length === 0) {

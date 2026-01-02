@@ -138,11 +138,16 @@ export const PremiumPicker: React.FC<PremiumPickerProps> = ({
           />
 
           <View style={[styles.modalContent, { paddingBottom: insets.bottom + spacing.md }]}>
-            <BlurView
-              intensity={Platform.OS === 'ios' ? 90 : 100}
-              tint="light"
-              style={styles.modalBlur}
-            >
+            <View style={styles.modalBackground}>
+              {Platform.OS === 'ios' ? (
+                <BlurView
+                  intensity={90}
+                  tint="light"
+                  style={StyleSheet.absoluteFill}
+                />
+              ) : null}
+            </View>
+            <View style={styles.modalInner}>
               <View style={styles.modalHeader}>
                 <View style={styles.modalHandle} />
                 <Text style={styles.modalTitle}>{label}</Text>
@@ -232,7 +237,7 @@ export const PremiumPicker: React.FC<PremiumPickerProps> = ({
                   </View>
                 }
               />
-            </BlurView>
+            </View>
           </View>
         </KeyboardAvoidingView>
       </Modal>
@@ -423,7 +428,11 @@ const styles = StyleSheet.create({
     borderTopRightRadius: borderRadius.xxl,
     overflow: 'hidden',
   },
-  modalBlur: {
+  modalBackground: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: Platform.OS === 'ios' ? 'rgba(255, 255, 255, 0.8)' : colors.neutral[0],
+  },
+  modalInner: {
     flex: 1,
   },
   modalHeader: {

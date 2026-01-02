@@ -18,6 +18,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { useAuthStore } from '../stores/authStore';
+import { orderService } from '../services/orderService';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, shadows, typography } from '../theme';
 import { SkeletonLoader, ProfileMenuSkeleton } from '../components/SkeletonLoader';
@@ -186,6 +187,7 @@ export const ProfileScreen = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [orderCount, setOrderCount] = useState(0);
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -195,6 +197,7 @@ export const ProfileScreen = () => {
   const loadInitialData = async () => {
     setLoading(true);
     await loadUser();
+    await loadOrderCount();
     setLoading(false);
     Animated.timing(fadeAnim, {
       toValue: 1,
@@ -203,9 +206,20 @@ export const ProfileScreen = () => {
     }).start();
   };
 
+  const loadOrderCount = async () => {
+    if (!user?.id) return;
+    try {
+      const orders = await orderService.getUserOrders(user.id);
+      setOrderCount(orders.length);
+    } catch (error) {
+      console.error('Failed to load orders:', error);
+    }
+  };
+
   const handleRefresh = async () => {
     setRefreshing(true);
     await loadUser();
+    await loadOrderCount();
     setRefreshing(false);
   };
 
@@ -256,7 +270,7 @@ export const ProfileScreen = () => {
             style={[styles.settingsButton, { top: insets.top + spacing.md }]}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              Alert.alert('Settings', 'Settings page coming soon!');
+              router.push('/settings');
             }}
           >
             <BlurView intensity={80} tint="light" style={styles.settingsBlur}>
@@ -298,9 +312,9 @@ export const ProfileScreen = () => {
         {/* Quick Stats */}
         <View style={styles.statsWrapper}>
           <QuickStats
-            orders={3}
+            orders={orderCount}
             favorites={user?.favorites?.length || 0}
-            plants={5}
+            plants={user?.favorites?.length || 0}
           />
         </View>
 
@@ -382,7 +396,7 @@ export const ProfileScreen = () => {
               icon="shield-check"
               label="Plant Insurance"
               subtitle="Protect your plants"
-              onPress={() => router.push('/subscription-manage')}
+              onPress={() => router.push('/plant-insurance')}
             />
           </View>
         </View>
@@ -395,6 +409,13 @@ export const ProfileScreen = () => {
               label="Help Center"
               subtitle="FAQs and support"
               onPress={() => router.push('/help-center')}
+            />
+            <View style={styles.menuDivider} />
+            <MenuItem
+              icon="chat"
+              label="Live Chat"
+              subtitle="Chat with our support team"
+              onPress={() => router.push('/live-chat')}
             />
             <View style={styles.menuDivider} />
             <MenuItem

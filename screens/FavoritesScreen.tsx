@@ -342,7 +342,7 @@ export const FavoritesScreen = () => {
   };
 
   const handleExplore = () => {
-    router.push('/(tabs)/shop');
+    router.push('/(tabs)');
   };
 
   const renderItem = ({ item, index }: { item: Plant; index: number }) => (

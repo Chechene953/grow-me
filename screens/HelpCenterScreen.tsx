@@ -8,6 +8,7 @@ import {
   TextInput,
   Linking,
 } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
@@ -130,6 +131,7 @@ const FAQAccordion: React.FC<{
 
 export const HelpCenterScreen = () => {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedCategory, setExpandedCategory] = useState<number | null>(0);
   const [expandedFAQ, setExpandedFAQ] = useState<string | null>(null);
@@ -137,6 +139,11 @@ export const HelpCenterScreen = () => {
   const handleContact = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     Linking.openURL('mailto:support@growme.app');
+  };
+
+  const handleLiveChat = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push('/live-chat');
   };
 
   const filteredData = searchQuery
@@ -202,9 +209,7 @@ export const HelpCenterScreen = () => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.quickAction}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            }}
+            onPress={handleLiveChat}
           >
             <View style={[styles.quickActionIcon, { backgroundColor: colors.accent.gold + '20' }]}>
               <MaterialCommunityIcons name="chat-outline" size={24} color={colors.accent.gold} />

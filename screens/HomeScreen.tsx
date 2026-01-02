@@ -32,9 +32,18 @@ export const HomeScreen = () => {
   const { user } = useAuthStore();
   const router = useRouter();
 
+  const { getAllPlants } = usePlantStore();
+  const [allPlants, setAllPlants] = useState<Plant[]>([]);
+
   useEffect(() => {
     loadFeaturedPlants();
+    loadAllPlants();
   }, []);
+
+  const loadAllPlants = async () => {
+    const plants = await getAllPlants();
+    setAllPlants(plants);
+  };
 
   useEffect(() => {
     const filterPlants = async () => {
@@ -47,12 +56,13 @@ export const HomeScreen = () => {
         setFilteredPlants(plants);
         setSearchResults(plants);
       } else {
-        setFilteredPlants(featuredPlants);
+        // Show all plants when no filter/search is applied
+        setFilteredPlants(allPlants.length > 0 ? allPlants : featuredPlants);
         setSearchResults([]);
       }
     };
     filterPlants();
-  }, [searchTerm, selectedCategory, featuredPlants]);
+  }, [searchTerm, selectedCategory, featuredPlants, allPlants]);
 
   const handlePlantPress = (plantId: string) => {
     setSearchTerm('');
