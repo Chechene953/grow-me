@@ -22,7 +22,8 @@ import { usePlantStore } from '../stores/plantStore';
 import { favoriteService } from '../services/favoriteService';
 import { Plant } from '../types';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, typography, shadows } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
+import { colors as defaultColors, spacing, borderRadius, typography, shadows } from '../theme';
 import { SkeletonLoader, PlantCardSkeleton } from '../components/SkeletonLoader';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -65,7 +66,7 @@ const AnimatedHeartButton: React.FC<{
           <MaterialCommunityIcons
             name={isFavorite ? 'heart' : 'heart-outline'}
             size={20}
-            color={isFavorite ? colors.semantic.error : colors.neutral[600]}
+            color={isFavorite ? defaultColors.semantic.error : defaultColors.neutral[600]}
           />
         </Animated.View>
       </BlurView>
@@ -99,9 +100,9 @@ const FavoriteCard: React.FC<{
   };
 
   const careLevelColor = {
-    Easy: colors.semantic.success,
-    Medium: colors.semantic.warning,
-    Hard: colors.semantic.error,
+    Easy: defaultColors.semantic.success,
+    Medium: defaultColors.semantic.warning,
+    Hard: defaultColors.semantic.error,
   }[plant.careLevel];
 
   return (
@@ -133,7 +134,7 @@ const FavoriteCard: React.FC<{
               <MaterialCommunityIcons
                 name="flower-tulip"
                 size={40}
-                color={colors.neutral[300]}
+                color={defaultColors.neutral[300]}
               />
             </View>
           ) : (
@@ -175,7 +176,7 @@ const FavoriteCard: React.FC<{
                 <MaterialCommunityIcons
                   name="air-filter"
                   size={12}
-                  color={colors.primary[600]}
+                  color={defaultColors.primary[600]}
                 />
               </View>
             )}
@@ -214,13 +215,13 @@ const EmptyFavorites: React.FC<{ onExplore: () => void }> = ({ onExplore }) => {
       <View style={styles.emptyIconContainer}>
         <Animated.View style={{ transform: [{ scale: heartAnim }] }}>
           <LinearGradient
-            colors={[colors.primary[100], colors.primary[50]]}
+            colors={[defaultColors.primary[100], defaultColors.primary[50]]}
             style={styles.emptyIconBg}
           >
             <MaterialCommunityIcons
               name="heart-outline"
               size={64}
-              color={colors.primary[400]}
+              color={defaultColors.primary[400]}
             />
           </LinearGradient>
         </Animated.View>
@@ -235,7 +236,7 @@ const EmptyFavorites: React.FC<{ onExplore: () => void }> = ({ onExplore }) => {
         activeOpacity={0.8}
       >
         <LinearGradient
-          colors={[colors.primary[500], colors.primary[700]]}
+          colors={[defaultColors.primary[500], defaultColors.primary[700]]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={styles.exploreButtonGradient}
@@ -243,7 +244,7 @@ const EmptyFavorites: React.FC<{ onExplore: () => void }> = ({ onExplore }) => {
           <MaterialCommunityIcons
             name="magnify"
             size={20}
-            color={colors.neutral[0]}
+            color={defaultColors.neutral[0]}
           />
           <Text style={styles.exploreButtonText}>Explore Plants</Text>
         </LinearGradient>
@@ -269,6 +270,7 @@ const FavoritesLoading: React.FC = () => (
 );
 
 export const FavoritesScreen = () => {
+  const { colors } = useTheme();
   const { user } = useAuthStore();
   const { getAllPlants } = usePlantStore();
   const router = useRouter();
@@ -373,18 +375,18 @@ export const FavoritesScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.neutral[50] }]}>
       <ModernHeader title="Favorites" />
 
       {/* Stats Bar */}
-      <View style={styles.statsBar}>
+      <View style={[styles.statsBar, { backgroundColor: colors.neutral[0] }]}>
         <View style={styles.statItem}>
           <MaterialCommunityIcons
             name="heart"
             size={18}
             color={colors.semantic.error}
           />
-          <Text style={styles.statText}>
+          <Text style={[styles.statText, { color: colors.neutral[600] }]}>
             {favoritePlants.length} {favoritePlants.length === 1 ? 'Plant' : 'Plants'}
           </Text>
         </View>
@@ -431,7 +433,7 @@ export const FavoritesScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.neutral[50],
+    backgroundColor: defaultColors.neutral[50],
   },
   loadingContainer: {
     flex: 1,
@@ -444,7 +446,7 @@ const styles = StyleSheet.create({
   },
   skeletonCard: {
     width: CARD_WIDTH,
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderRadius: borderRadius.xl,
     padding: spacing.sm,
     marginBottom: spacing.md,
@@ -457,9 +459,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.md,
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderBottomWidth: 1,
-    borderBottomColor: colors.neutral[100],
+    borderBottomColor: defaultColors.neutral[100],
   },
   statItem: {
     flexDirection: 'row',
@@ -469,7 +471,7 @@ const styles = StyleSheet.create({
   statText: {
     ...typography.callout,
     fontWeight: '600',
-    color: colors.neutral[800],
+    color: defaultColors.neutral[800],
   },
   sortButton: {
     flexDirection: 'row',
@@ -477,13 +479,13 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
     borderRadius: borderRadius.lg,
   },
   sortText: {
     ...typography.footnote,
     fontWeight: '600',
-    color: colors.neutral[600],
+    color: defaultColors.neutral[600],
   },
 
   // List
@@ -500,7 +502,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   card: {
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderRadius: borderRadius.xl,
     overflow: 'hidden',
     ...shadows.md,
@@ -509,7 +511,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     width: '100%',
     height: 140,
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
   },
   image: {
     width: '100%',
@@ -520,7 +522,7 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
   },
   imageGradient: {
     position: 'absolute',
@@ -553,7 +555,7 @@ const styles = StyleSheet.create({
   careBadgeText: {
     ...typography.caption,
     fontWeight: '700',
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
   },
   cardContent: {
     padding: spacing.md,
@@ -561,12 +563,12 @@ const styles = StyleSheet.create({
   plantName: {
     ...typography.callout,
     fontWeight: '700',
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     marginBottom: 2,
   },
   plantCategory: {
     ...typography.footnote,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
     marginBottom: spacing.sm,
   },
   priceRow: {
@@ -577,13 +579,13 @@ const styles = StyleSheet.create({
   price: {
     ...typography.callout,
     fontWeight: '800',
-    color: colors.primary[700],
+    color: defaultColors.primary[700],
   },
   airBadge: {
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: colors.primary[50],
+    backgroundColor: defaultColors.primary[50],
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -607,13 +609,13 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     ...typography.title2,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     marginBottom: spacing.sm,
     textAlign: 'center',
   },
   emptySubtitle: {
     ...typography.body,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: spacing.xl,
@@ -632,6 +634,6 @@ const styles = StyleSheet.create({
   exploreButtonText: {
     ...typography.callout,
     fontWeight: '700',
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
   },
 });

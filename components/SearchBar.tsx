@@ -1,7 +1,8 @@
 import React, { useRef, useState } from 'react';
 import { View, TextInput, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, shadows } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
+import { colors as defaultColors, spacing, borderRadius, shadows } from '../theme';
 
 interface SearchBarProps {
   value: string;
@@ -14,6 +15,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   onChangeText,
   placeholder = 'Search plants...',
 }) => {
+  const { colors } = useTheme();
   const inputRef = useRef<TextInput>(null);
   const [isFocused, setIsFocused] = useState(false);
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -40,7 +42,11 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
   return (
     <Animated.View style={[styles.shadowContainer, { transform: [{ scale: scaleAnim }] }]}>
-      <View style={[styles.container, isFocused && styles.containerFocused]}>
+      <View style={[
+        styles.container,
+        { backgroundColor: colors.neutral[0], borderColor: colors.neutral[200] },
+        isFocused && { borderColor: colors.primary[400] }
+      ]}>
         <View style={styles.iconContainer}>
           <MaterialCommunityIcons
             name="magnify"
@@ -50,7 +56,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         </View>
         <TextInput
           ref={inputRef}
-          style={styles.input}
+          style={[styles.input, { color: colors.neutral[900] }]}
           placeholder={placeholder}
           placeholderTextColor={colors.neutral[400]}
           value={value}
@@ -71,7 +77,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             activeOpacity={0.7}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <View style={styles.clearButtonInner}>
+            <View style={[styles.clearButtonInner, { backgroundColor: colors.neutral[400] }]}>
               <MaterialCommunityIcons name="close" size={14} color={colors.neutral[0]} />
             </View>
           </TouchableOpacity>
@@ -90,16 +96,16 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderRadius: borderRadius.xl,
     paddingHorizontal: spacing.lg,
     height: 52,
     borderWidth: 1.5,
-    borderColor: colors.neutral[200],
+    borderColor: defaultColors.neutral[200],
   },
   containerFocused: {
-    borderColor: colors.primary[400],
-    backgroundColor: colors.neutral[0],
+    borderColor: defaultColors.primary[400],
+    backgroundColor: defaultColors.neutral[0],
   },
   iconContainer: {
     marginRight: spacing.md,
@@ -109,7 +115,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     fontWeight: '500',
   },
   clearButton: {
@@ -119,7 +125,7 @@ const styles = StyleSheet.create({
     width: 22,
     height: 22,
     borderRadius: 11,
-    backgroundColor: colors.neutral[400],
+    backgroundColor: defaultColors.neutral[400],
     justifyContent: 'center',
     alignItems: 'center',
   },

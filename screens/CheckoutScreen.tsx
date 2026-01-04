@@ -24,7 +24,8 @@ import { useCartStore } from '../stores/cartStore';
 import { useAuthStore } from '../stores/authStore';
 import { orderService } from '../services/orderService';
 import { Address } from '../types';
-import { colors, spacing, borderRadius, shadows, typography } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
+import { colors as defaultColors, spacing, borderRadius, shadows, typography } from '../theme';
 
 type PaymentMethod = 'card' | 'apple_pay' | 'google_pay' | 'paypal';
 
@@ -47,6 +48,7 @@ export const CheckoutScreen = () => {
   const { items, getSubtotal, getDeliveryFee, getTotal, clearCart } = useCartStore();
   const { user } = useAuthStore();
   const router = useRouter();
+  const { colors } = useTheme();
 
   // Address state
   const [street, setStreet] = useState(user?.address?.street || '');
@@ -190,7 +192,7 @@ export const CheckoutScreen = () => {
   const availablePaymentMethods = PAYMENT_METHODS.filter(m => m.available);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.neutral[50] }]}>
       <ModernHeader title="Checkout" />
       <ScrollView
         style={styles.scrollView}

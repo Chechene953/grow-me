@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -19,9 +19,9 @@ import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { ModernHeader } from '../components/ModernHeader';
 import { useAuthStore } from '../stores/authStore';
-import { useTheme, ThemeMode } from '../contexts/ThemeContext';
+import { useTheme, ThemeMode, ThemeColors } from '../contexts/ThemeContext';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, shadows, typography } from '../theme';
+import { colors as defaultColors, spacing, borderRadius, shadows, typography } from '../theme';
 
 interface SettingItemProps {
   icon: keyof typeof MaterialCommunityIcons.glyphMap;
@@ -39,48 +39,53 @@ const SettingItem: React.FC<SettingItemProps> = ({
   onPress,
   rightElement,
   danger,
-}) => (
-  <TouchableOpacity
-    style={styles.settingItem}
-    onPress={() => {
-      if (onPress) {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        onPress();
-      }
-    }}
-    activeOpacity={onPress ? 0.7 : 1}
-    disabled={!onPress && !rightElement}
-  >
-    <View style={[styles.settingIcon, danger && styles.settingIconDanger]}>
-      <MaterialCommunityIcons
-        name={icon}
-        size={22}
-        color={danger ? colors.semantic.error : colors.primary[600]}
-      />
-    </View>
-    <View style={styles.settingContent}>
-      <Text style={[styles.settingTitle, danger && styles.settingTitleDanger]}>
-        {title}
-      </Text>
-      {subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
-    </View>
-    {rightElement || (
-      onPress && (
+}) => {
+  const { colors } = useTheme();
+
+  return (
+    <TouchableOpacity
+      style={styles.settingItem}
+      onPress={() => {
+        if (onPress) {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          onPress();
+        }
+      }}
+      activeOpacity={onPress ? 0.7 : 1}
+      disabled={!onPress && !rightElement}
+    >
+      <View style={[styles.settingIcon, { backgroundColor: colors.primary[50] }, danger && { backgroundColor: `${colors.semantic.error}15` }]}>
         <MaterialCommunityIcons
-          name="chevron-right"
+          name={icon}
           size={22}
-          color={colors.neutral[400]}
+          color={danger ? colors.semantic.error : colors.primary[600]}
         />
-      )
-    )}
-  </TouchableOpacity>
-);
+      </View>
+      <View style={styles.settingContent}>
+        <Text style={[styles.settingTitle, { color: colors.neutral[800] }, danger && { color: colors.semantic.error }]}>
+          {title}
+        </Text>
+        {subtitle && <Text style={[styles.settingSubtitle, { color: colors.neutral[500] }]}>{subtitle}</Text>}
+      </View>
+      {rightElement || (
+        onPress && (
+          <MaterialCommunityIcons
+            name="chevron-right"
+            size={22}
+            color={colors.neutral[400]}
+          />
+        )
+      )}
+    </TouchableOpacity>
+  );
+};
 
 // Password Change Modal
 const PasswordModal: React.FC<{
   visible: boolean;
   onClose: () => void;
 }> = ({ visible, onClose }) => {
+  const { colors } = useTheme();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -227,6 +232,7 @@ const TwoFactorModal: React.FC<{
   userId: string;
   userEmail: string;
 }> = ({ visible, onClose, enabled, onToggle, userId, userEmail }) => {
+  const { colors } = useTheme();
   const [verificationCode, setVerificationCode] = useState('');
   const [step, setStep] = useState<'info' | 'setup' | 'verify' | 'recovery'>('info');
   const [loading, setLoading] = useState(false);
@@ -320,12 +326,17 @@ const TwoFactorModal: React.FC<{
 
   return (
     <Modal visible={visible} animationType="slide" transparent>
-      <ScrollView style={styles.modalOverlay} contentContainerStyle={styles.modalScrollContent}>
-        <TouchableOpacity
-          style={styles.modalBackdrop}
-          activeOpacity={1}
-          onPress={resetAndClose}
-        />
+      <View style={styles.modalOverlay}>
+        <ScrollView
+          contentContainerStyle={styles.modalScrollContent}
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+        >
+          <TouchableOpacity
+            style={styles.modalBackdrop}
+            activeOpacity={1}
+            onPress={resetAndClose}
+          />
         <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
             <View style={styles.modalHandle} />
@@ -566,7 +577,8 @@ const TwoFactorModal: React.FC<{
             )}
           </View>
         </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
     </Modal>
   );
 };
@@ -608,13 +620,44 @@ export const SettingsScreen = () => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { user, signOut } = useAuthStore();
-  const { mode: themeMode, setThemeMode, isDark } = useTheme();
+  const { mode: themeMode, setThemeMode, isDark, colors } = useTheme();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [emailUpdates, setEmailUpdates] = useState(true);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [passwordModalVisible, setPasswordModalVisible] = useState(false);
   const [twoFactorModalVisible, setTwoFactorModalVisible] = useState(false);
   const [themeModalVisible, setThemeModalVisible] = useState(false);
+
+  // Dynamic styles based on theme
+  const dynamicStyles = useMemo(() => ({
+    container: {
+      backgroundColor: colors.neutral[50],
+    },
+    section: {
+      backgroundColor: colors.neutral[0],
+    },
+    sectionTitle: {
+      color: colors.neutral[500],
+    },
+    settingTitle: {
+      color: colors.neutral[800],
+    },
+    settingSubtitle: {
+      color: colors.neutral[500],
+    },
+    settingIcon: {
+      backgroundColor: colors.primary[50],
+    },
+    divider: {
+      backgroundColor: colors.neutral[100],
+    },
+    modalContent: {
+      backgroundColor: colors.neutral[0],
+    },
+    modalTitle: {
+      color: colors.neutral[900],
+    },
+  }), [colors]);
 
   const handleSignOut = () => {
     Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
@@ -664,7 +707,7 @@ export const SettingsScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, dynamicStyles.container]}>
       <ModernHeader title="Settings" />
 
       <ScrollView
@@ -676,8 +719,8 @@ export const SettingsScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         {/* Account Section */}
-        <Text style={styles.sectionTitle}>Account</Text>
-        <View style={styles.section}>
+        <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>Account</Text>
+        <View style={[styles.section, dynamicStyles.section]}>
           <SettingItem
             icon="account-edit"
             title="Edit Profile"
@@ -708,8 +751,8 @@ export const SettingsScreen = () => {
         </View>
 
         {/* Notifications Section */}
-        <Text style={styles.sectionTitle}>Notifications</Text>
-        <View style={styles.section}>
+        <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>Notifications</Text>
+        <View style={[styles.section, dynamicStyles.section]}>
           <SettingItem
             icon="bell-outline"
             title="Push Notifications"
@@ -746,8 +789,8 @@ export const SettingsScreen = () => {
         </View>
 
         {/* App Section */}
-        <Text style={styles.sectionTitle}>App</Text>
-        <View style={styles.section}>
+        <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>App</Text>
+        <View style={[styles.section, dynamicStyles.section]}>
           <SettingItem
             icon="palette-outline"
             title="Appearance"
@@ -779,8 +822,8 @@ export const SettingsScreen = () => {
         </View>
 
         {/* Danger Zone */}
-        <Text style={styles.sectionTitle}>Danger Zone</Text>
-        <View style={styles.section}>
+        <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>Danger Zone</Text>
+        <View style={[styles.section, dynamicStyles.section]}>
           <SettingItem
             icon="logout"
             title="Sign Out"
@@ -821,52 +864,114 @@ export const SettingsScreen = () => {
             activeOpacity={1}
             onPress={() => setThemeModalVisible(false)}
           />
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, dynamicStyles.modalContent]}>
             <View style={styles.modalHeader}>
               <View style={styles.modalHandle} />
-              <Text style={styles.modalTitle}>Appearance</Text>
+              <Text style={[styles.modalTitle, dynamicStyles.modalTitle]}>Appearance</Text>
               <TouchableOpacity style={styles.modalClose} onPress={() => setThemeModalVisible(false)}>
                 <MaterialCommunityIcons name="close" size={24} color={colors.neutral[600]} />
               </TouchableOpacity>
             </View>
 
             <View style={styles.modalBody}>
-              <Text style={styles.themeDescription}>
+              <Text style={[styles.themeDescription, { color: colors.neutral[600] }]}>
                 Choose how GrowMe looks on your device. You can select Light, Dark, or match your system settings.
               </Text>
 
               <View style={styles.themeOptions}>
-                <ThemeOptionButton
-                  mode="light"
-                  currentMode={themeMode}
-                  label="Light"
-                  icon="white-balance-sunny"
-                  onPress={() => setThemeMode('light')}
-                />
-                <ThemeOptionButton
-                  mode="dark"
-                  currentMode={themeMode}
-                  label="Dark"
-                  icon="weather-night"
-                  onPress={() => setThemeMode('dark')}
-                />
-                <ThemeOptionButton
-                  mode="system"
-                  currentMode={themeMode}
-                  label="System"
-                  icon="cellphone"
-                  onPress={() => setThemeMode('system')}
-                />
+                <TouchableOpacity
+                  style={[
+                    styles.themeOption,
+                    { backgroundColor: colors.neutral[50], borderColor: themeMode === 'light' ? colors.primary[500] : colors.neutral[200] },
+                    themeMode === 'light' && { backgroundColor: colors.primary[50] }
+                  ]}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setThemeMode('light');
+                  }}
+                >
+                  <MaterialCommunityIcons
+                    name="white-balance-sunny"
+                    size={20}
+                    color={themeMode === 'light' ? colors.primary[600] : colors.neutral[500]}
+                  />
+                  <Text style={[
+                    styles.themeOptionText,
+                    { color: themeMode === 'light' ? colors.primary[700] : colors.neutral[600] },
+                    themeMode === 'light' && { fontWeight: '600' }
+                  ]}>
+                    Light
+                  </Text>
+                  {themeMode === 'light' && (
+                    <MaterialCommunityIcons name="check-circle" size={18} color={colors.primary[600]} />
+                  )}
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.themeOption,
+                    { backgroundColor: colors.neutral[50], borderColor: themeMode === 'dark' ? colors.primary[500] : colors.neutral[200] },
+                    themeMode === 'dark' && { backgroundColor: colors.primary[50] }
+                  ]}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setThemeMode('dark');
+                  }}
+                >
+                  <MaterialCommunityIcons
+                    name="weather-night"
+                    size={20}
+                    color={themeMode === 'dark' ? colors.primary[600] : colors.neutral[500]}
+                  />
+                  <Text style={[
+                    styles.themeOptionText,
+                    { color: themeMode === 'dark' ? colors.primary[700] : colors.neutral[600] },
+                    themeMode === 'dark' && { fontWeight: '600' }
+                  ]}>
+                    Dark
+                  </Text>
+                  {themeMode === 'dark' && (
+                    <MaterialCommunityIcons name="check-circle" size={18} color={colors.primary[600]} />
+                  )}
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.themeOption,
+                    { backgroundColor: colors.neutral[50], borderColor: themeMode === 'system' ? colors.primary[500] : colors.neutral[200] },
+                    themeMode === 'system' && { backgroundColor: colors.primary[50] }
+                  ]}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setThemeMode('system');
+                  }}
+                >
+                  <MaterialCommunityIcons
+                    name="cellphone"
+                    size={20}
+                    color={themeMode === 'system' ? colors.primary[600] : colors.neutral[500]}
+                  />
+                  <Text style={[
+                    styles.themeOptionText,
+                    { color: themeMode === 'system' ? colors.primary[700] : colors.neutral[600] },
+                    themeMode === 'system' && { fontWeight: '600' }
+                  ]}>
+                    System
+                  </Text>
+                  {themeMode === 'system' && (
+                    <MaterialCommunityIcons name="check-circle" size={18} color={colors.primary[600]} />
+                  )}
+                </TouchableOpacity>
               </View>
 
               <View style={styles.themePreviewCard}>
-                <View style={[styles.themePreviewHalf, { backgroundColor: colors.neutral[0] }]}>
-                  <MaterialCommunityIcons name="white-balance-sunny" size={24} color={colors.accent.gold} />
-                  <Text style={[styles.themePreviewLabel, { color: colors.neutral[900] }]}>Light</Text>
+                <View style={[styles.themePreviewHalf, { backgroundColor: defaultColors.neutral[0] }]}>
+                  <MaterialCommunityIcons name="white-balance-sunny" size={24} color={defaultColors.accent.gold} />
+                  <Text style={[styles.themePreviewLabel, { color: defaultColors.neutral[900] }]}>Light</Text>
                 </View>
-                <View style={[styles.themePreviewHalf, { backgroundColor: colors.neutral[900] }]}>
-                  <MaterialCommunityIcons name="weather-night" size={24} color={colors.accent.lavender} />
-                  <Text style={[styles.themePreviewLabel, { color: colors.neutral[0] }]}>Dark</Text>
+                <View style={[styles.themePreviewHalf, { backgroundColor: defaultColors.neutral[900] }]}>
+                  <MaterialCommunityIcons name="weather-night" size={24} color={defaultColors.accent.lavender} />
+                  <Text style={[styles.themePreviewLabel, { color: defaultColors.neutral[0] }]}>Dark</Text>
                 </View>
               </View>
             </View>

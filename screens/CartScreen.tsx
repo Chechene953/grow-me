@@ -8,12 +8,14 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { CartItem } from '../components/CartItem';
 import { Button } from '../components/Button';
 import { useCartStore } from '../stores/cartStore';
-import { colors, spacing, borderRadius, shadows, typography } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
+import { colors as defaultColors, spacing, borderRadius, shadows, typography } from '../theme';
 
 // Tab bar height + bottom padding
 const TAB_BAR_HEIGHT = 90;
 
 export const CartScreen = () => {
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const { items, removeItem, updateQuantity, getSubtotal, getDeliveryFee, getTotal } = useCartStore();
   const router = useRouter();
@@ -32,7 +34,7 @@ export const CartScreen = () => {
 
   if (items.length === 0) {
     return (
-      <View style={styles.emptyContainer}>
+      <View style={[styles.emptyContainer, { backgroundColor: colors.neutral[50] }]}>
         <View style={styles.emptyIconContainer}>
           <LinearGradient
             colors={[colors.primary[100], colors.primary[50]]}
@@ -57,11 +59,11 @@ export const CartScreen = () => {
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <SafeAreaView style={styles.container} edges={['left', 'right', 'top']}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Your Cart</Text>
-        <View style={styles.itemCountBadge}>
-          <Text style={styles.itemCountText}>{itemCount} {itemCount === 1 ? 'item' : 'items'}</Text>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.neutral[50] }]} edges={['left', 'right', 'top']}>
+      <View style={[styles.header, { backgroundColor: colors.neutral[0] }]}>
+        <Text style={[styles.headerTitle, { color: colors.neutral[900] }]}>Your Cart</Text>
+        <View style={[styles.itemCountBadge, { backgroundColor: colors.primary[50] }]}>
+          <Text style={[styles.itemCountText, { color: colors.primary[700] }]}>{itemCount} {itemCount === 1 ? 'item' : 'items'}</Text>
         </View>
       </View>
 
@@ -153,7 +155,7 @@ export const CartScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
   },
   header: {
     flexDirection: 'row',
@@ -162,21 +164,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xl,
     paddingTop: spacing.lg,
     paddingBottom: spacing.md,
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
   },
   headerTitle: {
     ...typography.title2,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
   },
   itemCountBadge: {
-    backgroundColor: colors.primary[50],
+    backgroundColor: defaultColors.primary[50],
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
     borderRadius: borderRadius.pill,
   },
   itemCountText: {
     ...typography.footnote,
-    color: colors.primary[700],
+    color: defaultColors.primary[700],
     fontWeight: '600',
   },
   scrollView: {
@@ -188,7 +190,7 @@ const styles = StyleSheet.create({
   freeShippingBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.primary[50],
+    backgroundColor: defaultColors.primary[50],
     padding: spacing.md,
     borderRadius: borderRadius.lg,
     marginTop: spacing.sm,
@@ -196,12 +198,12 @@ const styles = StyleSheet.create({
   },
   freeShippingText: {
     ...typography.footnote,
-    color: colors.neutral[700],
+    color: defaultColors.neutral[700],
     flex: 1,
   },
   freeShippingAmount: {
     fontWeight: '700',
-    color: colors.primary[600],
+    color: defaultColors.primary[600],
   },
   footerWrapper: {
     position: 'absolute',
@@ -256,18 +258,18 @@ const styles = StyleSheet.create({
   },
   summaryLabel: {
     ...typography.body,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
   },
   summaryValue: {
     ...typography.body,
     fontWeight: '600',
-    color: colors.neutral[800],
+    color: defaultColors.neutral[800],
   },
   freeDelivery: {
-    color: colors.semantic.success,
+    color: defaultColors.semantic.success,
   },
   freeTag: {
-    backgroundColor: colors.semantic.success,
+    backgroundColor: defaultColors.semantic.success,
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
     borderRadius: borderRadius.sm,
@@ -275,7 +277,7 @@ const styles = StyleSheet.create({
   freeTagText: {
     fontSize: 10,
     fontWeight: '700',
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
   },
   divider: {
     height: 1,
@@ -284,18 +286,18 @@ const styles = StyleSheet.create({
   },
   summaryTotalLabel: {
     ...typography.title3,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
   },
   summaryTotalValue: {
     ...typography.title2,
-    color: colors.primary[700],
+    color: defaultColors.primary[700],
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: spacing.xl,
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
   },
   emptyIconContainer: {
     marginBottom: spacing.xl,
@@ -309,12 +311,12 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     ...typography.title2,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     marginBottom: spacing.sm,
   },
   emptySubtext: {
     ...typography.body,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
     textAlign: 'center',
     marginBottom: spacing.xl,
   },

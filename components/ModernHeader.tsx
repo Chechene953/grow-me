@@ -4,7 +4,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
-import { colors, spacing, typography, borderRadius } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
+import { colors as defaultColors, spacing, typography, borderRadius } from '../theme';
 
 interface ModernHeaderProps {
   title?: string;
@@ -30,6 +31,7 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const { colors, isDark } = useTheme();
 
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
@@ -52,7 +54,7 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
   const BackButton = () => (
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <TouchableOpacity
-        style={styles.backButton}
+        style={[styles.backButton, { backgroundColor: colors.primary[50] }]}
         onPress={() => router.back()}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
@@ -70,7 +72,7 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
 
   const ActionButton = ({ icon, onPress }: { icon: keyof typeof MaterialCommunityIcons.glyphMap; onPress: () => void }) => (
     <TouchableOpacity
-      style={styles.actionButton}
+      style={[styles.actionButton, { backgroundColor: colors.neutral[100] }]}
       onPress={onPress}
       activeOpacity={0.7}
       hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -97,7 +99,7 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
 
       {title && (
         <View style={styles.titleContainer}>
-          <Text style={styles.title} numberOfLines={1}>
+          <Text style={[styles.title, { color: colors.neutral[900] }]} numberOfLines={1}>
             {title}
           </Text>
         </View>
@@ -124,10 +126,10 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
   return (
     <BlurView
       intensity={Platform.OS === 'ios' ? 80 : 100}
-      tint="light"
-      style={styles.blurContainer}
+      tint={isDark ? 'dark' : 'light'}
+      style={[styles.blurContainer, { borderBottomColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)' }]}
     >
-      <View style={styles.blurOverlay} />
+      <View style={[styles.blurOverlay, { backgroundColor: isDark ? 'rgba(18, 18, 18, 0.92)' : 'rgba(255, 255, 255, 0.92)' }]} />
       {headerContent}
     </BlurView>
   );
@@ -171,14 +173,14 @@ const styles = StyleSheet.create({
   },
   title: {
     ...typography.title3,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     fontWeight: '600',
   },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.primary[50],
+    backgroundColor: defaultColors.primary[50],
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -186,7 +188,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
     justifyContent: 'center',
     alignItems: 'center',
   },

@@ -1,7 +1,8 @@
 import React, { useRef } from 'react';
 import { Text, StyleSheet, View, TouchableOpacity, Animated } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, shadows, typography } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
+import { colors as defaultColors, spacing, borderRadius, shadows, typography } from '../theme';
 
 interface CategoryChipProps {
   label: string;
@@ -30,6 +31,7 @@ export const CategoryChip: React.FC<CategoryChipProps> = ({
   selected = false,
   onPress,
 }) => {
+  const { colors } = useTheme();
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {
@@ -57,7 +59,9 @@ export const CategoryChip: React.FC<CategoryChipProps> = ({
       <TouchableOpacity
         style={[
           styles.chip,
-          selected ? styles.chipSelected : styles.chipUnselected,
+          selected
+            ? [styles.chipSelected, { backgroundColor: colors.primary[600], borderColor: colors.primary[600] }]
+            : [styles.chipUnselected, { backgroundColor: colors.primary[50], borderColor: colors.primary[200] }],
         ]}
         onPress={onPress}
         onPressIn={handlePressIn}
@@ -71,7 +75,7 @@ export const CategoryChip: React.FC<CategoryChipProps> = ({
             color={selected ? colors.neutral[0] : colors.primary[600]}
           />
         </View>
-        <Text style={[styles.text, selected && styles.textSelected]}>{label}</Text>
+        <Text style={[styles.text, { color: colors.primary[700] }, selected && { color: colors.neutral[0] }]}>{label}</Text>
       </TouchableOpacity>
     </Animated.View>
   );
@@ -87,14 +91,14 @@ const styles = StyleSheet.create({
     marginRight: spacing.sm,
   },
   chipUnselected: {
-    backgroundColor: colors.primary[50],
+    backgroundColor: defaultColors.primary[50],
     borderWidth: 1,
-    borderColor: colors.primary[200],
+    borderColor: defaultColors.primary[200],
   },
   chipSelected: {
-    backgroundColor: colors.primary[600],
+    backgroundColor: defaultColors.primary[600],
     borderWidth: 1,
-    borderColor: colors.primary[600],
+    borderColor: defaultColors.primary[600],
     ...shadows.sm,
   },
   iconContainer: {
@@ -102,10 +106,10 @@ const styles = StyleSheet.create({
   },
   text: {
     ...typography.footnote,
-    color: colors.primary[700],
+    color: defaultColors.primary[700],
     fontWeight: '600',
   },
   textSelected: {
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
   },
 });

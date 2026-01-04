@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,18 +7,13 @@ import {
   Image,
   TouchableOpacity,
   ActivityIndicator,
+  Animated,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  withDelay,
-} from 'react-native-reanimated';
 import { Button } from '../components/Button';
 import { orderService } from '../services/orderService';
 import { useAuthStore } from '../stores/authStore';
@@ -34,17 +29,36 @@ export const OrderConfirmationScreen = () => {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Animation values
-  const checkScale = useSharedValue(0);
-  const cardOpacity = useSharedValue(0);
-  const cardTranslateY = useSharedValue(30);
+  // Animation values using React Native's Animated API
+  const checkScale = useRef(new Animated.Value(0)).current;
+  const cardOpacity = useRef(new Animated.Value(0)).current;
+  const cardTranslateY = useRef(new Animated.Value(30)).current;
 
   useEffect(() => {
     loadOrder();
     // Trigger animations
-    checkScale.value = withSpring(1, { damping: 8, stiffness: 100 });
-    cardOpacity.value = withDelay(300, withSpring(1));
-    cardTranslateY.value = withDelay(300, withSpring(0));
+    Animated.spring(checkScale, {
+      toValue: 1,
+      friction: 8,
+      tension: 100,
+      useNativeDriver: true,
+    }).start();
+
+    Animated.parallel([
+      Animated.timing(cardOpacity, {
+        toValue: 1,
+        duration: 400,
+        delay: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(cardTranslateY, {
+        toValue: 0,
+        duration: 400,
+        delay: 300,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   }, []);
 
@@ -59,15 +73,6 @@ export const OrderConfirmationScreen = () => {
       setLoading(false);
     }
   };
-
-  const checkAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: checkScale.value }],
-  }));
-
-  const cardAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: cardOpacity.value,
-    transform: [{ translateY: cardTranslateY.value }],
-  }));
 
   const handleContinueShopping = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -98,7 +103,7 @@ export const OrderConfirmationScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         {/* Success Animation */}
-        <Animated.View style={[styles.successContainer, checkAnimatedStyle]}>
+        <Animated.View style={[styles.successContainer, { transform: [{ scale: checkScale }] }]}>
           <LinearGradient
             colors={[colors.semantic.success, '#45a049']}
             style={styles.successCircle}
@@ -114,13 +119,13 @@ export const OrderConfirmationScreen = () => {
         </Text>
 
         {/* Order Number */}
-        <Animated.View style={[styles.orderNumberCard, cardAnimatedStyle]}>
+        <Animated.View style={[styles.orderNumberCard, { opacity: cardOpacity, transform: [{ translateY: cardTranslateY }] }]}>
           <Text style={styles.orderNumberLabel}>Order Number</Text>
           <Text style={styles.orderNumber}>#{orderId?.slice(-8).toUpperCase()}</Text>
         </Animated.View>
 
         {/* Email Notification */}
-        <Animated.View style={[styles.infoCard, cardAnimatedStyle]}>
+        <Animated.View style={[styles.infoCard, { opacity: cardOpacity, transform: [{ translateY: cardTranslateY }] }]}>
           <View style={styles.infoIconContainer}>
             <MaterialCommunityIcons name="email-check-outline" size={28} color={colors.primary[600]} />
           </View>
@@ -134,7 +139,7 @@ export const OrderConfirmationScreen = () => {
         </Animated.View>
 
         {/* Tracking Info */}
-        <Animated.View style={[styles.infoCard, cardAnimatedStyle]}>
+        <Animated.View style={[styles.infoCard, { opacity: cardOpacity, transform: [{ translateY: cardTranslateY }] }]}>
           <View style={[styles.infoIconContainer, { backgroundColor: colors.accent.gold + '20' }]}>
             <MaterialCommunityIcons name="truck-fast-outline" size={28} color={colors.accent.gold} />
           </View>
@@ -148,7 +153,7 @@ export const OrderConfirmationScreen = () => {
 
         {/* Order Summary */}
         {order && (
-          <Animated.View style={[styles.summaryCard, cardAnimatedStyle]}>
+          <Animated.View style={[styles.summaryCard, { opacity: cardOpacity, transform: [{ translateY: cardTranslateY }] }]}>
             <Text style={styles.sectionTitle}>Order Summary</Text>
 
             {/* Items */}
@@ -201,7 +206,7 @@ export const OrderConfirmationScreen = () => {
         )}
 
         {/* Estimated Delivery */}
-        <Animated.View style={[styles.deliveryCard, cardAnimatedStyle]}>
+        <Animated.View style={[styles.deliveryCard, { opacity: cardOpacity, transform: [{ translateY: cardTranslateY }] }]}>
           <MaterialCommunityIcons name="calendar-clock" size={24} color={colors.primary[600]} />
           <View style={styles.deliveryContent}>
             <Text style={styles.deliveryTitle}>Estimated Delivery</Text>

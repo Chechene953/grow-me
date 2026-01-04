@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -20,7 +20,8 @@ import * as Haptics from 'expo-haptics';
 import { useAuthStore } from '../stores/authStore';
 import { orderService } from '../services/orderService';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, shadows, typography } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
+import { colors as defaultColors, spacing, borderRadius, shadows, typography } from '../theme';
 import { SkeletonLoader, ProfileMenuSkeleton } from '../components/SkeletonLoader';
 
 const TAB_BAR_HEIGHT = 100;
@@ -48,6 +49,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
   showArrow = true,
   rightElement,
 }) => {
+  const { colors } = useTheme();
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {
@@ -85,8 +87,9 @@ const MenuItem: React.FC<MenuItemProps> = ({
         <View
           style={[
             styles.menuIconContainer,
-            danger && styles.menuIconContainerDanger,
-            premium && styles.menuIconContainerPremium,
+            { backgroundColor: colors.primary[50] },
+            danger && { backgroundColor: `${colors.semantic.error}15` },
+            premium && { backgroundColor: `${colors.accent.gold}20` },
           ]}
         >
           <MaterialCommunityIcons
@@ -102,19 +105,19 @@ const MenuItem: React.FC<MenuItemProps> = ({
           />
         </View>
         <View style={styles.menuTextContainer}>
-          <Text style={[styles.menuItemText, danger && styles.menuItemTextDanger]}>
+          <Text style={[styles.menuItemText, { color: colors.neutral[800] }, danger && { color: colors.semantic.error }]}>
             {label}
           </Text>
-          {subtitle && <Text style={styles.menuSubtext}>{subtitle}</Text>}
+          {subtitle && <Text style={[styles.menuSubtext, { color: colors.neutral[500] }]}>{subtitle}</Text>}
         </View>
         {badge !== undefined && badge > 0 && (
-          <View style={styles.menuBadge}>
-            <Text style={styles.menuBadgeText}>{badge}</Text>
+          <View style={[styles.menuBadge, { backgroundColor: colors.primary[600] }]}>
+            <Text style={[styles.menuBadgeText, { color: colors.neutral[0] }]}>{badge}</Text>
           </View>
         )}
         {premium && (
-          <View style={styles.proBadge}>
-            <Text style={styles.proBadgeText}>PRO</Text>
+          <View style={[styles.proBadge, { backgroundColor: colors.accent.gold }]}>
+            <Text style={[styles.proBadgeText, { color: colors.neutral[900] }]}>PRO</Text>
           </View>
         )}
         {rightElement}
@@ -135,33 +138,37 @@ const QuickStats: React.FC<{
   orders: number;
   favorites: number;
   plants: number;
-}> = ({ orders, favorites, plants }) => (
-  <View style={styles.statsContainer}>
-    <View style={styles.statCard}>
-      <View style={[styles.statIconBg, { backgroundColor: colors.primary[50] }]}>
-        <MaterialCommunityIcons name="package-variant" size={20} color={colors.primary[600]} />
+}> = ({ orders, favorites, plants }) => {
+  const { colors } = useTheme();
+
+  return (
+    <View style={[styles.statsContainer, { backgroundColor: colors.neutral[0] }]}>
+      <View style={styles.statCard}>
+        <View style={[styles.statIconBg, { backgroundColor: colors.primary[50] }]}>
+          <MaterialCommunityIcons name="package-variant" size={20} color={colors.primary[600]} />
+        </View>
+        <Text style={[styles.statNumber, { color: colors.neutral[900] }]}>{orders}</Text>
+        <Text style={[styles.statLabel, { color: colors.neutral[500] }]}>Orders</Text>
       </View>
-      <Text style={styles.statNumber}>{orders}</Text>
-      <Text style={styles.statLabel}>Orders</Text>
-    </View>
-    <View style={styles.statDivider} />
-    <View style={styles.statCard}>
-      <View style={[styles.statIconBg, { backgroundColor: `${colors.semantic.error}15` }]}>
-        <MaterialCommunityIcons name="heart" size={20} color={colors.semantic.error} />
+      <View style={[styles.statDivider, { backgroundColor: colors.neutral[100] }]} />
+      <View style={styles.statCard}>
+        <View style={[styles.statIconBg, { backgroundColor: `${colors.semantic.error}15` }]}>
+          <MaterialCommunityIcons name="heart" size={20} color={colors.semantic.error} />
+        </View>
+        <Text style={[styles.statNumber, { color: colors.neutral[900] }]}>{favorites}</Text>
+        <Text style={[styles.statLabel, { color: colors.neutral[500] }]}>Favorites</Text>
       </View>
-      <Text style={styles.statNumber}>{favorites}</Text>
-      <Text style={styles.statLabel}>Favorites</Text>
-    </View>
-    <View style={styles.statDivider} />
-    <View style={styles.statCard}>
-      <View style={[styles.statIconBg, { backgroundColor: colors.semantic.success + '20' }]}>
-        <MaterialCommunityIcons name="flower-tulip" size={20} color={colors.semantic.success} />
+      <View style={[styles.statDivider, { backgroundColor: colors.neutral[100] }]} />
+      <View style={styles.statCard}>
+        <View style={[styles.statIconBg, { backgroundColor: colors.semantic.success + '20' }]}>
+          <MaterialCommunityIcons name="flower-tulip" size={20} color={colors.semantic.success} />
+        </View>
+        <Text style={[styles.statNumber, { color: colors.neutral[900] }]}>{plants}</Text>
+        <Text style={[styles.statLabel, { color: colors.neutral[500] }]}>Plants</Text>
       </View>
-      <Text style={styles.statNumber}>{plants}</Text>
-      <Text style={styles.statLabel}>Plants</Text>
     </View>
-  </View>
-);
+  );
+};
 
 // Loading State
 const ProfileSkeleton: React.FC = () => (
@@ -184,6 +191,7 @@ export const ProfileScreen = () => {
   const insets = useSafeAreaInsets();
   const { user, signOut, loadUser } = useAuthStore();
   const router = useRouter();
+  const { colors } = useTheme();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
@@ -247,7 +255,7 @@ export const ProfileScreen = () => {
   }
 
   return (
-    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+    <Animated.View style={[styles.container, { opacity: fadeAnim, backgroundColor: colors.neutral[100] }]}>
       <ScrollView
         contentContainerStyle={{ paddingBottom: TAB_BAR_HEIGHT + spacing.xl }}
         showsVerticalScrollIndicator={false}
@@ -320,15 +328,15 @@ export const ProfileScreen = () => {
 
         {/* Menu sections */}
         <View style={styles.menuSection}>
-          <Text style={styles.sectionTitle}>My Account</Text>
-          <View style={styles.menuCard}>
+          <Text style={[styles.sectionTitle, { color: colors.neutral[500] }]}>My Account</Text>
+          <View style={[styles.menuCard, { backgroundColor: colors.neutral[0] }]}>
             <MenuItem
               icon="package-variant"
               label="My Orders"
               subtitle="Track and manage your orders"
               onPress={() => router.push('/orders')}
             />
-            <View style={styles.menuDivider} />
+            <View style={[styles.menuDivider, { backgroundColor: colors.neutral[100] }]} />
             <MenuItem
               icon="heart"
               label="Favorites"
@@ -336,14 +344,14 @@ export const ProfileScreen = () => {
               onPress={() => router.push('/favorites')}
               badge={user?.favorites?.length || 0}
             />
-            <View style={styles.menuDivider} />
+            <View style={[styles.menuDivider, { backgroundColor: colors.neutral[100] }]} />
             <MenuItem
               icon="account-edit"
               label="Edit Profile"
               subtitle="Update your information"
               onPress={() => router.push('/edit-profile')}
             />
-            <View style={styles.menuDivider} />
+            <View style={[styles.menuDivider, { backgroundColor: colors.neutral[100] }]} />
             <MenuItem
               icon="map-marker-outline"
               label="Addresses"
@@ -354,15 +362,15 @@ export const ProfileScreen = () => {
         </View>
 
         <View style={styles.menuSection}>
-          <Text style={styles.sectionTitle}>Plant Care</Text>
-          <View style={styles.menuCard}>
+          <Text style={[styles.sectionTitle, { color: colors.neutral[500] }]}>Plant Care</Text>
+          <View style={[styles.menuCard, { backgroundColor: colors.neutral[0] }]}>
             <MenuItem
               icon="book-open-page-variant"
               label="Care Tips"
               subtitle="Learn how to care for your plants"
               onPress={() => router.push('/care-tips')}
             />
-            <View style={styles.menuDivider} />
+            <View style={[styles.menuDivider, { backgroundColor: colors.neutral[100] }]} />
             <MenuItem
               icon="bell-outline"
               label="Watering Reminders"
@@ -382,8 +390,8 @@ export const ProfileScreen = () => {
         </View>
 
         <View style={styles.menuSection}>
-          <Text style={styles.sectionTitle}>Subscription</Text>
-          <View style={styles.menuCard}>
+          <Text style={[styles.sectionTitle, { color: colors.neutral[500] }]}>Subscription</Text>
+          <View style={[styles.menuCard, { backgroundColor: colors.neutral[0] }]}>
             <MenuItem
               icon="crown"
               label="Premium Membership"
@@ -391,7 +399,7 @@ export const ProfileScreen = () => {
               onPress={() => router.push('/subscription-manage')}
               premium
             />
-            <View style={styles.menuDivider} />
+            <View style={[styles.menuDivider, { backgroundColor: colors.neutral[100] }]} />
             <MenuItem
               icon="shield-check"
               label="Plant Insurance"
@@ -402,29 +410,29 @@ export const ProfileScreen = () => {
         </View>
 
         <View style={styles.menuSection}>
-          <Text style={styles.sectionTitle}>Support</Text>
-          <View style={styles.menuCard}>
+          <Text style={[styles.sectionTitle, { color: colors.neutral[500] }]}>Support</Text>
+          <View style={[styles.menuCard, { backgroundColor: colors.neutral[0] }]}>
             <MenuItem
               icon="help-circle-outline"
               label="Help Center"
               subtitle="FAQs and support"
               onPress={() => router.push('/help-center')}
             />
-            <View style={styles.menuDivider} />
+            <View style={[styles.menuDivider, { backgroundColor: colors.neutral[100] }]} />
             <MenuItem
               icon="chat"
               label="Live Chat"
               subtitle="Chat with our support team"
               onPress={() => router.push('/live-chat')}
             />
-            <View style={styles.menuDivider} />
+            <View style={[styles.menuDivider, { backgroundColor: colors.neutral[100] }]} />
             <MenuItem
               icon="message-text-outline"
               label="Contact Us"
               subtitle="Get in touch with our team"
               onPress={() => router.push('/contact')}
             />
-            <View style={styles.menuDivider} />
+            <View style={[styles.menuDivider, { backgroundColor: colors.neutral[100] }]} />
             <MenuItem
               icon="file-document-outline"
               label="Terms & Privacy"
@@ -435,7 +443,7 @@ export const ProfileScreen = () => {
         </View>
 
         <View style={styles.menuSection}>
-          <View style={styles.menuCard}>
+          <View style={[styles.menuCard, { backgroundColor: colors.neutral[0] }]}>
             <MenuItem
               icon="logout"
               label="Sign Out"
@@ -448,12 +456,12 @@ export const ProfileScreen = () => {
 
         {/* App Info */}
         <View style={styles.appInfo}>
-          <View style={styles.appLogoContainer}>
+          <View style={[styles.appLogoContainer, { backgroundColor: colors.primary[50] }]}>
             <MaterialCommunityIcons name="leaf" size={24} color={colors.primary[600]} />
           </View>
-          <Text style={styles.appName}>GrowMe</Text>
-          <Text style={styles.version}>Version 1.0.0</Text>
-          <Text style={styles.copyright}>Made with love for plant lovers</Text>
+          <Text style={[styles.appName, { color: colors.neutral[800] }]}>GrowMe</Text>
+          <Text style={[styles.version, { color: colors.neutral[400] }]}>Version 1.0.0</Text>
+          <Text style={[styles.copyright, { color: colors.neutral[400] }]}>Made with love for plant lovers</Text>
         </View>
       </ScrollView>
     </Animated.View>

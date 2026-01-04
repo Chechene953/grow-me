@@ -22,12 +22,14 @@ import { PremiumPicker, COUNTRIES, getStatesForCountry } from '../components/Pre
 import { useAuthStore } from '../stores/authStore';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { colors, spacing, borderRadius, shadows, typography } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
+import { colors as defaultColors, spacing, borderRadius, shadows, typography } from '../theme';
 
 export const EditProfileScreen = () => {
   const { user, updateProfile } = useAuthStore();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
   const [phone, setPhone] = useState('');
@@ -128,7 +130,7 @@ export const EditProfileScreen = () => {
   const states = getStatesForCountry(countryCode);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.neutral[50] }]}>
       <ModernHeader title="Edit Profile" />
 
       <KeyboardAvoidingView
@@ -184,16 +186,16 @@ export const EditProfileScreen = () => {
           </View>
 
           {/* Personal Information */}
-          <View style={styles.section}>
+          <View style={[styles.section, { backgroundColor: colors.neutral[0] }]}>
             <View style={styles.sectionHeader}>
-              <View style={styles.sectionIconContainer}>
+              <View style={[styles.sectionIconContainer, { backgroundColor: colors.primary[50] }]}>
                 <MaterialCommunityIcons
                   name="account-circle-outline"
                   size={20}
                   color={colors.primary[600]}
                 />
               </View>
-              <Text style={styles.sectionTitle}>Personal Information</Text>
+              <Text style={[styles.sectionTitle, { color: colors.neutral[800] }]}>Personal Information</Text>
             </View>
 
             <Input
@@ -235,16 +237,16 @@ export const EditProfileScreen = () => {
           </View>
 
           {/* Address */}
-          <View style={styles.section}>
+          <View style={[styles.section, { backgroundColor: colors.neutral[0] }]}>
             <View style={styles.sectionHeader}>
-              <View style={styles.sectionIconContainer}>
+              <View style={[styles.sectionIconContainer, { backgroundColor: colors.primary[50] }]}>
                 <MaterialCommunityIcons
                   name="map-marker-outline"
                   size={20}
                   color={colors.primary[600]}
                 />
               </View>
-              <Text style={styles.sectionTitle}>Delivery Address</Text>
+              <Text style={[styles.sectionTitle, { color: colors.neutral[800] }]}>Delivery Address</Text>
             </View>
 
             <Input
@@ -287,11 +289,13 @@ export const EditProfileScreen = () => {
               label="Country"
               value={countryCode}
               options={COUNTRIES}
-              onChange={(value) => {
+              onValueChange={(value) => {
                 setCountryCode(value);
                 setStateValue(''); // Reset state when country changes
               }}
               placeholder="Select country"
+              searchable
+              icon="earth"
             />
 
             {states.length > 0 && (
@@ -299,23 +303,25 @@ export const EditProfileScreen = () => {
                 label={countryCode === 'CA' ? 'Province' : 'State'}
                 value={stateValue}
                 options={states}
-                onChange={setStateValue}
+                onValueChange={setStateValue}
                 placeholder={`Select ${countryCode === 'CA' ? 'province' : 'state'}`}
+                searchable
+                icon="map-marker"
               />
             )}
           </View>
 
           {/* Password Section */}
-          <View style={styles.section}>
+          <View style={[styles.section, { backgroundColor: colors.neutral[0] }]}>
             <View style={styles.sectionHeader}>
-              <View style={styles.sectionIconContainer}>
+              <View style={[styles.sectionIconContainer, { backgroundColor: colors.primary[50] }]}>
                 <MaterialCommunityIcons
                   name="lock-outline"
                   size={20}
                   color={colors.primary[600]}
                 />
               </View>
-              <Text style={styles.sectionTitle}>Security</Text>
+              <Text style={[styles.sectionTitle, { color: colors.neutral[800] }]}>Security</Text>
             </View>
 
             <TouchableOpacity

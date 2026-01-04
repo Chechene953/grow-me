@@ -1,7 +1,8 @@
 import React, { useRef } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions, Animated } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors, typography, spacing, shadows, borderRadius } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
+import { colors as defaultColors, typography, spacing, shadows, borderRadius } from '../theme';
 import { Plant } from '../types';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -23,6 +24,7 @@ export const PlantCardPremium: React.FC<PlantCardPremiumProps> = ({
   onFavorite,
   isFavorite = false,
 }) => {
+  const { colors } = useTheme();
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const heartScaleAnim = useRef(new Animated.Value(1)).current;
 
@@ -79,7 +81,7 @@ export const PlantCardPremium: React.FC<PlantCardPremiumProps> = ({
   }[plant.careLevel];
 
   return (
-    <Animated.View style={[styles.card, { transform: [{ scale: scaleAnim }] }]}>
+    <Animated.View style={[styles.card, { transform: [{ scale: scaleAnim }], backgroundColor: colors.neutral[0] }]}>
       <TouchableOpacity
         onPress={onPress}
         onPressIn={handlePressIn}
@@ -122,27 +124,27 @@ export const PlantCardPremium: React.FC<PlantCardPremiumProps> = ({
         </View>
 
         <View style={styles.content}>
-          <Text style={styles.name} numberOfLines={1}>
+          <Text style={[styles.name, { color: colors.neutral[800] }]} numberOfLines={1}>
             {plant.name}
           </Text>
 
-          <Text style={styles.category} numberOfLines={1}>
+          <Text style={[styles.category, { color: colors.neutral[500] }]} numberOfLines={1}>
             {plant.category}
           </Text>
 
           <View style={styles.footer}>
-            <Text style={styles.price}>
+            <Text style={[styles.price, { color: colors.primary[600] }]}>
               <Text style={styles.currencySymbol}>$</Text>
               {plant.basePrice.toFixed(2)}
             </Text>
 
-            <View style={styles.lightBadge}>
+            <View style={[styles.lightBadge, { backgroundColor: `${colors.accent.gold}15` }]}>
               <MaterialCommunityIcons
                 name="white-balance-sunny"
                 size={11}
                 color={colors.accent.gold}
               />
-              <Text style={styles.lightText}>{plant.lightPreference}</Text>
+              <Text style={[styles.lightText, { color: colors.accent.gold }]}>{plant.lightPreference}</Text>
             </View>
           </View>
         </View>
@@ -154,7 +156,7 @@ export const PlantCardPremium: React.FC<PlantCardPremiumProps> = ({
 const styles = StyleSheet.create({
   card: {
     width: CARD_WIDTH,
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderRadius: borderRadius.xl,
     overflow: 'hidden',
     marginBottom: spacing.md,
@@ -164,7 +166,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: IMAGE_HEIGHT,
     position: 'relative',
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
   },
   image: {
     width: '100%',
@@ -194,7 +196,7 @@ const styles = StyleSheet.create({
   },
   careBadgeText: {
     fontSize: 9,
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
     fontWeight: '700',
   },
   airPurifyBadge: {
@@ -204,7 +206,7 @@ const styles = StyleSheet.create({
     width: 26,
     height: 26,
     borderRadius: 13,
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     justifyContent: 'center',
     alignItems: 'center',
     ...shadows.sm,
@@ -215,12 +217,12 @@ const styles = StyleSheet.create({
   },
   name: {
     ...typography.bodyMedium,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     marginBottom: 2,
   },
   category: {
     ...typography.caption,
-    color: colors.neutral[400],
+    color: defaultColors.neutral[400],
     marginBottom: spacing.sm,
   },
   footer: {
@@ -230,7 +232,7 @@ const styles = StyleSheet.create({
   },
   price: {
     fontSize: 17,
-    color: colors.primary[700],
+    color: defaultColors.primary[700],
     fontWeight: '700',
   },
   currencySymbol: {
@@ -240,7 +242,7 @@ const styles = StyleSheet.create({
   lightBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: `${colors.accent.gold}20`,
+    backgroundColor: `${defaultColors.accent.gold}20`,
     paddingHorizontal: spacing.sm,
     paddingVertical: 3,
     borderRadius: borderRadius.sm,
@@ -248,7 +250,7 @@ const styles = StyleSheet.create({
   },
   lightText: {
     fontSize: 10,
-    color: colors.neutral[600],
+    color: defaultColors.neutral[600],
     fontWeight: '600',
   },
 });

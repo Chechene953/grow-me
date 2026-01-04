@@ -11,7 +11,8 @@ import { useAuthStore } from '../stores/authStore';
 import { favoriteService } from '../services/favoriteService';
 import { Plant, PlantCategory } from '../types';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors, spacing } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
+import { colors as defaultColors, spacing } from '../theme';
 
 const CATEGORIES: PlantCategory[] = [
   'Low Light',
@@ -24,6 +25,7 @@ const CATEGORIES: PlantCategory[] = [
 ];
 
 export const HomeScreen = () => {
+  const { colors } = useTheme();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<PlantCategory | null>(null);
   const [filteredPlants, setFilteredPlants] = useState<Plant[]>([]);
@@ -85,10 +87,10 @@ export const HomeScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.neutral[100] }]}>
       <PremiumHeader userName={user?.name} />
 
-      <View style={styles.searchContainer}>
+      <View style={[styles.searchContainer, { backgroundColor: colors.neutral[0] }]}>
         <SearchBar value={searchTerm} onChangeText={setSearchTerm} />
       </View>
 
@@ -98,7 +100,7 @@ export const HomeScreen = () => {
         visible={searchTerm.length > 0 && !selectedCategory}
       />
 
-      <View style={styles.categoriesContainer}>
+      <View style={[styles.categoriesContainer, { backgroundColor: colors.neutral[0] }]}>
         <FlatList
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -138,7 +140,7 @@ export const HomeScreen = () => {
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
               <MaterialCommunityIcons name="leaf-off" size={64} color={colors.neutral[300]} />
-              <Text style={styles.emptyText}>No plants found</Text>
+              <Text style={[styles.emptyText, { color: colors.neutral[500] }]}>No plants found</Text>
             </View>
           }
         />

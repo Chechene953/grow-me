@@ -22,7 +22,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ModernHeader } from '../components/ModernHeader';
 import { OrderCardSkeleton } from '../components/SkeletonLoader';
 import { Button } from '../components/Button';
-import { colors, spacing, borderRadius, shadows, typography } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
+import { colors as defaultColors, spacing, borderRadius, shadows, typography } from '../theme';
 
 const STATUS_CONFIG: Record<OrderStatus, {
   color: string;
@@ -31,8 +32,8 @@ const STATUS_CONFIG: Record<OrderStatus, {
   label: string;
 }> = {
   'Processing': {
-    color: colors.accent.gold,
-    bgColor: `${colors.accent.gold}15`,
+    color: defaultColors.accent.gold,
+    bgColor: `${defaultColors.accent.gold}15`,
     icon: 'clock-outline',
     label: 'Processing'
   },
@@ -49,14 +50,14 @@ const STATUS_CONFIG: Record<OrderStatus, {
     label: 'Out for Delivery'
   },
   'Delivered': {
-    color: colors.semantic.success,
-    bgColor: `${colors.semantic.success}15`,
+    color: defaultColors.semantic.success,
+    bgColor: `${defaultColors.semantic.success}15`,
     icon: 'check-circle-outline',
     label: 'Delivered'
   },
   'Cancelled': {
-    color: colors.semantic.error,
-    bgColor: `${colors.semantic.error}15`,
+    color: defaultColors.semantic.error,
+    bgColor: `${defaultColors.semantic.error}15`,
     icon: 'close-circle-outline',
     label: 'Cancelled'
   },
@@ -162,7 +163,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
               <MaterialCommunityIcons
                 name="chevron-down"
                 size={24}
-                color={colors.neutral[400]}
+                color={defaultColors.neutral[400]}
               />
             </Animated.View>
           </View>
@@ -202,7 +203,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
         {/* Estimated Delivery */}
         {order.estimatedDelivery && order.status !== 'Delivered' && order.status !== 'Cancelled' && (
           <View style={styles.estimatedDelivery}>
-            <MaterialCommunityIcons name="calendar-clock" size={16} color={colors.primary[600]} />
+            <MaterialCommunityIcons name="calendar-clock" size={16} color={defaultColors.primary[600]} />
             <Text style={styles.estimatedText}>
               Estimated delivery: {formatDate(order.estimatedDelivery)}
             </Text>
@@ -229,21 +230,21 @@ const OrderCard: React.FC<OrderCardProps> = ({
                       <View style={styles.timelineIconContainer}>
                         <View style={[
                           styles.timelineDot,
-                          isCompleted && { backgroundColor: colors.primary[600] },
+                          isCompleted && { backgroundColor: defaultColors.primary[600] },
                           isCurrent && styles.timelineDotCurrent,
                         ]}>
                           {isCompleted && (
                             <MaterialCommunityIcons
                               name="check"
                               size={12}
-                              color={colors.neutral[0]}
+                              color={defaultColors.neutral[0]}
                             />
                           )}
                         </View>
                         {index < TRACKING_STEPS.length - 1 && (
                           <View style={[
                             styles.timelineLine,
-                            isCompleted && { backgroundColor: colors.primary[600] },
+                            isCompleted && { backgroundColor: defaultColors.primary[600] },
                           ]} />
                         )}
                       </View>
@@ -281,13 +282,13 @@ const OrderCard: React.FC<OrderCardProps> = ({
               }}
             >
               <View style={styles.trackingLeft}>
-                <MaterialCommunityIcons name="barcode" size={20} color={colors.primary[600]} />
+                <MaterialCommunityIcons name="barcode" size={20} color={defaultColors.primary[600]} />
                 <View>
                   <Text style={styles.trackingLabel}>{order.carrier || 'Carrier'}</Text>
                   <Text style={styles.trackingNumber}>{order.trackingNumber}</Text>
                 </View>
               </View>
-              <MaterialCommunityIcons name="open-in-new" size={18} color={colors.neutral[400]} />
+              <MaterialCommunityIcons name="open-in-new" size={18} color={defaultColors.neutral[400]} />
             </TouchableOpacity>
           )}
 
@@ -295,23 +296,23 @@ const OrderCard: React.FC<OrderCardProps> = ({
           <View style={styles.actionButtons}>
             {order.status !== 'Cancelled' && order.status !== 'Delivered' && order.canCancel !== false && (
               <TouchableOpacity style={styles.actionButton} onPress={onCancel}>
-                <MaterialCommunityIcons name="close-circle-outline" size={18} color={colors.semantic.error} />
-                <Text style={[styles.actionButtonText, { color: colors.semantic.error }]}>
+                <MaterialCommunityIcons name="close-circle-outline" size={18} color={defaultColors.semantic.error} />
+                <Text style={[styles.actionButtonText, { color: defaultColors.semantic.error }]}>
                   Cancel Order
                 </Text>
               </TouchableOpacity>
             )}
             {order.status === 'Delivered' && (
               <TouchableOpacity style={styles.actionButton} onPress={onReorder}>
-                <MaterialCommunityIcons name="refresh" size={18} color={colors.primary[600]} />
-                <Text style={[styles.actionButtonText, { color: colors.primary[600] }]}>
+                <MaterialCommunityIcons name="refresh" size={18} color={defaultColors.primary[600]} />
+                <Text style={[styles.actionButtonText, { color: defaultColors.primary[600] }]}>
                   Reorder
                 </Text>
               </TouchableOpacity>
             )}
             <TouchableOpacity style={[styles.actionButton, styles.actionButtonPrimary]} onPress={onTrack}>
-              <MaterialCommunityIcons name="eye-outline" size={18} color={colors.neutral[0]} />
-              <Text style={[styles.actionButtonText, { color: colors.neutral[0] }]}>
+              <MaterialCommunityIcons name="eye-outline" size={18} color={defaultColors.neutral[0]} />
+              <Text style={[styles.actionButtonText, { color: defaultColors.neutral[0] }]}>
                 View Details
               </Text>
             </TouchableOpacity>
@@ -323,6 +324,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
 };
 
 export const OrdersScreen = () => {
+  const { colors } = useTheme();
   const router = useRouter();
   const { user } = useAuthStore();
   const [orders, setOrders] = useState<Order[]>([]);
@@ -460,11 +462,11 @@ export const OrdersScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.neutral[50] }]}>
       <ModernHeader title="My Orders" />
 
       {/* Filter Tabs */}
-      <View style={styles.filterContainer}>
+      <View style={[styles.filterContainer, { backgroundColor: colors.neutral[0] }]}>
         {(['all', 'active', 'completed'] as const).map((f) => (
           <TouchableOpacity
             key={f}
@@ -521,13 +523,13 @@ export const OrdersScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
   },
   filterContainer: {
     flexDirection: 'row',
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     gap: spacing.sm,
   },
   filterTab: {
@@ -536,25 +538,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.pill,
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
     gap: spacing.xs,
   },
   filterTabActive: {
-    backgroundColor: colors.primary[600],
+    backgroundColor: defaultColors.primary[600],
   },
   filterTabText: {
     ...typography.footnote,
     fontWeight: '600',
-    color: colors.neutral[600],
+    color: defaultColors.neutral[600],
   },
   filterTabTextActive: {
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
   },
   filterBadge: {
     minWidth: 18,
     height: 18,
     borderRadius: 9,
-    backgroundColor: colors.semantic.error,
+    backgroundColor: defaultColors.semantic.error,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 4,
@@ -562,14 +564,14 @@ const styles = StyleSheet.create({
   filterBadgeText: {
     fontSize: 10,
     fontWeight: '700',
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
   },
   listContent: {
     padding: spacing.lg,
     paddingBottom: 120,
   },
   orderCard: {
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderRadius: borderRadius.xl,
     marginBottom: spacing.md,
     overflow: 'hidden',
@@ -585,11 +587,11 @@ const styles = StyleSheet.create({
   orderId: {
     ...typography.callout,
     fontWeight: '700',
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
   },
   orderDate: {
     ...typography.footnote,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
     marginTop: 2,
   },
   headerRight: {
@@ -625,34 +627,34 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
     borderWidth: 2,
-    borderColor: colors.neutral[0],
-    backgroundColor: colors.neutral[100],
+    borderColor: defaultColors.neutral[0],
+    backgroundColor: defaultColors.neutral[100],
   },
   itemImage: {
     width: '100%',
     height: '100%',
   },
   moreItems: {
-    backgroundColor: colors.primary[100],
+    backgroundColor: defaultColors.primary[100],
     justifyContent: 'center',
     alignItems: 'center',
   },
   moreItemsText: {
     ...typography.caption,
     fontWeight: '600',
-    color: colors.primary[700],
+    color: defaultColors.primary[700],
   },
   itemsInfo: {
     alignItems: 'flex-end',
   },
   itemsCount: {
     ...typography.footnote,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
   },
   orderTotal: {
     ...typography.title3,
     fontWeight: '700',
-    color: colors.primary[700],
+    color: defaultColors.primary[700],
   },
   estimatedDelivery: {
     flexDirection: 'row',
@@ -660,13 +662,13 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing.lg,
     marginBottom: spacing.md,
     padding: spacing.sm,
-    backgroundColor: colors.primary[50],
+    backgroundColor: defaultColors.primary[50],
     borderRadius: borderRadius.lg,
     gap: spacing.xs,
   },
   estimatedText: {
     ...typography.footnote,
-    color: colors.primary[700],
+    color: defaultColors.primary[700],
     fontWeight: '500',
   },
   expandedContent: {
@@ -676,7 +678,7 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     paddingTop: 0,
     borderTopWidth: 1,
-    borderTopColor: colors.neutral[100],
+    borderTopColor: defaultColors.neutral[100],
   },
   trackingSection: {
     marginBottom: spacing.md,
@@ -684,7 +686,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     ...typography.footnote,
     fontWeight: '600',
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: spacing.md,
@@ -705,20 +707,20 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: colors.neutral[200],
+    backgroundColor: defaultColors.neutral[200],
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: colors.neutral[0],
+    borderColor: defaultColors.neutral[0],
   },
   timelineDotCurrent: {
     borderWidth: 3,
-    borderColor: colors.primary[200],
+    borderColor: defaultColors.primary[200],
   },
   timelineLine: {
     width: 2,
     flex: 1,
-    backgroundColor: colors.neutral[200],
+    backgroundColor: defaultColors.neutral[200],
     marginVertical: 2,
   },
   timelineContent: {
@@ -728,14 +730,14 @@ const styles = StyleSheet.create({
   },
   timelineLabel: {
     ...typography.footnote,
-    color: colors.neutral[400],
+    color: defaultColors.neutral[400],
   },
   timelineLabelActive: {
-    color: colors.neutral[700],
+    color: defaultColors.neutral[700],
     fontWeight: '500',
   },
   timelineLabelCurrent: {
-    color: colors.primary[700],
+    color: defaultColors.primary[700],
     fontWeight: '600',
   },
   trackingInfo: {
@@ -743,7 +745,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: spacing.md,
-    backgroundColor: colors.neutral[50],
+    backgroundColor: defaultColors.neutral[50],
     borderRadius: borderRadius.lg,
     marginBottom: spacing.md,
   },
@@ -754,12 +756,12 @@ const styles = StyleSheet.create({
   },
   trackingLabel: {
     ...typography.caption,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
   },
   trackingNumber: {
     ...typography.callout,
     fontWeight: '600',
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
   },
   actionButtons: {
@@ -775,11 +777,11 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     borderRadius: borderRadius.lg,
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
     gap: spacing.xs,
   },
   actionButtonPrimary: {
-    backgroundColor: colors.primary[600],
+    backgroundColor: defaultColors.primary[600],
   },
   actionButtonText: {
     ...typography.footnote,
@@ -801,12 +803,12 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     ...typography.title2,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     marginBottom: spacing.sm,
   },
   emptySubtext: {
     ...typography.body,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
     textAlign: 'center',
     maxWidth: 280,
   },
@@ -816,7 +818,7 @@ const styles = StyleSheet.create({
   },
   emptyFilterText: {
     ...typography.body,
-    color: colors.neutral[400],
+    color: defaultColors.neutral[400],
     marginTop: spacing.md,
   },
 });
