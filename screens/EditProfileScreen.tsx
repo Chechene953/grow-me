@@ -23,7 +23,7 @@ import { useAuthStore } from '../stores/authStore';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useTheme } from '../contexts/ThemeContext';
-import { colors as defaultColors, spacing, borderRadius, shadows, typography } from '../theme';
+import { colors, spacing, borderRadius, shadows, typography } from '../theme';
 
 export const EditProfileScreen = () => {
   const { user, updateProfile } = useAuthStore();
@@ -311,76 +311,6 @@ export const EditProfileScreen = () => {
             )}
           </View>
 
-          {/* Password Section */}
-          <View style={[styles.section, { backgroundColor: colors.neutral[0] }]}>
-            <View style={styles.sectionHeader}>
-              <View style={[styles.sectionIconContainer, { backgroundColor: colors.primary[50] }]}>
-                <MaterialCommunityIcons
-                  name="lock-outline"
-                  size={20}
-                  color={colors.primary[600]}
-                />
-              </View>
-              <Text style={[styles.sectionTitle, { color: colors.neutral[800] }]}>Security</Text>
-            </View>
-
-            <TouchableOpacity
-              style={styles.securityItem}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                Alert.alert('Change Password', 'Password change coming soon!');
-              }}
-              activeOpacity={0.7}
-            >
-              <View style={styles.securityItemLeft}>
-                <MaterialCommunityIcons
-                  name="key-outline"
-                  size={22}
-                  color={colors.neutral[600]}
-                />
-                <View style={styles.securityItemText}>
-                  <Text style={styles.securityItemTitle}>Change Password</Text>
-                  <Text style={styles.securityItemSubtitle}>
-                    Update your account password
-                  </Text>
-                </View>
-              </View>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={22}
-                color={colors.neutral[300]}
-              />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.securityItem}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                Alert.alert('Two-Factor Auth', '2FA setup coming soon!');
-              }}
-              activeOpacity={0.7}
-            >
-              <View style={styles.securityItemLeft}>
-                <MaterialCommunityIcons
-                  name="shield-check-outline"
-                  size={22}
-                  color={colors.neutral[600]}
-                />
-                <View style={styles.securityItemText}>
-                  <Text style={styles.securityItemTitle}>
-                    Two-Factor Authentication
-                  </Text>
-                  <Text style={styles.securityItemSubtitle}>
-                    Add extra security to your account
-                  </Text>
-                </View>
-              </View>
-              <View style={styles.securityBadge}>
-                <Text style={styles.securityBadgeText}>Off</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-
           {/* Save Button */}
           <TouchableOpacity
             style={[styles.saveButton, loading && styles.saveButtonDisabled]}
@@ -556,46 +486,6 @@ const styles = StyleSheet.create({
   },
   flex1: {
     flex: 1,
-  },
-
-  // Security Section
-  securityItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.neutral[100],
-  },
-  securityItemLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    flex: 1,
-  },
-  securityItemText: {
-    flex: 1,
-  },
-  securityItemTitle: {
-    ...typography.callout,
-    fontWeight: '600',
-    color: colors.neutral[800],
-  },
-  securityItemSubtitle: {
-    ...typography.footnote,
-    color: colors.neutral[500],
-    marginTop: 2,
-  },
-  securityBadge: {
-    backgroundColor: colors.neutral[200],
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    borderRadius: borderRadius.sm,
-  },
-  securityBadgeText: {
-    ...typography.caption,
-    fontWeight: '600',
-    color: colors.neutral[600],
   },
 
   // Save Button

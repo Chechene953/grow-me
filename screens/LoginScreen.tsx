@@ -7,7 +7,6 @@ import { useRouter } from 'expo-router';
 import { getFirebaseErrorMessage } from '../utils/errorMessages';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
-import * as AppleAuthentication from 'expo-apple-authentication';
 import * as AuthSession from 'expo-auth-session';
 
 WebBrowser.maybeCompleteAuthSession();
@@ -16,7 +15,7 @@ export const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { signIn, loading, signInWithGoogle, signInWithApple } = useAuthStore();
+  const { signIn, loading, signInWithGoogle } = useAuthStore();
   const router = useRouter();
 
   const expoClientId = process.env.EXPO_PUBLIC_GOOGLE_EXPO_CLIENT_ID;
@@ -168,40 +167,6 @@ export const LoginScreen = () => {
               style={styles.socialButton}
               icon="google"
             />
-
-            {Platform.OS === 'ios' && (
-              <AppleAuthentication.AppleAuthenticationButton
-                buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
-                buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
-                cornerRadius={8}
-                style={styles.appleButton}
-                onPress={async () => {
-                  try {
-                    const array = new Uint8Array(32);
-                    for (let i = 0; i < 32; i++) {
-                      array[i] = Math.floor(Math.random() * 256);
-                    }
-                    const nonce = Array.from(array, b => b.toString(16).padStart(2, '0')).join('');
-                    const credential = await AppleAuthentication.signInAsync({
-                      requestedScopes: [
-                        AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-                        AppleAuthentication.AppleAuthenticationScope.EMAIL,
-                      ],
-                      state: nonce,
-                    });
-                    if (credential.identityToken) {
-                      await signInWithApple(credential.identityToken, nonce, {
-                        name: `${credential.fullName?.givenName || ''} ${credential.fullName?.familyName || ''}`.trim() || undefined,
-                        email: credential.email || undefined,
-                      });
-                    }
-                  } catch (err: any) {
-                    if (err?.code === 'ERR_CANCELED') return;
-                    setError(getFirebaseErrorMessage(err));
-                  }
-                }}
-              />
-            )}
           </View>
 
           <View style={styles.footer}>
@@ -212,6 +177,12 @@ export const LoginScreen = () => {
             >
               Sign Up
             </Text>
+          </View>
+
+          <View style={styles.testCredentials}>
+            <Text style={styles.testTitle}>Test Account</Text>
+            <Text style={styles.testText}>Email: test@growme.com</Text>
+            <Text style={styles.testText}>Password: Test123!</Text>
           </View>
         </View>
       </ScrollView>
@@ -291,9 +262,27 @@ const styles = StyleSheet.create({
   socialButton: {
     marginTop: 0,
   },
-  appleButton: {
-    height: 44,
-    width: '100%',
-    marginTop: 8,
+  testCredentials: {
+    marginTop: 32,
+    padding: 16,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderStyle: 'dashed',
+  },
+  testTitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#666',
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  testText: {
+    fontSize: 14,
+    color: '#333',
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    marginBottom: 4,
   },
 });

@@ -2,24 +2,9 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
-    "module": "commonjs",
-    "esModuleInterop": true,
-    "skipLibCheck": true,
     "paths": {
-      "@/*": [
-        "./*"
-      ]
-    },
-    "ts-node": {
-      "esm": false,
-      "compilerOptions": {
-        "module": "commonjs"
-      }
+      "@/*": ["./*"]
     }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx"
-  ]
+  "include": ["**/*.ts", "**/*.tsx"]
 }
-

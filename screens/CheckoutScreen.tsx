@@ -25,9 +25,9 @@ import { useAuthStore } from '../stores/authStore';
 import { orderService } from '../services/orderService';
 import { Address } from '../types';
 import { useTheme } from '../contexts/ThemeContext';
-import { colors as defaultColors, spacing, borderRadius, shadows, typography } from '../theme';
+import { colors, spacing, borderRadius, shadows, typography } from '../theme';
 
-type PaymentMethod = 'card' | 'apple_pay' | 'google_pay' | 'paypal';
+type PaymentMethod = 'card' | 'google_pay';
 
 interface PaymentMethodConfig {
   id: PaymentMethod;
@@ -37,9 +37,7 @@ interface PaymentMethodConfig {
 }
 
 const PAYMENT_METHODS: PaymentMethodConfig[] = [
-  { id: 'apple_pay', label: 'Apple Pay', iconName: 'apple', available: Platform.OS === 'ios' },
   { id: 'google_pay', label: 'Google Pay', iconName: 'google', available: Platform.OS === 'android' },
-  { id: 'paypal', label: 'PayPal', iconName: 'paypal', available: true },
   { id: 'card', label: 'Credit Card', iconName: 'credit-card-outline', available: true },
 ];
 
@@ -109,14 +107,13 @@ export const CheckoutScreen = () => {
   };
 
   const handleDigitalWalletPayment = async (method: PaymentMethod) => {
-    // In a real app, this would integrate with the native payment APIs
     Alert.alert(
-      `${method === 'apple_pay' ? 'Apple Pay' : method === 'google_pay' ? 'Google Pay' : 'PayPal'}`,
-      'This would open the native payment sheet. For demo purposes, we\'ll simulate a successful payment.',
+      'Google Pay',
+      'Google Pay will be available in the production version.',
       [
         { text: 'Cancel', style: 'cancel', onPress: () => setSelectedPaymentMethod('card') },
         {
-          text: 'Simulate Payment',
+          text: 'Continue',
           onPress: () => {
             setPaymentIntentId(`${method}_${Date.now()}`);
             setPaymentCompleted(true);

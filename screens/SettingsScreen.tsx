@@ -21,7 +21,7 @@ import { ModernHeader } from '../components/ModernHeader';
 import { useAuthStore } from '../stores/authStore';
 import { useTheme, ThemeMode, ThemeColors } from '../contexts/ThemeContext';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors as defaultColors, spacing, borderRadius, shadows, typography } from '../theme';
+import { colors, spacing, borderRadius, shadows, typography } from '../theme';
 
 interface SettingItemProps {
   icon: keyof typeof MaterialCommunityIcons.glyphMap;
@@ -965,13 +965,13 @@ export const SettingsScreen = () => {
               </View>
 
               <View style={styles.themePreviewCard}>
-                <View style={[styles.themePreviewHalf, { backgroundColor: defaultColors.neutral[0] }]}>
-                  <MaterialCommunityIcons name="white-balance-sunny" size={24} color={defaultColors.accent.gold} />
-                  <Text style={[styles.themePreviewLabel, { color: defaultColors.neutral[900] }]}>Light</Text>
+                <View style={[styles.themePreviewHalf, { backgroundColor: colors.neutral[0] }]}>
+                  <MaterialCommunityIcons name="white-balance-sunny" size={24} color={colors.accent.gold} />
+                  <Text style={[styles.themePreviewLabel, { color: colors.neutral[900] }]}>Light</Text>
                 </View>
-                <View style={[styles.themePreviewHalf, { backgroundColor: defaultColors.neutral[900] }]}>
-                  <MaterialCommunityIcons name="weather-night" size={24} color={defaultColors.accent.lavender} />
-                  <Text style={[styles.themePreviewLabel, { color: defaultColors.neutral[0] }]}>Dark</Text>
+                <View style={[styles.themePreviewHalf, { backgroundColor: colors.neutral[900] }]}>
+                  <MaterialCommunityIcons name="weather-night" size={24} color={colors.accent.lavender} />
+                  <Text style={[styles.themePreviewLabel, { color: colors.neutral[0] }]}>Dark</Text>
                 </View>
               </View>
             </View>

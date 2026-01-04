@@ -1,4 +1,6 @@
 node_modules/
+stripe-backend/node_modules/
+stripe-backend/.vercel/
 .expo/
 .expo-shared/
 dist/

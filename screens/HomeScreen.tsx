@@ -12,7 +12,7 @@ import { favoriteService } from '../services/favoriteService';
 import { Plant, PlantCategory } from '../types';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
-import { colors as defaultColors, spacing } from '../theme';
+import { colors, spacing } from '../theme';
 
 const CATEGORIES: PlantCategory[] = [
   'Low Light',

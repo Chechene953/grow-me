@@ -80,7 +80,7 @@ const QUICK_REPLIES: Record<string, QuickReply> = {
   },
   'Update payment method': {
     text: 'Update payment method',
-    response: 'To update your payment method:\n\n1. Go to Profile > Settings\n2. Select "Payment Methods"\n3. Add or edit your card details\n\nWe accept Visa, Mastercard, Amex, Apple Pay, Google Pay, and PayPal.',
+    response: 'To update your payment method:\n\n1. Go to Profile > Settings\n2. Select "Payment Methods"\n3. Add or edit your card details\n\nWe accept Visa, Mastercard, Amex, and Google Pay.',
   },
   'Subscription Help': {
     text: 'Subscription Help',

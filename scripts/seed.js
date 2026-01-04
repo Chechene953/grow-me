@@ -5,14 +5,21 @@
 const { initializeApp } = require('firebase/app');
 const { getFirestore, collection, addDoc, getDocs, deleteDoc, Timestamp } = require('firebase/firestore');
 
-// Firebase configuration
+// Firebase configuration - requires .env file with EXPO_PUBLIC_FIREBASE_* variables
+require('dotenv').config();
+
 const firebaseConfig = {
-  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY || 'AIzaSyCvz8nVsHT7ffEY6-aGqgxcMPHGiNrvvPE',
-  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN || 'growme-9e45f.firebaseapp.com',
-  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID || 'growme-9e45f',
-  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '317576532523',
-  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID || '1:317576532523:web:37d556eba2a469f1ad106e',
+  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
+
+if (!firebaseConfig.apiKey) {
+  console.error('Error: Firebase configuration not found. Make sure .env file exists with EXPO_PUBLIC_FIREBASE_* variables.');
+  process.exit(1);
+}
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);

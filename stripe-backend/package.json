@@ -1,0 +1,12 @@
+{
+  "name": "growme-stripe-backend",
+  "version": "1.0.0",
+  "description": "Stripe backend for GrowMe app - Deploy to Vercel",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "stripe": "^14.10.0"
+  }
+}

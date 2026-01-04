@@ -15,13 +15,12 @@ import {
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { useAuthStore } from '../stores/authStore';
 import { orderService } from '../services/orderService';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
-import { colors as defaultColors, spacing, borderRadius, shadows, typography } from '../theme';
+import { colors, spacing, borderRadius, shadows, typography } from '../theme';
 import { SkeletonLoader, ProfileMenuSkeleton } from '../components/SkeletonLoader';
 
 const TAB_BAR_HEIGHT = 100;
@@ -281,9 +280,9 @@ export const ProfileScreen = () => {
               router.push('/settings');
             }}
           >
-            <BlurView intensity={80} tint="light" style={styles.settingsBlur}>
+            <View style={[styles.settingsBlur, { backgroundColor: 'rgba(255, 255, 255, 0.9)' }]}>
               <MaterialCommunityIcons name="cog-outline" size={22} color={colors.primary[700]} />
-            </BlurView>
+            </View>
           </TouchableOpacity>
 
           <TouchableOpacity
