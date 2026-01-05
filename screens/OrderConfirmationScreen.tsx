@@ -76,12 +76,12 @@ export const OrderConfirmationScreen = () => {
 
   const handleContinueShopping = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.replace('/(tabs)/shop');
+    router.replace('/(tabs)');
   };
 
   const handleViewOrders = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.replace('/my-orders');
+    router.replace('/orders');
   };
 
   if (loading) {

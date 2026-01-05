@@ -1,11 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, Platform } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { CardField, useStripe, useConfirmPayment } from '@stripe/stripe-react-native';
+import Constants from 'expo-constants';
 import { colors, spacing, borderRadius, shadows, typography } from '../theme';
 import { ENV } from '../utils/env';
+import { DemoPaymentForm } from './DemoPaymentForm';
+
+// Check if running in Expo Go
+const isExpoGo = Constants.appOwnership === 'expo';
+
+// Only import Stripe if not in Expo Go
+let CardForm: any = null;
+let useConfirmPayment: any = null;
+let useStripe: any = null;
+
+if (!isExpoGo) {
+  try {
+    const stripe = require('@stripe/stripe-react-native');
+    CardForm = stripe.CardForm;
+    useConfirmPayment = stripe.useConfirmPayment;
+    useStripe = stripe.useStripe;
+  } catch (e) {
+    console.log('Stripe native module not available');
+  }
+}
 
 interface PaymentFormProps {
   amount: number;
@@ -18,7 +38,35 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
   onPaymentSuccess,
   onPaymentError,
 }) => {
+  // If in Expo Go, use the demo form
+  if (isExpoGo || !CardForm) {
+    return (
+      <DemoPaymentForm
+        amount={amount}
+        onPaymentSuccess={onPaymentSuccess}
+        onPaymentError={onPaymentError}
+      />
+    );
+  }
+
+  // Native Stripe implementation for production builds
+  return (
+    <NativePaymentForm
+      amount={amount}
+      onPaymentSuccess={onPaymentSuccess}
+      onPaymentError={onPaymentError}
+    />
+  );
+};
+
+// Native Stripe payment form for production builds
+const NativePaymentForm: React.FC<PaymentFormProps> = ({
+  amount,
+  onPaymentSuccess,
+  onPaymentError,
+}) => {
   const [cardComplete, setCardComplete] = useState(false);
+  const [cardDetails, setCardDetails] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const { confirmPayment } = useConfirmPayment();
   const stripe = useStripe();
@@ -103,11 +151,7 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
 
       <View style={styles.card}>
         <Text style={styles.label}>Card Details</Text>
-        <CardField
-          postalCodeEnabled={true}
-          placeholders={{
-            number: '4242 4242 4242 4242',
-          }}
+        <CardForm
           cardStyle={{
             backgroundColor: colors.neutral[50],
             textColor: colors.neutral[900],
@@ -116,9 +160,12 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
             borderRadius: 12,
             fontSize: 16,
             placeholderColor: colors.neutral[400],
+            cursorColor: colors.primary[600],
           }}
-          style={styles.cardField}
-          onCardChange={(details) => {
+          style={styles.cardForm}
+          onFormComplete={(details: any) => {
+            console.log('CardForm details:', JSON.stringify(details, null, 2));
+            setCardDetails(details);
             setCardComplete(details.complete);
           }}
         />
@@ -213,9 +260,9 @@ const styles = StyleSheet.create({
     color: colors.neutral[700],
     marginBottom: spacing.sm,
   },
-  cardField: {
+  cardForm: {
     width: '100%',
-    height: 50,
+    height: 220,
     marginVertical: spacing.xs,
   },
   payButtonContainer: {

@@ -15,31 +15,32 @@ export const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [googleLoading, setGoogleLoading] = useState(false);
   const { signIn, loading, signInWithGoogle } = useAuthStore();
   const router = useRouter();
 
-  const expoClientId = process.env.EXPO_PUBLIC_GOOGLE_EXPO_CLIENT_ID;
+  const clientId = process.env.EXPO_PUBLIC_GOOGLE_EXPO_CLIENT_ID;
   const iosClientIdEnv = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;
   const androidClientIdEnv = process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID;
   const webClientIdEnv = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
 
-  const iosClientId = iosClientIdEnv || expoClientId;
+  const iosClientId = iosClientIdEnv || clientId;
 
   const redirectUri = AuthSession.makeRedirectUri({
-    useProxy: true,
+    scheme: 'growme',
   });
 
-  const googleConfig: Parameters<typeof Google.useAuthRequest>[0] | null = expoClientId ? {
-    expoClientId: expoClientId,
-    webClientId: webClientIdEnv || expoClientId,
-    iosClientId: iosClientId || expoClientId,
-    androidClientId: androidClientIdEnv || expoClientId,
+  const googleConfig: Partial<Google.GoogleAuthRequestConfig> | null = clientId ? {
+    clientId: clientId,
+    webClientId: webClientIdEnv || clientId,
+    iosClientId: iosClientId || clientId,
+    androidClientId: androidClientIdEnv || clientId,
     scopes: ['profile', 'email'],
     redirectUri: redirectUri,
   } : null;
 
   const [request, response, promptAsync] = Google.useAuthRequest(googleConfig || {
-    expoClientId: '',
+    clientId: '',
     iosClientId: '',
     androidClientId: '',
     webClientId: '',
@@ -51,6 +52,8 @@ export const LoginScreen = () => {
       if (!response) {
         return;
       }
+
+      setGoogleLoading(false);
 
       if (response?.type === 'success') {
         const idToken = response.authentication?.idToken;
@@ -72,6 +75,8 @@ export const LoginScreen = () => {
         } else {
           setError(getFirebaseErrorMessage({ message: errorMessage }));
         }
+      } else if (response?.type === 'cancel' || response?.type === 'dismiss') {
+        // User cancelled the auth flow
       }
     };
     run();
@@ -157,13 +162,18 @@ export const LoginScreen = () => {
             <Button
               title="Continue with Google"
               onPress={() => {
-                if (!expoClientId) {
+                if (!clientId) {
                   setError('Google Sign-In is not configured. Please add EXPO_PUBLIC_GOOGLE_EXPO_CLIENT_ID to your .env file and restart the app.');
                   return;
                 }
-                promptAsync();
+                if (googleLoading) {
+                  return; // Prevent multiple calls
+                }
+                setGoogleLoading(true);
+                promptAsync().catch(() => setGoogleLoading(false));
               }}
-              disabled={!request || !expoClientId}
+              disabled={!request || !clientId || googleLoading}
+              loading={googleLoading}
               style={styles.socialButton}
               icon="google"
             />
