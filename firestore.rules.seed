@@ -7,6 +7,7 @@ service cloud.firestore {
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
+
     
     // Plants collection - TEMPORARY: allow write for seeding
     // ⚠️ WARNING: These rules allow public write access
