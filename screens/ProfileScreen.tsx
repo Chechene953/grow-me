@@ -272,7 +272,7 @@ export const ProfileScreen = () => {
           colors={[colors.primary[600], colors.primary[500]]}
           style={[styles.header, { paddingTop: insets.top + spacing.xl }]}
         >
-          {/* Settings Button */}
+          {/* Settings Button - Made more prominent */}
           <TouchableOpacity
             style={[styles.settingsButton, { top: insets.top + spacing.md }]}
             onPress={() => {
@@ -280,8 +280,8 @@ export const ProfileScreen = () => {
               router.push('/settings');
             }}
           >
-            <View style={[styles.settingsBlur, { backgroundColor: 'rgba(255, 255, 255, 0.9)' }]}>
-              <MaterialCommunityIcons name="cog-outline" size={22} color={colors.primary[700]} />
+            <View style={[styles.settingsBlur, { backgroundColor: colors.neutral[0] }]}>
+              <MaterialCommunityIcons name="cog" size={24} color={colors.primary[600]} />
             </View>
           </TouchableOpacity>
 
@@ -497,12 +497,13 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   settingsBlur: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
+    ...shadows.md,
   },
   avatarContainer: {
     position: 'relative',

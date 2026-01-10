@@ -32,7 +32,7 @@ export const EditProfileScreen = () => {
   const { colors } = useTheme();
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState((user as any)?.phone || '');
   const [street, setStreet] = useState(user?.address?.street || '');
   const [city, setCity] = useState(user?.address?.city || '');
   const [stateValue, setStateValue] = useState(user?.address?.state || '');
@@ -105,6 +105,7 @@ export const EditProfileScreen = () => {
     try {
       await updateProfile({
         name: name.trim(),
+        phone: phone.trim() || undefined,
         address: {
           street,
           city,

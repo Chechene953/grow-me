@@ -2,33 +2,6 @@
 
 ## For Testers - January 7, 2026
 
----
-
-## Option 1: Test via Developer's Expo Server (Recommended)
-
-1. Install **Expo Go** on your phone
-   - [iOS App Store](https://apps.apple.com/app/expo-go/id982107779)
-   - [Google Play Store](https://play.google.com/store/apps/details?id=host.exp.exponent)
-
-2. Connect to the same WiFi network as the developer
-
-3. Scan the QR code provided by the developer
-
-4. Use the test account:
-   - Email: `test@growme.com`
-   - Password: `Test123!`
-
----
-
-## Option 2: Set Up Your Own Instance
-
-Follow the [SETUP.md](./SETUP.md) guide to configure:
-- Firebase project
-- Google Sign-In
-- Stripe payments
-- Environment variables
-
----
 
 ## Test Scenarios
 

@@ -72,6 +72,7 @@ interface OrderCardProps {
   onReorder: () => void;
   expanded: boolean;
   onToggle: () => void;
+  themeColors: typeof defaultColors;
 }
 
 const OrderCard: React.FC<OrderCardProps> = ({
@@ -81,6 +82,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
   onReorder,
   expanded,
   onToggle,
+  themeColors,
 }) => {
   const expandAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -135,7 +137,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
   });
 
   return (
-    <Animated.View style={[styles.orderCard, { transform: [{ scale: scaleAnim }] }]}>
+    <Animated.View style={[styles.orderCard, { transform: [{ scale: scaleAnim }], backgroundColor: themeColors.neutral[0] }]}>
       <TouchableOpacity
         onPress={onToggle}
         onPressIn={handlePressIn}
@@ -145,8 +147,8 @@ const OrderCard: React.FC<OrderCardProps> = ({
         {/* Header */}
         <View style={styles.orderHeader}>
           <View>
-            <Text style={styles.orderId}>Order #{order.id.slice(0, 8).toUpperCase()}</Text>
-            <Text style={styles.orderDate}>{formatDate(order.createdAt)}</Text>
+            <Text style={[styles.orderId, { color: themeColors.neutral[900] }]}>Order #{order.id.slice(0, 8).toUpperCase()}</Text>
+            <Text style={[styles.orderDate, { color: themeColors.neutral[500] }]}>{formatDate(order.createdAt)}</Text>
           </View>
           <View style={styles.headerRight}>
             <View style={[styles.statusBadge, { backgroundColor: statusConfig.bgColor }]}>
@@ -163,7 +165,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
               <MaterialCommunityIcons
                 name="chevron-down"
                 size={24}
-                color={defaultColors.neutral[400]}
+                color={themeColors.neutral[400]}
               />
             </Animated.View>
           </View>
@@ -177,7 +179,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
                 key={index}
                 style={[
                   styles.itemImageContainer,
-                  { marginLeft: index > 0 ? -12 : 0, zIndex: 3 - index }
+                  { marginLeft: index > 0 ? -12 : 0, zIndex: 3 - index, borderColor: themeColors.neutral[0], backgroundColor: themeColors.neutral[100] }
                 ]}
               >
                 <Image
@@ -187,24 +189,24 @@ const OrderCard: React.FC<OrderCardProps> = ({
               </View>
             ))}
             {order.items.length > 3 && (
-              <View style={[styles.itemImageContainer, styles.moreItems, { marginLeft: -12 }]}>
-                <Text style={styles.moreItemsText}>+{order.items.length - 3}</Text>
+              <View style={[styles.itemImageContainer, styles.moreItems, { marginLeft: -12, backgroundColor: themeColors.primary[100] }]}>
+                <Text style={[styles.moreItemsText, { color: themeColors.primary[700] }]}>+{order.items.length - 3}</Text>
               </View>
             )}
           </View>
           <View style={styles.itemsInfo}>
-            <Text style={styles.itemsCount}>
+            <Text style={[styles.itemsCount, { color: themeColors.neutral[500] }]}>
               {order.items.reduce((sum, item) => sum + item.quantity, 0)} item(s)
             </Text>
-            <Text style={styles.orderTotal}>${order.total.toFixed(2)}</Text>
+            <Text style={[styles.orderTotal, { color: themeColors.primary[700] }]}>${order.total.toFixed(2)}</Text>
           </View>
         </View>
 
         {/* Estimated Delivery */}
         {order.estimatedDelivery && order.status !== 'Delivered' && order.status !== 'Cancelled' && (
-          <View style={styles.estimatedDelivery}>
-            <MaterialCommunityIcons name="calendar-clock" size={16} color={defaultColors.primary[600]} />
-            <Text style={styles.estimatedText}>
+          <View style={[styles.estimatedDelivery, { backgroundColor: themeColors.primary[50] }]}>
+            <MaterialCommunityIcons name="calendar-clock" size={16} color={themeColors.primary[600]} />
+            <Text style={[styles.estimatedText, { color: themeColors.primary[700] }]}>
               Estimated delivery: {formatDate(order.estimatedDelivery)}
             </Text>
           </View>
@@ -213,11 +215,11 @@ const OrderCard: React.FC<OrderCardProps> = ({
 
       {/* Expanded Content */}
       <Animated.View style={[styles.expandedContent, { height: expandedHeight }]}>
-        <View style={styles.expandedInner}>
+        <View style={[styles.expandedInner, { borderTopColor: themeColors.neutral[100] }]}>
           {/* Tracking Timeline - only show for active orders */}
           {order.status !== 'Delivered' && order.status !== 'Cancelled' && (
             <View style={styles.trackingSection}>
-              <Text style={styles.sectionTitle}>Order Progress</Text>
+              <Text style={[styles.sectionTitle, { color: themeColors.neutral[500] }]}>Order Progress</Text>
               <View style={styles.timeline}>
                 {TRACKING_STEPS.map((step, index) => {
                   const currentIndex = getCurrentStepIndex();
@@ -230,29 +232,32 @@ const OrderCard: React.FC<OrderCardProps> = ({
                       <View style={styles.timelineIconContainer}>
                         <View style={[
                           styles.timelineDot,
-                          isCompleted && { backgroundColor: defaultColors.primary[600] },
-                          isCurrent && styles.timelineDotCurrent,
+                          { backgroundColor: themeColors.neutral[200], borderColor: themeColors.neutral[0] },
+                          isCompleted && { backgroundColor: themeColors.primary[600] },
+                          isCurrent && { borderColor: themeColors.primary[200] },
                         ]}>
                           {isCompleted && (
                             <MaterialCommunityIcons
                               name="check"
                               size={12}
-                              color={defaultColors.neutral[0]}
+                              color={themeColors.neutral[0]}
                             />
                           )}
                         </View>
                         {index < TRACKING_STEPS.length - 1 && (
                           <View style={[
                             styles.timelineLine,
-                            isCompleted && { backgroundColor: defaultColors.primary[600] },
+                            { backgroundColor: themeColors.neutral[200] },
+                            isCompleted && { backgroundColor: themeColors.primary[600] },
                           ]} />
                         )}
                       </View>
                       <View style={styles.timelineContent}>
                         <Text style={[
                           styles.timelineLabel,
-                          isCompleted && styles.timelineLabelActive,
-                          isCurrent && styles.timelineLabelCurrent,
+                          { color: themeColors.neutral[400] },
+                          isCompleted && { color: themeColors.neutral[700] },
+                          isCurrent && { color: themeColors.primary[700] },
                         ]}>
                           {stepConfig.label}
                         </Text>
@@ -267,7 +272,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
           {/* Tracking Number */}
           {order.trackingNumber && (
             <TouchableOpacity
-              style={styles.trackingInfo}
+              style={[styles.trackingInfo, { backgroundColor: themeColors.neutral[50] }]}
               onPress={() => {
                 if (order.carrier) {
                   // Open carrier tracking page
@@ -282,37 +287,37 @@ const OrderCard: React.FC<OrderCardProps> = ({
               }}
             >
               <View style={styles.trackingLeft}>
-                <MaterialCommunityIcons name="barcode" size={20} color={defaultColors.primary[600]} />
+                <MaterialCommunityIcons name="barcode" size={20} color={themeColors.primary[600]} />
                 <View>
-                  <Text style={styles.trackingLabel}>{order.carrier || 'Carrier'}</Text>
-                  <Text style={styles.trackingNumber}>{order.trackingNumber}</Text>
+                  <Text style={[styles.trackingLabel, { color: themeColors.neutral[500] }]}>{order.carrier || 'Carrier'}</Text>
+                  <Text style={[styles.trackingNumber, { color: themeColors.neutral[900] }]}>{order.trackingNumber}</Text>
                 </View>
               </View>
-              <MaterialCommunityIcons name="open-in-new" size={18} color={defaultColors.neutral[400]} />
+              <MaterialCommunityIcons name="open-in-new" size={18} color={themeColors.neutral[400]} />
             </TouchableOpacity>
           )}
 
           {/* Action Buttons */}
           <View style={styles.actionButtons}>
             {order.status !== 'Cancelled' && order.status !== 'Delivered' && order.canCancel !== false && (
-              <TouchableOpacity style={styles.actionButton} onPress={onCancel}>
-                <MaterialCommunityIcons name="close-circle-outline" size={18} color={defaultColors.semantic.error} />
-                <Text style={[styles.actionButtonText, { color: defaultColors.semantic.error }]}>
+              <TouchableOpacity style={[styles.actionButton, { backgroundColor: themeColors.neutral[100] }]} onPress={onCancel}>
+                <MaterialCommunityIcons name="close-circle-outline" size={18} color={themeColors.semantic.error} />
+                <Text style={[styles.actionButtonText, { color: themeColors.semantic.error }]}>
                   Cancel Order
                 </Text>
               </TouchableOpacity>
             )}
             {order.status === 'Delivered' && (
-              <TouchableOpacity style={styles.actionButton} onPress={onReorder}>
-                <MaterialCommunityIcons name="refresh" size={18} color={defaultColors.primary[600]} />
-                <Text style={[styles.actionButtonText, { color: defaultColors.primary[600] }]}>
+              <TouchableOpacity style={[styles.actionButton, { backgroundColor: themeColors.neutral[100] }]} onPress={onReorder}>
+                <MaterialCommunityIcons name="refresh" size={18} color={themeColors.primary[600]} />
+                <Text style={[styles.actionButtonText, { color: themeColors.primary[600] }]}>
                   Reorder
                 </Text>
               </TouchableOpacity>
             )}
-            <TouchableOpacity style={[styles.actionButton, styles.actionButtonPrimary]} onPress={onTrack}>
-              <MaterialCommunityIcons name="eye-outline" size={18} color={defaultColors.neutral[0]} />
-              <Text style={[styles.actionButtonText, { color: defaultColors.neutral[0] }]}>
+            <TouchableOpacity style={[styles.actionButton, { backgroundColor: themeColors.primary[600] }]} onPress={onTrack}>
+              <MaterialCommunityIcons name="eye-outline" size={18} color={themeColors.neutral[0]} />
+              <Text style={[styles.actionButtonText, { color: themeColors.neutral[0] }]}>
                 View Details
               </Text>
             </TouchableOpacity>
@@ -470,15 +475,23 @@ export const OrdersScreen = () => {
         {(['all', 'active', 'completed'] as const).map((f) => (
           <TouchableOpacity
             key={f}
-            style={[styles.filterTab, filter === f && styles.filterTabActive]}
+            style={[
+              styles.filterTab,
+              { backgroundColor: colors.neutral[100] },
+              filter === f && { backgroundColor: colors.primary[600] }
+            ]}
             onPress={() => setFilter(f)}
           >
-            <Text style={[styles.filterTabText, filter === f && styles.filterTabTextActive]}>
+            <Text style={[
+              styles.filterTabText,
+              { color: colors.neutral[600] },
+              filter === f && { color: colors.neutral[0] }
+            ]}>
               {f.charAt(0).toUpperCase() + f.slice(1)}
             </Text>
             {f === 'active' && orders.filter(o => !['Delivered', 'Cancelled'].includes(o.status)).length > 0 && (
-              <View style={styles.filterBadge}>
-                <Text style={styles.filterBadgeText}>
+              <View style={[styles.filterBadge, { backgroundColor: colors.semantic.error }]}>
+                <Text style={[styles.filterBadgeText, { color: colors.neutral[0] }]}>
                   {orders.filter(o => !['Delivered', 'Cancelled'].includes(o.status)).length}
                 </Text>
               </View>
@@ -498,9 +511,10 @@ export const OrdersScreen = () => {
             onTrack={() => handleViewDetails(item.id)}
             onCancel={() => handleCancelOrder(item.id)}
             onReorder={() => handleReorder(item)}
+            themeColors={colors}
           />
         )}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[styles.listContent, { paddingBottom: 140 }]}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -512,7 +526,7 @@ export const OrdersScreen = () => {
         ListEmptyComponent={
           <View style={styles.emptyFilter}>
             <MaterialCommunityIcons name="filter-off-outline" size={48} color={colors.neutral[300]} />
-            <Text style={styles.emptyFilterText}>No {filter} orders</Text>
+            <Text style={[styles.emptyFilterText, { color: colors.neutral[400] }]}>No {filter} orders</Text>
           </View>
         }
       />
