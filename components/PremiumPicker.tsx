@@ -14,7 +14,8 @@ import {
 import { BlurView } from 'expo-blur';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, spacing, borderRadius, shadows, typography } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
+import { colors as defaultColors, spacing, borderRadius, shadows, typography } from '../theme';
 
 interface PickerOption {
   label: string;
@@ -44,6 +45,7 @@ export const PremiumPicker: React.FC<PremiumPickerProps> = ({
   error,
   icon,
 }) => {
+  const { colors } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -82,13 +84,14 @@ export const PremiumPicker: React.FC<PremiumPickerProps> = ({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>{label}</Text>
+      <Text style={[styles.label, { color: colors.neutral[700] }]}>{label}</Text>
 
       <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
         <TouchableOpacity
           style={[
             styles.pickerButton,
-            error && styles.pickerButtonError,
+            { backgroundColor: colors.neutral[50], borderColor: colors.neutral[200] },
+            error && { borderColor: colors.semantic.error, backgroundColor: `${colors.semantic.error}08` },
           ]}
           onPress={() => setModalVisible(true)}
           onPressIn={handlePressIn}
@@ -105,7 +108,8 @@ export const PremiumPicker: React.FC<PremiumPickerProps> = ({
           )}
           <Text style={[
             styles.pickerText,
-            !selectedOption && styles.placeholderText,
+            { color: colors.neutral[900] },
+            !selectedOption && { color: colors.neutral[400] },
           ]}>
             {selectedOption?.label || placeholder}
           </Text>
@@ -118,7 +122,7 @@ export const PremiumPicker: React.FC<PremiumPickerProps> = ({
       </Animated.View>
 
       {error && (
-        <Text style={styles.errorText}>{error}</Text>
+        <Text style={[styles.errorText, { color: colors.semantic.error }]}>{error}</Text>
       )}
 
       <Modal
@@ -137,11 +141,11 @@ export const PremiumPicker: React.FC<PremiumPickerProps> = ({
             onPress={() => setModalVisible(false)}
           />
 
-          <View style={[styles.modalContent, { paddingBottom: insets.bottom + spacing.md }]}>
-            <View style={styles.modalInner}>
-              <View style={styles.modalHeader}>
-                <View style={styles.modalHandle} />
-                <Text style={styles.modalTitle}>{label}</Text>
+          <View style={[styles.modalContent, { paddingBottom: insets.bottom + spacing.md, backgroundColor: colors.neutral[0] }]}>
+            <View style={[styles.modalInner, { backgroundColor: colors.neutral[0] }]}>
+              <View style={[styles.modalHeader, { borderBottomColor: colors.neutral[100] }]}>
+                <View style={[styles.modalHandle, { backgroundColor: colors.neutral[300] }]} />
+                <Text style={[styles.modalTitle, { color: colors.neutral[900] }]}>{label}</Text>
                 <TouchableOpacity
                   style={styles.closeButton}
                   onPress={() => setModalVisible(false)}
@@ -155,14 +159,14 @@ export const PremiumPicker: React.FC<PremiumPickerProps> = ({
               </View>
 
               {searchable && (
-                <View style={styles.searchContainer}>
+                <View style={[styles.searchContainer, { backgroundColor: colors.neutral[100] }]}>
                   <MaterialCommunityIcons
                     name="magnify"
                     size={20}
                     color={colors.neutral[400]}
                   />
                   <TextInput
-                    style={styles.searchInput}
+                    style={[styles.searchInput, { color: colors.neutral[900] }]}
                     placeholder="Search..."
                     placeholderTextColor={colors.neutral[400]}
                     value={searchQuery}
@@ -188,7 +192,8 @@ export const PremiumPicker: React.FC<PremiumPickerProps> = ({
                   <TouchableOpacity
                     style={[
                       styles.optionItem,
-                      item.value === value && styles.optionItemSelected,
+                      { borderBottomColor: colors.neutral[50] },
+                      item.value === value && { backgroundColor: colors.primary[50] },
                     ]}
                     onPress={() => handleSelect(item)}
                   >
@@ -198,12 +203,13 @@ export const PremiumPicker: React.FC<PremiumPickerProps> = ({
                     <View style={styles.optionText}>
                       <Text style={[
                         styles.optionLabel,
-                        item.value === value && styles.optionLabelSelected,
+                        { color: colors.neutral[900] },
+                        item.value === value && { color: colors.primary[700] },
                       ]}>
                         {item.label}
                       </Text>
                       {item.subtitle && (
-                        <Text style={styles.optionSubtitle}>{item.subtitle}</Text>
+                        <Text style={[styles.optionSubtitle, { color: colors.neutral[500] }]}>{item.subtitle}</Text>
                       )}
                     </View>
                     {item.value === value && (
@@ -215,7 +221,7 @@ export const PremiumPicker: React.FC<PremiumPickerProps> = ({
                     )}
                   </TouchableOpacity>
                 )}
-                style={styles.optionsList}
+                style={[styles.optionsList, { backgroundColor: colors.neutral[0] }]}
                 contentContainerStyle={styles.optionsListContent}
                 showsVerticalScrollIndicator={true}
                 initialNumToRender={20}
@@ -227,7 +233,7 @@ export const PremiumPicker: React.FC<PremiumPickerProps> = ({
                       size={48}
                       color={colors.neutral[300]}
                     />
-                    <Text style={styles.emptyText}>No results found</Text>
+                    <Text style={[styles.emptyText, { color: colors.neutral[400] }]}>No results found</Text>
                   </View>
                 }
               />
@@ -431,23 +437,23 @@ const styles = StyleSheet.create({
   label: {
     ...typography.footnote,
     fontWeight: '600',
-    color: colors.neutral[700],
+    color: defaultColors.neutral[700],
     marginBottom: spacing.xs,
   },
   pickerButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.neutral[50],
+    backgroundColor: defaultColors.neutral[50],
     borderWidth: 1.5,
-    borderColor: colors.neutral[200],
+    borderColor: defaultColors.neutral[200],
     borderRadius: borderRadius.lg,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
     minHeight: 52,
   },
   pickerButtonError: {
-    borderColor: colors.semantic.error,
-    backgroundColor: `${colors.semantic.error}08`,
+    borderColor: defaultColors.semantic.error,
+    backgroundColor: `${defaultColors.semantic.error}08`,
   },
   leftIcon: {
     marginRight: spacing.sm,
@@ -455,14 +461,14 @@ const styles = StyleSheet.create({
   pickerText: {
     flex: 1,
     ...typography.body,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
   },
   placeholderText: {
-    color: colors.neutral[400],
+    color: defaultColors.neutral[400],
   },
   errorText: {
     ...typography.caption,
-    color: colors.semantic.error,
+    color: defaultColors.semantic.error,
     marginTop: spacing.xs,
   },
   modalOverlay: {
@@ -478,12 +484,12 @@ const styles = StyleSheet.create({
     minHeight: 400,
     borderTopLeftRadius: borderRadius.xxl,
     borderTopRightRadius: borderRadius.xxl,
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     overflow: 'hidden',
   },
   modalInner: {
     flex: 1,
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
   },
   modalHeader: {
     alignItems: 'center',
@@ -491,18 +497,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.neutral[100],
+    borderBottomColor: defaultColors.neutral[100],
   },
   modalHandle: {
     width: 36,
     height: 4,
-    backgroundColor: colors.neutral[300],
+    backgroundColor: defaultColors.neutral[300],
     borderRadius: 2,
     marginBottom: spacing.md,
   },
   modalTitle: {
     ...typography.headline,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
   },
   closeButton: {
     position: 'absolute',
@@ -513,7 +519,7 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
     marginHorizontal: spacing.lg,
     marginVertical: spacing.md,
     paddingHorizontal: spacing.md,
@@ -523,12 +529,12 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     ...typography.body,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     paddingVertical: spacing.sm,
   },
   optionsList: {
     flex: 1,
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
   },
   optionsListContent: {
     flexGrow: 1,
@@ -539,10 +545,10 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: colors.neutral[50],
+    borderBottomColor: defaultColors.neutral[50],
   },
   optionItemSelected: {
-    backgroundColor: colors.primary[50],
+    backgroundColor: defaultColors.primary[50],
   },
   optionIcon: {
     fontSize: 24,
@@ -553,15 +559,15 @@ const styles = StyleSheet.create({
   },
   optionLabel: {
     ...typography.body,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
   },
   optionLabelSelected: {
-    color: colors.primary[700],
+    color: defaultColors.primary[700],
     fontWeight: '600',
   },
   optionSubtitle: {
     ...typography.caption,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
     marginTop: 2,
   },
   emptyList: {
@@ -570,7 +576,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     ...typography.body,
-    color: colors.neutral[400],
+    color: defaultColors.neutral[400],
     marginTop: spacing.md,
   },
 });

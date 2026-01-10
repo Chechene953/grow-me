@@ -90,7 +90,19 @@ export const authService = {
   },
 
   async updateProfile(userId: string, updates: Partial<User>): Promise<void> {
-    await updateDoc(doc(db, 'users', userId), updates);
+    // Remove undefined values as Firestore doesn't accept them
+    const cleanUpdates = Object.fromEntries(
+      Object.entries(updates).filter(([_, value]) => value !== undefined)
+    );
+
+    // Also clean nested objects like address
+    if (cleanUpdates.address && typeof cleanUpdates.address === 'object') {
+      cleanUpdates.address = Object.fromEntries(
+        Object.entries(cleanUpdates.address).filter(([_, value]) => value !== undefined && value !== '')
+      );
+    }
+
+    await updateDoc(doc(db, 'users', userId), cleanUpdates);
   },
 
   async signInWithGoogleIdToken(idToken: string, profile?: { name?: string; email?: string }): Promise<User> {

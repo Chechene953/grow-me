@@ -23,7 +23,7 @@ import { useAuthStore } from '../stores/authStore';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useTheme } from '../contexts/ThemeContext';
-import { colors, spacing, borderRadius, shadows, typography } from '../theme';
+import { colors as defaultColors, spacing, borderRadius, shadows, typography } from '../theme';
 
 export const EditProfileScreen = () => {
   const { user, updateProfile } = useAuthStore();
@@ -381,7 +381,7 @@ export const EditProfileScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.neutral[50],
+    backgroundColor: defaultColors.neutral[50],
   },
   scrollView: {
     flex: 1,
@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: colors.primary[600],
+    backgroundColor: defaultColors.primary[600],
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 3,
@@ -434,13 +434,13 @@ const styles = StyleSheet.create({
   },
   avatarHint: {
     ...typography.footnote,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
     marginTop: spacing.md,
   },
 
   // Sections
   section: {
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderRadius: borderRadius.xl,
     padding: spacing.lg,
     marginBottom: spacing.lg,
@@ -456,13 +456,13 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: colors.primary[50],
+    backgroundColor: defaultColors.primary[50],
     justifyContent: 'center',
     alignItems: 'center',
   },
   sectionTitle: {
     ...typography.title3,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
   },
 
   // Input Styles
@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
   },
   infoNoteText: {
     ...typography.caption,
-    color: colors.neutral[400],
+    color: defaultColors.neutral[400],
     flex: 1,
   },
   row: {
@@ -508,7 +508,7 @@ const styles = StyleSheet.create({
   saveButtonText: {
     ...typography.callout,
     fontWeight: '700',
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
   },
 
   // Danger Button
@@ -523,6 +523,6 @@ const styles = StyleSheet.create({
   dangerButtonText: {
     ...typography.callout,
     fontWeight: '600',
-    color: colors.semantic.error,
+    color: defaultColors.semantic.error,
   },
 });

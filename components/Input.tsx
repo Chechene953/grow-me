@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { View, TextInput, Text, StyleSheet, TextInputProps, TouchableOpacity, Animated } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, shadows, typography } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
+import { colors as defaultColors, spacing, borderRadius, shadows, typography } from '../theme';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -21,6 +22,7 @@ export const Input: React.FC<InputProps> = ({
   style,
   ...props
 }) => {
+  const { colors } = useTheme();
   const [isFocused, setIsFocused] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const borderColorAnim = useRef(new Animated.Value(0)).current;
@@ -54,7 +56,7 @@ export const Input: React.FC<InputProps> = ({
     ? `${colors.semantic.error}08`
     : borderColorAnim.interpolate({
         inputRange: [0, 1],
-        outputRange: [colors.neutral[0], colors.primary[50]],
+        outputRange: [colors.neutral[50], colors.primary[50]],
       });
 
   const isPassword = secureTextEntry !== undefined;
@@ -64,10 +66,10 @@ export const Input: React.FC<InputProps> = ({
     <View style={styles.container}>
       {label && (
         <View style={styles.labelContainer}>
-          <Text style={[styles.label, isFocused && styles.labelFocused, error && styles.labelError]}>
+          <Text style={[styles.label, { color: colors.neutral[700] }, isFocused && { color: colors.primary[600] }, error && { color: colors.semantic.error }]}>
             {label}
           </Text>
-          {required && <Text style={styles.requiredIndicator}>*</Text>}
+          {required && <Text style={[styles.requiredIndicator, { color: colors.semantic.error }]}>*</Text>}
         </View>
       )}
       <Animated.View style={[styles.inputContainer, { borderColor, backgroundColor }, error && styles.inputContainerError]}>
@@ -83,6 +85,7 @@ export const Input: React.FC<InputProps> = ({
         <TextInput
           style={[
             styles.input,
+            { color: colors.neutral[900] },
             icon && styles.inputWithIcon,
             isPassword && styles.inputWithRightIcon,
             style,
@@ -114,11 +117,11 @@ export const Input: React.FC<InputProps> = ({
             size={14}
             color={colors.semantic.error}
           />
-          <Text style={styles.errorText}>{error}</Text>
+          <Text style={[styles.errorText, { color: colors.semantic.error }]}>{error}</Text>
         </View>
       )}
       {hint && !error && (
-        <Text style={styles.hintText}>{hint}</Text>
+        <Text style={[styles.hintText, { color: colors.neutral[500] }]}>{hint}</Text>
       )}
     </View>
   );
@@ -136,16 +139,16 @@ const styles = StyleSheet.create({
   label: {
     ...typography.footnote,
     fontWeight: '600',
-    color: colors.neutral[700],
+    color: defaultColors.neutral[700],
   },
   labelFocused: {
-    color: colors.primary[600],
+    color: defaultColors.primary[600],
   },
   labelError: {
-    color: colors.semantic.error,
+    color: defaultColors.semantic.error,
   },
   requiredIndicator: {
-    color: colors.semantic.error,
+    color: defaultColors.semantic.error,
     marginLeft: 2,
     fontSize: 14,
   },
@@ -153,14 +156,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1.5,
-    borderColor: colors.neutral[200],
+    borderColor: defaultColors.neutral[200],
     borderRadius: borderRadius.lg,
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     minHeight: 52,
     ...shadows.xs,
   },
   inputContainerError: {
-    borderColor: colors.semantic.error,
+    borderColor: defaultColors.semantic.error,
   },
   iconContainer: {
     position: 'absolute',
@@ -172,7 +175,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     fontSize: 16,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     fontWeight: '500',
   },
   inputWithIcon: {
@@ -194,11 +197,11 @@ const styles = StyleSheet.create({
   },
   errorText: {
     ...typography.caption,
-    color: colors.semantic.error,
+    color: defaultColors.semantic.error,
   },
   hintText: {
     ...typography.caption,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
     marginTop: spacing.xs,
   },
 });

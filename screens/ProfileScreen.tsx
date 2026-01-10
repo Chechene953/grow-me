@@ -20,7 +20,7 @@ import { useAuthStore } from '../stores/authStore';
 import { orderService } from '../services/orderService';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
-import { colors, spacing, borderRadius, shadows, typography } from '../theme';
+import { colors as defaultColors, spacing, borderRadius, shadows, typography } from '../theme';
 import { SkeletonLoader, ProfileMenuSkeleton } from '../components/SkeletonLoader';
 
 const TAB_BAR_HEIGHT = 100;
@@ -470,14 +470,14 @@ export const ProfileScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
   },
   skeletonContainer: {
     flex: 1,
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
   },
   skeletonHeader: {
-    backgroundColor: colors.primary[600],
+    backgroundColor: defaultColors.primary[600],
     alignItems: 'center',
     paddingTop: 100,
     paddingBottom: 40,
@@ -532,7 +532,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: colors.primary[700],
+    backgroundColor: defaultColors.primary[700],
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 3,
@@ -540,7 +540,7 @@ const styles = StyleSheet.create({
   },
   name: {
     ...typography.title2,
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
     marginBottom: spacing.xs,
   },
   email: {
@@ -560,7 +560,7 @@ const styles = StyleSheet.create({
   memberBadgeText: {
     ...typography.footnote,
     fontWeight: '600',
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
   },
 
   // Stats
@@ -570,7 +570,7 @@ const styles = StyleSheet.create({
   },
   statsContainer: {
     flexDirection: 'row',
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderRadius: borderRadius.xl,
     padding: spacing.lg,
     ...shadows.md,
@@ -581,7 +581,7 @@ const styles = StyleSheet.create({
   },
   statDivider: {
     width: 1,
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
     marginVertical: spacing.sm,
   },
   statIconBg: {
@@ -594,11 +594,11 @@ const styles = StyleSheet.create({
   },
   statNumber: {
     ...typography.title2,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
   },
   statLabel: {
     ...typography.caption,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
     marginTop: 2,
   },
 
@@ -609,7 +609,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     ...typography.footnote,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -617,7 +617,7 @@ const styles = StyleSheet.create({
     marginLeft: spacing.sm,
   },
   menuCard: {
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderRadius: borderRadius.xl,
     overflow: 'hidden',
     ...Platform.select({
@@ -641,7 +641,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 14,
-    backgroundColor: colors.primary[50],
+    backgroundColor: defaultColors.primary[50],
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.md,
@@ -658,21 +658,21 @@ const styles = StyleSheet.create({
   menuItemText: {
     ...typography.callout,
     fontWeight: '600',
-    color: colors.neutral[800],
+    color: defaultColors.neutral[800],
   },
   menuItemTextDanger: {
-    color: colors.semantic.error,
+    color: defaultColors.semantic.error,
   },
   menuSubtext: {
     ...typography.footnote,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
     marginTop: 2,
   },
   menuBadge: {
     minWidth: 22,
     height: 22,
     borderRadius: 11,
-    backgroundColor: colors.primary[600],
+    backgroundColor: defaultColors.primary[600],
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: spacing.sm,
@@ -681,10 +681,10 @@ const styles = StyleSheet.create({
   menuBadgeText: {
     fontSize: 12,
     fontWeight: '700',
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
   },
   proBadge: {
-    backgroundColor: colors.accent.gold,
+    backgroundColor: defaultColors.accent.gold,
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
     borderRadius: borderRadius.sm,
@@ -693,11 +693,11 @@ const styles = StyleSheet.create({
   proBadgeText: {
     ...typography.caption,
     fontWeight: '800',
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
   },
   menuDivider: {
     height: 1,
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
     marginLeft: spacing.md + 44 + spacing.md,
   },
 
@@ -711,23 +711,23 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 16,
-    backgroundColor: colors.primary[50],
+    backgroundColor: defaultColors.primary[50],
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.md,
   },
   appName: {
     ...typography.title3,
-    color: colors.neutral[800],
+    color: defaultColors.neutral[800],
     marginBottom: spacing.xs,
   },
   version: {
     ...typography.footnote,
-    color: colors.neutral[400],
+    color: defaultColors.neutral[400],
     marginBottom: spacing.xs,
   },
   copyright: {
     ...typography.caption,
-    color: colors.neutral[400],
+    color: defaultColors.neutral[400],
   },
 });

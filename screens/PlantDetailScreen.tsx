@@ -26,7 +26,8 @@ import { favoriteService } from '../services/favoriteService';
 import { Plant, PlantSize, PotColor, Accessory, CartItem } from '../types';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ARViewerScreen } from './ARViewerScreen';
-import { colors, spacing, borderRadius, shadows, typography } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
+import { colors as defaultColors, spacing, borderRadius, shadows, typography } from '../theme';
 import { SkeletonLoader } from '../components/SkeletonLoader';
 
 interface PlantDetailScreenProps {
@@ -314,6 +315,7 @@ const PlantDetailSkeleton: React.FC = () => (
 );
 
 export const PlantDetailScreen = ({ plantId }: PlantDetailScreenProps) => {
+  const { colors } = useTheme();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { getPlantById } = usePlantStore();
@@ -534,7 +536,7 @@ export const PlantDetailScreen = ({ plantId }: PlantDetailScreenProps) => {
   const unitPrice = currentPrice / quantity;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.neutral[50] }]}>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={[styles.scrollContent, { paddingBottom: 160 }]}
@@ -672,36 +674,36 @@ export const PlantDetailScreen = ({ plantId }: PlantDetailScreenProps) => {
         </View>
 
         {/* Content */}
-        <View style={styles.content}>
+        <View style={[styles.content, { backgroundColor: colors.neutral[0] }]}>
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.name}>{plant.name}</Text>
+            <Text style={[styles.name, { color: colors.neutral[900] }]}>{plant.name}</Text>
             <View style={styles.ratingContainer}>
               <MaterialCommunityIcons name="star" size={18} color={colors.accent.gold} />
-              <Text style={styles.ratingText}>4.8</Text>
-              <Text style={styles.reviewCount}>(128)</Text>
+              <Text style={[styles.ratingText, { color: colors.neutral[900] }]}>4.8</Text>
+              <Text style={[styles.reviewCount, { color: colors.neutral[500] }]}>(128)</Text>
             </View>
           </View>
 
           {/* Tags */}
           <View style={styles.tagsRow}>
-            <View style={styles.categoryTag}>
-              <Text style={styles.categoryTagText}>{plant.category}</Text>
+            <View style={[styles.categoryTag, { backgroundColor: colors.primary[50] }]}>
+              <Text style={[styles.categoryTagText, { color: colors.primary[700] }]}>{plant.category}</Text>
             </View>
-            <View style={styles.lightTag}>
+            <View style={[styles.lightTag, { backgroundColor: `${colors.accent.gold}15` }]}>
               <MaterialCommunityIcons name="white-balance-sunny" size={14} color={colors.accent.gold} />
-              <Text style={styles.lightTagText}>{plant.lightPreference} Light</Text>
+              <Text style={[styles.lightTagText, { color: colors.neutral[700] }]}>{plant.lightPreference} Light</Text>
             </View>
           </View>
 
           {/* Description */}
-          <Text style={styles.description}>{plant.description}</Text>
+          <Text style={[styles.description, { color: colors.neutral[600] }]}>{plant.description}</Text>
 
           {/* Size Selection */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Select Size</Text>
-              <Text style={styles.sectionHint}>Tap to select</Text>
+              <Text style={[styles.sectionTitle, { color: colors.neutral[900] }]}>Select Size</Text>
+              <Text style={[styles.sectionHint, { color: colors.neutral[500] }]}>Tap to select</Text>
             </View>
             <SizeSelector
               sizes={plant.sizes}
@@ -714,8 +716,8 @@ export const PlantDetailScreen = ({ plantId }: PlantDetailScreenProps) => {
           {/* Pot Color Selection */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Pot Color & Material</Text>
-              <Text style={styles.sectionHint}>{plant.colors.length} options</Text>
+              <Text style={[styles.sectionTitle, { color: colors.neutral[900] }]}>Pot Color & Material</Text>
+              <Text style={[styles.sectionHint, { color: colors.neutral[500] }]}>{plant.colors.length} options</Text>
             </View>
             <PotColorSelector
               colors={plant.colors}
@@ -727,8 +729,8 @@ export const PlantDetailScreen = ({ plantId }: PlantDetailScreenProps) => {
           {/* Accessories */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Enhance Your Plant</Text>
-              <Text style={styles.sectionHint}>Optional add-ons</Text>
+              <Text style={[styles.sectionTitle, { color: colors.neutral[900] }]}>Enhance Your Plant</Text>
+              <Text style={[styles.sectionHint, { color: colors.neutral[500] }]}>Optional add-ons</Text>
             </View>
             {AVAILABLE_ACCESSORIES.map((accessory) => (
               <AccessoryItem

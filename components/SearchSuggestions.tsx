@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
 import { Plant } from '../types';
+import { useTheme } from '../contexts/ThemeContext';
+import { spacing, borderRadius, shadows } from '../theme';
 
 interface SearchSuggestionsProps {
   plants: Plant[];
@@ -13,6 +15,8 @@ export const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
   onSelectPlant,
   visible,
 }) => {
+  const { colors } = useTheme();
+
   if (!visible || plants.length === 0) {
     return null;
   }
@@ -33,26 +37,30 @@ export const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {
+      backgroundColor: colors.neutral[0],
+      borderColor: colors.neutral[200],
+      shadowColor: colors.neutral[900],
+    }]}>
       <FlatList
         data={plants.slice(0, 5)} // Limit to 5 suggestions
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity
-            style={styles.suggestionItem}
+            style={[styles.suggestionItem, { borderBottomColor: colors.neutral[100] }]}
             onPress={() => onSelectPlant(item.id)}
             activeOpacity={0.7}
           >
             <Image
               source={{ uri: getPlantPreviewImage(item) }}
-              style={styles.previewImage}
+              style={[styles.previewImage, { backgroundColor: colors.neutral[100] }]}
               resizeMode="cover"
             />
             <View style={styles.textContainer}>
-              <Text style={styles.plantName} numberOfLines={1}>
+              <Text style={[styles.plantName, { color: colors.neutral[900] }]} numberOfLines={1}>
                 {item.name}
               </Text>
-              <Text style={styles.plantCategory} numberOfLines={1}>
+              <Text style={[styles.plantCategory, { color: colors.neutral[500] }]} numberOfLines={1}>
                 {item.category}
               </Text>
             </View>
@@ -66,54 +74,37 @@ export const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    marginHorizontal: 24,
-    marginTop: -8,
-    marginBottom: 8,
-    paddingVertical: 8,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
+    borderRadius: borderRadius.lg,
+    marginHorizontal: spacing.xl,
+    marginTop: -spacing.sm,
+    marginBottom: spacing.sm,
+    paddingVertical: spacing.sm,
+    ...shadows.md,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
     maxHeight: 300,
   },
   suggestionItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#F5F5F5',
   },
   previewImage: {
     width: 50,
     height: 50,
-    borderRadius: 8,
-    backgroundColor: '#F5F5F5',
+    borderRadius: borderRadius.md,
   },
   textContainer: {
     flex: 1,
-    marginLeft: 12,
+    marginLeft: spacing.md,
   },
   plantName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
     marginBottom: 2,
   },
   plantCategory: {
     fontSize: 14,
-    color: '#666',
   },
 });
-
-
-
-

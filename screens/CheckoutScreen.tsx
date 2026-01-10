@@ -245,14 +245,14 @@ export const CheckoutScreen = () => {
         </View>
 
         {/* Delivery Address Section */}
-        <View style={styles.section}>
+        <View style={[styles.section, { backgroundColor: colors.neutral[0] }]}>
           <View style={styles.sectionHeader}>
-            <View style={styles.sectionIconContainer}>
+            <View style={[styles.sectionIconContainer, { backgroundColor: colors.primary[50] }]}>
               <MaterialCommunityIcons name="map-marker-outline" size={20} color={colors.primary[600]} />
             </View>
             <View style={styles.sectionTitleContainer}>
-              <Text style={styles.sectionTitle}>Delivery Address</Text>
-              <Text style={styles.sectionSubtitle}>Where should we deliver your plants?</Text>
+              <Text style={[styles.sectionTitle, { color: colors.neutral[900] }]}>Delivery Address</Text>
+              <Text style={[styles.sectionSubtitle, { color: colors.neutral[500] }]}>Where should we deliver your plants?</Text>
             </View>
           </View>
 
@@ -323,11 +323,11 @@ export const CheckoutScreen = () => {
         </View>
 
         {/* Promo Code Section */}
-        <View style={styles.promoSection}>
-          <View style={styles.promoInputContainer}>
+        <View style={[styles.promoSection, { backgroundColor: colors.neutral[0] }]}>
+          <View style={[styles.promoInputContainer, { backgroundColor: colors.neutral[50] }]}>
             <MaterialCommunityIcons name="ticket-percent-outline" size={20} color={colors.neutral[400]} />
             <TextInput
-              style={styles.promoInput}
+              style={[styles.promoInput, { color: colors.neutral[900] }]}
               placeholder="Enter promo code"
               placeholderTextColor={colors.neutral[400]}
               value={promoCode}
@@ -352,32 +352,32 @@ export const CheckoutScreen = () => {
               </TouchableOpacity>
             )}
           </View>
-          <Text style={styles.promoHint}>Try "PLANT20" for 20% off or "FREESHIP" for free shipping</Text>
+          <Text style={[styles.promoHint, { color: colors.neutral[400] }]}>Try "PLANT20" for 20% off or "FREESHIP" for free shipping</Text>
         </View>
 
         {/* Order Summary Section */}
-        <View style={styles.section}>
+        <View style={[styles.section, { backgroundColor: colors.neutral[0] }]}>
           <View style={styles.sectionHeader}>
-            <View style={styles.sectionIconContainer}>
+            <View style={[styles.sectionIconContainer, { backgroundColor: colors.primary[50] }]}>
               <MaterialCommunityIcons name="receipt" size={20} color={colors.primary[600]} />
             </View>
-            <Text style={styles.sectionTitle}>Order Summary</Text>
+            <Text style={[styles.sectionTitle, { color: colors.neutral[900] }]}>Order Summary</Text>
           </View>
           <View style={styles.summary}>
             <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Subtotal ({items.reduce((sum, i) => sum + i.quantity, 0)} items)</Text>
-              <Text style={styles.summaryValue}>${subtotal.toFixed(2)}</Text>
+              <Text style={[styles.summaryLabel, { color: colors.neutral[500] }]}>Subtotal ({items.reduce((sum, i) => sum + i.quantity, 0)} items)</Text>
+              <Text style={[styles.summaryValue, { color: colors.neutral[800] }]}>${subtotal.toFixed(2)}</Text>
             </View>
             <View style={styles.summaryRow}>
               <View style={styles.deliveryRow}>
-                <Text style={styles.summaryLabel}>Delivery</Text>
+                <Text style={[styles.summaryLabel, { color: colors.neutral[500] }]}>Delivery</Text>
                 {deliveryFee === 0 && (
                   <View style={styles.freeTag}>
                     <Text style={styles.freeTagText}>FREE</Text>
                   </View>
                 )}
               </View>
-              <Text style={[styles.summaryValue, deliveryFee === 0 && styles.freeValue]}>
+              <Text style={[styles.summaryValue, { color: colors.neutral[800] }, deliveryFee === 0 && { color: colors.semantic.success }]}>
                 {deliveryFee === 0 ? '$0.00' : `$${deliveryFee.toFixed(2)}`}
               </Text>
             </View>
@@ -385,28 +385,28 @@ export const CheckoutScreen = () => {
               <View style={styles.summaryRow}>
                 <View style={styles.discountRow}>
                   <MaterialCommunityIcons name="tag-outline" size={16} color={colors.semantic.success} />
-                  <Text style={styles.discountLabel}>Promo Discount</Text>
+                  <Text style={[styles.discountLabel, { color: colors.semantic.success }]}>Promo Discount</Text>
                 </View>
-                <Text style={styles.discountValue}>-${discount.toFixed(2)}</Text>
+                <Text style={[styles.discountValue, { color: colors.semantic.success }]}>-${discount.toFixed(2)}</Text>
               </View>
             )}
-            <View style={styles.divider} />
+            <View style={[styles.divider, { backgroundColor: colors.neutral[200] }]} />
             <View style={styles.summaryRow}>
-              <Text style={styles.summaryTotalLabel}>Total</Text>
-              <Text style={styles.summaryTotalValue}>${total.toFixed(2)}</Text>
+              <Text style={[styles.summaryTotalLabel, { color: colors.neutral[900] }]}>Total</Text>
+              <Text style={[styles.summaryTotalValue, { color: colors.primary[700] }]}>${total.toFixed(2)}</Text>
             </View>
           </View>
         </View>
 
         {/* Payment Section */}
-        <View style={styles.section}>
+        <View style={[styles.section, { backgroundColor: colors.neutral[0] }]}>
           <View style={styles.sectionHeader}>
-            <View style={styles.sectionIconContainer}>
+            <View style={[styles.sectionIconContainer, { backgroundColor: colors.primary[50] }]}>
               <MaterialCommunityIcons name="credit-card-outline" size={20} color={colors.primary[600]} />
             </View>
             <View style={styles.sectionTitleContainer}>
-              <Text style={styles.sectionTitle}>Payment Method</Text>
-              <Text style={styles.sectionSubtitle}>All transactions are secure and encrypted</Text>
+              <Text style={[styles.sectionTitle, { color: colors.neutral[900] }]}>Payment Method</Text>
+              <Text style={[styles.sectionSubtitle, { color: colors.neutral[500] }]}>All transactions are secure and encrypted</Text>
             </View>
           </View>
 
@@ -441,7 +441,8 @@ export const CheckoutScreen = () => {
                     key={method.id}
                     style={[
                       styles.paymentMethodCard,
-                      selectedPaymentMethod === method.id && styles.paymentMethodCardSelected,
+                      { backgroundColor: colors.neutral[50], borderColor: colors.neutral[200] },
+                      selectedPaymentMethod === method.id && { borderColor: colors.primary[600], backgroundColor: colors.primary[50] },
                     ]}
                     onPress={() => handlePaymentMethodSelect(method.id)}
                     activeOpacity={0.7}
@@ -453,7 +454,8 @@ export const CheckoutScreen = () => {
                     />
                     <Text style={[
                       styles.paymentMethodLabel,
-                      selectedPaymentMethod === method.id && styles.paymentMethodLabelSelected,
+                      { color: colors.neutral[600] },
+                      selectedPaymentMethod === method.id && { color: colors.primary[700] },
                     ]}>
                       {method.label}
                     </Text>
@@ -483,7 +485,7 @@ export const CheckoutScreen = () => {
               {/* Security Badge */}
               <View style={styles.securityBadge}>
                 <MaterialCommunityIcons name="shield-check" size={16} color={colors.semantic.success} />
-                <Text style={styles.securityText}>
+                <Text style={[styles.securityText, { color: colors.neutral[500] }]}>
                   Secured by Stripe. Your payment info is encrypted.
                 </Text>
               </View>
@@ -493,16 +495,16 @@ export const CheckoutScreen = () => {
       </ScrollView>
 
       {/* Sticky Footer */}
-      <BlurView intensity={90} tint="light" style={[styles.footer, { paddingBottom: Math.max(spacing.lg, insets.bottom + spacing.md) }]}>
+      <BlurView intensity={90} tint="light" style={[styles.footer, { paddingBottom: Math.max(spacing.lg, insets.bottom + spacing.md), borderTopColor: colors.neutral[200] }]}>
         <View style={styles.footerContent}>
           <View style={styles.footerTotal}>
             <View>
-              <Text style={styles.footerTotalLabel}>Total</Text>
+              <Text style={[styles.footerTotalLabel, { color: colors.neutral[500] }]}>Total</Text>
               {promoApplied && (
-                <Text style={styles.footerSavings}>You save ${discount.toFixed(2)}</Text>
+                <Text style={[styles.footerSavings, { color: colors.semantic.success }]}>You save ${discount.toFixed(2)}</Text>
               )}
             </View>
-            <Text style={styles.footerTotalValue}>${total.toFixed(2)}</Text>
+            <Text style={[styles.footerTotalValue, { color: colors.primary[700] }]}>${total.toFixed(2)}</Text>
           </View>
           {paymentCompleted && (
             <Button
@@ -523,7 +525,7 @@ export const CheckoutScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
   },
   scrollView: {
     flex: 1,
@@ -545,7 +547,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: colors.neutral[200],
+    backgroundColor: defaultColors.neutral[200],
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.xs,
@@ -559,35 +561,35 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   progressDotCompleted: {
-    backgroundColor: colors.primary[600],
+    backgroundColor: defaultColors.primary[600],
   },
   progressDotText: {
     fontSize: 12,
     fontWeight: '700',
-    color: colors.neutral[400],
+    color: defaultColors.neutral[400],
   },
   progressDotTextActive: {
     fontSize: 12,
     fontWeight: '700',
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
   },
   progressLabel: {
     ...typography.caption,
-    color: colors.neutral[400],
+    color: defaultColors.neutral[400],
   },
   progressLabelActive: {
-    color: colors.primary[600],
+    color: defaultColors.primary[600],
     fontWeight: '600',
   },
   progressLine: {
     width: 40,
     height: 2,
-    backgroundColor: colors.neutral[200],
+    backgroundColor: defaultColors.neutral[200],
     marginHorizontal: spacing.sm,
     marginBottom: spacing.lg,
   },
   progressLineActive: {
-    backgroundColor: colors.primary[600],
+    backgroundColor: defaultColors.primary[600],
   },
   itemsPreview: {
     marginBottom: spacing.lg,
@@ -601,21 +603,21 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: borderRadius.lg,
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
   },
   itemPreviewName: {
     ...typography.caption,
-    color: colors.neutral[700],
+    color: defaultColors.neutral[700],
     marginTop: spacing.xs,
     textAlign: 'center',
   },
   itemPreviewPrice: {
     ...typography.caption,
     fontWeight: '600',
-    color: colors.primary[600],
+    color: defaultColors.primary[600],
   },
   section: {
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderRadius: borderRadius.xl,
     padding: spacing.lg,
     marginBottom: spacing.md,
@@ -631,7 +633,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: borderRadius.lg,
-    backgroundColor: colors.primary[50],
+    backgroundColor: defaultColors.primary[50],
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -640,11 +642,11 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     ...typography.title3,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
   },
   sectionSubtitle: {
     ...typography.caption,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
     marginTop: 2,
   },
   row: {
@@ -655,7 +657,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   promoSection: {
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderRadius: borderRadius.xl,
     padding: spacing.md,
     marginBottom: spacing.md,
@@ -663,7 +665,7 @@ const styles = StyleSheet.create({
   promoInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.neutral[50],
+    backgroundColor: defaultColors.neutral[50],
     borderRadius: borderRadius.lg,
     paddingHorizontal: spacing.md,
     gap: spacing.sm,
@@ -671,27 +673,27 @@ const styles = StyleSheet.create({
   promoInput: {
     flex: 1,
     ...typography.body,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     paddingVertical: spacing.md,
   },
   promoButton: {
-    backgroundColor: colors.primary[600],
+    backgroundColor: defaultColors.primary[600],
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.md,
   },
   promoButtonDisabled: {
-    backgroundColor: colors.neutral[300],
+    backgroundColor: defaultColors.neutral[300],
   },
   promoButtonText: {
     ...typography.footnote,
     fontWeight: '600',
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
   },
   promoAppliedBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.semantic.success,
+    backgroundColor: defaultColors.semantic.success,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     borderRadius: borderRadius.md,
@@ -700,11 +702,11 @@ const styles = StyleSheet.create({
   promoAppliedText: {
     ...typography.caption,
     fontWeight: '600',
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
   },
   promoHint: {
     ...typography.caption,
-    color: colors.neutral[400],
+    color: defaultColors.neutral[400],
     marginTop: spacing.sm,
     textAlign: 'center',
   },
@@ -729,27 +731,27 @@ const styles = StyleSheet.create({
   },
   summaryLabel: {
     ...typography.body,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
   },
   summaryValue: {
     ...typography.body,
     fontWeight: '600',
-    color: colors.neutral[800],
+    color: defaultColors.neutral[800],
   },
   freeValue: {
-    color: colors.semantic.success,
+    color: defaultColors.semantic.success,
   },
   discountLabel: {
     ...typography.body,
-    color: colors.semantic.success,
+    color: defaultColors.semantic.success,
   },
   discountValue: {
     ...typography.body,
     fontWeight: '600',
-    color: colors.semantic.success,
+    color: defaultColors.semantic.success,
   },
   freeTag: {
-    backgroundColor: colors.semantic.success,
+    backgroundColor: defaultColors.semantic.success,
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
     borderRadius: borderRadius.sm,
@@ -757,20 +759,20 @@ const styles = StyleSheet.create({
   freeTagText: {
     fontSize: 10,
     fontWeight: '700',
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
   },
   divider: {
     height: 1,
-    backgroundColor: colors.neutral[200],
+    backgroundColor: defaultColors.neutral[200],
     marginVertical: spacing.md,
   },
   summaryTotalLabel: {
     ...typography.title3,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
   },
   summaryTotalValue: {
     ...typography.title2,
-    color: colors.primary[700],
+    color: defaultColors.primary[700],
   },
   addressWarning: {
     flexDirection: 'row',
@@ -783,7 +785,7 @@ const styles = StyleSheet.create({
   },
   addressWarningText: {
     ...typography.footnote,
-    color: colors.neutral[700],
+    color: defaultColors.neutral[700],
     flex: 1,
   },
   paymentMethods: {
@@ -797,7 +799,7 @@ const styles = StyleSheet.create({
     minWidth: '45%',
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.neutral[50],
+    backgroundColor: defaultColors.neutral[50],
     borderWidth: 1.5,
     borderColor: colors.neutral[200],
     borderRadius: borderRadius.lg,
@@ -806,7 +808,7 @@ const styles = StyleSheet.create({
   },
   paymentMethodCardSelected: {
     borderColor: colors.primary[600],
-    backgroundColor: colors.primary[50],
+    backgroundColor: defaultColors.primary[50],
   },
   paymentMethodIcon: {
     width: 32,
@@ -815,11 +817,11 @@ const styles = StyleSheet.create({
   paymentMethodLabel: {
     ...typography.footnote,
     fontWeight: '500',
-    color: colors.neutral[600],
+    color: defaultColors.neutral[600],
     flex: 1,
   },
   paymentMethodLabelSelected: {
-    color: colors.primary[700],
+    color: defaultColors.primary[700],
     fontWeight: '600',
   },
   paymentMethodCheck: {
@@ -837,12 +839,12 @@ const styles = StyleSheet.create({
   },
   securityText: {
     ...typography.caption,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
   },
   paymentSuccess: {
     alignItems: 'center',
     padding: spacing.xl,
-    backgroundColor: colors.primary[50],
+    backgroundColor: defaultColors.primary[50],
     borderRadius: borderRadius.xl,
   },
   paymentSuccessIcon: {
@@ -855,12 +857,12 @@ const styles = StyleSheet.create({
   },
   paymentSuccessText: {
     ...typography.title3,
-    color: colors.primary[700],
+    color: defaultColors.primary[700],
     marginBottom: spacing.xs,
   },
   paymentSuccessSubtext: {
     ...typography.footnote,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
   },
   footer: {
     position: 'absolute',
@@ -882,15 +884,15 @@ const styles = StyleSheet.create({
   },
   footerTotalLabel: {
     ...typography.body,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
   },
   footerSavings: {
     ...typography.caption,
-    color: colors.semantic.success,
+    color: defaultColors.semantic.success,
     fontWeight: '500',
   },
   footerTotalValue: {
     ...typography.title1,
-    color: colors.primary[700],
+    color: defaultColors.primary[700],
   },
 });
