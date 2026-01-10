@@ -171,6 +171,8 @@ npx vercel --prod
 Create a `.env` file:
 
 ```env
+
+// FIREBASE //
 EXPO_PUBLIC_FIREBASE_API_KEY=your_api_key
 EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
 EXPO_PUBLIC_FIREBASE_PROJECT_ID=your-project
@@ -178,8 +180,10 @@ EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
 EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=123456789012
 EXPO_PUBLIC_FIREBASE_APP_ID=1:123456789012:web:abcdef123456
 
+// GOOGLE EXPO CLIENT //
 EXPO_PUBLIC_GOOGLE_EXPO_CLIENT_ID=your-client-id.apps.googleusercontent.com
 
+// STRIPE //
 EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_xxxxx
 EXPO_PUBLIC_STRIPE_BACKEND_URL=https://your-project.vercel.app
 ```
