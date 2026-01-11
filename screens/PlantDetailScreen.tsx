@@ -63,6 +63,7 @@ const AnimatedOptionCard: React.FC<{
   children: React.ReactNode;
   style?: any;
 }> = ({ selected, onPress, children, style }) => {
+  const { colors } = useTheme();
   return (
     <Pressable
       onPress={() => {
@@ -92,6 +93,7 @@ const QuantitySelector: React.FC<{
   onChange: (qty: number) => void;
   max?: number;
 }> = ({ quantity, onChange, max = 10 }) => {
+  const { colors } = useTheme();
   const handleDecrease = () => {
     if (quantity > 1) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -149,6 +151,7 @@ const SizeSelector: React.FC<{
   onSelect: (size: PlantSize) => void;
   basePrice: number;
 }> = ({ sizes, selected, onSelect, basePrice }) => {
+  const { colors } = useTheme();
   const sizeModifiers = { Small: 0.8, Medium: 1, Large: 1.5 };
 
   return (
@@ -200,6 +203,7 @@ const PotColorSelector: React.FC<{
   selected: PotColor | null;
   onSelect: (color: PotColor) => void;
 }> = ({ colors: potColors, selected, onSelect }) => {
+  const { colors } = useTheme();
   return (
     <ScrollView
       horizontal
@@ -248,6 +252,7 @@ const AccessoryItem: React.FC<{
   selected: boolean;
   onToggle: () => void;
 }> = ({ accessory, selected, onToggle }) => {
+  const { colors } = useTheme();
   const handlePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     onToggle();
@@ -842,7 +847,7 @@ export const PlantDetailScreen = ({ plantId }: PlantDetailScreenProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.neutral[50],
+    backgroundColor: defaultColors.neutral[50],
   },
   scrollView: {
     flex: 1,
@@ -852,7 +857,7 @@ const styles = StyleSheet.create({
   },
   skeletonContainer: {
     flex: 1,
-    backgroundColor: colors.neutral[50],
+    backgroundColor: defaultColors.neutral[50],
   },
   skeletonContent: {
     padding: spacing.xl,
@@ -861,12 +866,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.neutral[50],
+    backgroundColor: defaultColors.neutral[50],
     gap: spacing.lg,
   },
   errorText: {
     ...typography.title3,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
   },
 
   // Image Gallery
@@ -874,7 +879,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     width: '100%',
     height: 400,
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
   },
   imageCarousel: {
     width: '100%',
@@ -888,13 +893,13 @@ const styles = StyleSheet.create({
     height: 400,
   },
   imageError: {
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
     justifyContent: 'center',
     alignItems: 'center',
   },
   imageErrorText: {
     marginTop: spacing.sm,
-    color: colors.neutral[400],
+    color: defaultColors.neutral[400],
     ...typography.footnote,
   },
   imageIndicators: {
@@ -914,7 +919,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.4)',
   },
   indicatorActive: {
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     width: 24,
   },
   navArrow: {
@@ -979,12 +984,12 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: 11,
     fontWeight: '700',
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
   },
 
   // Content
   content: {
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     marginTop: -24,
@@ -999,7 +1004,7 @@ const styles = StyleSheet.create({
   },
   name: {
     ...typography.title1,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     flex: 1,
     marginRight: spacing.md,
   },
@@ -1011,11 +1016,11 @@ const styles = StyleSheet.create({
   ratingText: {
     ...typography.callout,
     fontWeight: '700',
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
   },
   reviewCount: {
     ...typography.footnote,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
   },
   tagsRow: {
     flexDirection: 'row',
@@ -1024,20 +1029,20 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   categoryTag: {
-    backgroundColor: colors.primary[50],
+    backgroundColor: defaultColors.primary[50],
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs + 2,
     borderRadius: borderRadius.pill,
   },
   categoryTagText: {
     ...typography.footnote,
-    color: colors.primary[700],
+    color: defaultColors.primary[700],
     fontWeight: '600',
   },
   lightTag: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: `${colors.accent.gold}15`,
+    backgroundColor: `${defaultColors.accent.gold}15`,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs + 2,
     borderRadius: borderRadius.pill,
@@ -1045,11 +1050,11 @@ const styles = StyleSheet.create({
   },
   lightTagText: {
     ...typography.footnote,
-    color: colors.neutral[700],
+    color: defaultColors.neutral[700],
   },
   description: {
     ...typography.body,
-    color: colors.neutral[600],
+    color: defaultColors.neutral[600],
     lineHeight: 24,
     marginBottom: spacing.xl,
   },
@@ -1066,11 +1071,11 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     ...typography.title3,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
   },
   sectionHint: {
     ...typography.footnote,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
   },
 
   // Size Selector
@@ -1093,33 +1098,33 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
     justifyContent: 'center',
     alignItems: 'center',
   },
   sizeIconCircleSelected: {
-    backgroundColor: colors.primary[100],
+    backgroundColor: defaultColors.primary[100],
   },
   sizeName: {
     ...typography.callout,
     fontWeight: '700',
-    color: colors.neutral[800],
+    color: defaultColors.neutral[800],
     marginBottom: 2,
   },
   sizeNameSelected: {
-    color: colors.primary[700],
+    color: defaultColors.primary[700],
   },
   sizeHeight: {
     ...typography.caption,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
   },
   sizePot: {
     ...typography.caption,
-    color: colors.neutral[400],
+    color: defaultColors.neutral[400],
     marginBottom: spacing.sm,
   },
   sizePriceTag: {
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
     borderRadius: borderRadius.sm,
@@ -1127,10 +1132,10 @@ const styles = StyleSheet.create({
   sizePrice: {
     ...typography.footnote,
     fontWeight: '700',
-    color: colors.neutral[600],
+    color: defaultColors.neutral[600],
   },
   sizePriceSelected: {
-    color: colors.primary[700],
+    color: defaultColors.primary[700],
   },
   selectedBadge: {
     position: 'absolute',
@@ -1183,14 +1188,14 @@ const styles = StyleSheet.create({
   colorName: {
     ...typography.footnote,
     fontWeight: '600',
-    color: colors.neutral[800],
+    color: defaultColors.neutral[800],
     marginBottom: 2,
   },
   colorNameSelected: {
-    color: colors.primary[700],
+    color: defaultColors.primary[700],
   },
   materialTag: {
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
     borderRadius: borderRadius.sm,
@@ -1198,11 +1203,11 @@ const styles = StyleSheet.create({
   },
   materialText: {
     ...typography.caption,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
   },
   colorModifier: {
     ...typography.footnote,
-    color: colors.primary[600],
+    color: defaultColors.primary[600],
     fontWeight: '600',
   },
 
@@ -1212,26 +1217,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: spacing.md,
     borderRadius: borderRadius.xl,
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderWidth: 2,
-    borderColor: colors.neutral[200],
+    borderColor: defaultColors.neutral[200],
     marginBottom: spacing.sm,
     gap: spacing.md,
   },
   accessoryCardSelected: {
-    borderColor: colors.primary[400],
-    backgroundColor: colors.primary[50],
+    borderColor: defaultColors.primary[400],
+    backgroundColor: defaultColors.primary[50],
   },
   accessoryIconContainer: {
     width: 48,
     height: 48,
     borderRadius: 14,
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
     justifyContent: 'center',
     alignItems: 'center',
   },
   accessoryIconContainerSelected: {
-    backgroundColor: colors.primary[100],
+    backgroundColor: defaultColors.primary[100],
   },
   accessoryInfo: {
     flex: 1,
@@ -1239,15 +1244,15 @@ const styles = StyleSheet.create({
   accessoryTitle: {
     ...typography.callout,
     fontWeight: '600',
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     marginBottom: 2,
   },
   accessoryTitleSelected: {
-    color: colors.primary[700],
+    color: defaultColors.primary[700],
   },
   accessoryDesc: {
     ...typography.footnote,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
   },
   accessoryRight: {
     alignItems: 'flex-end',
@@ -1256,23 +1261,23 @@ const styles = StyleSheet.create({
   accessoryPriceText: {
     ...typography.callout,
     fontWeight: '700',
-    color: colors.neutral[600],
+    color: defaultColors.neutral[600],
   },
   accessoryPriceTextSelected: {
-    color: colors.primary[600],
+    color: defaultColors.primary[600],
   },
   accessoryCheck: {
     width: 24,
     height: 24,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: colors.neutral[300],
+    borderColor: defaultColors.neutral[300],
     justifyContent: 'center',
     alignItems: 'center',
   },
   accessoryCheckSelected: {
-    backgroundColor: colors.primary[600],
-    borderColor: colors.primary[600],
+    backgroundColor: defaultColors.primary[600],
+    borderColor: defaultColors.primary[600],
   },
 
   // Quantity Selector
@@ -1280,14 +1285,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: colors.neutral[50],
+    backgroundColor: defaultColors.neutral[50],
     padding: spacing.md,
     borderRadius: borderRadius.xl,
   },
   quantityLabel: {
     ...typography.callout,
     fontWeight: '600',
-    color: colors.neutral[800],
+    color: defaultColors.neutral[800],
   },
   quantityControls: {
     flexDirection: 'row',
@@ -1298,11 +1303,11 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: colors.neutral[200],
+    borderColor: defaultColors.neutral[200],
   },
   quantityBtnDisabled: {
     opacity: 0.5,
@@ -1314,7 +1319,7 @@ const styles = StyleSheet.create({
   quantityText: {
     ...typography.title3,
     fontWeight: '700',
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
   },
 
   // AR Button
@@ -1334,7 +1339,7 @@ const styles = StyleSheet.create({
   arButtonText: {
     ...typography.callout,
     fontWeight: '700',
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
   },
   arBadge: {
     backgroundColor: 'rgba(255,255,255,0.2)',
@@ -1345,7 +1350,7 @@ const styles = StyleSheet.create({
   arBadgeText: {
     ...typography.caption,
     fontWeight: '700',
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
   },
 
   // Footer
@@ -1355,7 +1360,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     borderTopWidth: 1,
-    borderTopColor: colors.neutral[100],
+    borderTopColor: defaultColors.neutral[100],
   },
   footerContent: {
     flexDirection: 'row',
@@ -1369,13 +1374,13 @@ const styles = StyleSheet.create({
   },
   priceLabel: {
     ...typography.footnote,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
     marginBottom: 2,
   },
   priceValue: {
     fontSize: 28,
     fontWeight: '800',
-    color: colors.primary[700],
+    color: defaultColors.primary[700],
   },
   currencySymbol: {
     fontSize: 18,
@@ -1383,7 +1388,7 @@ const styles = StyleSheet.create({
   },
   unitPrice: {
     ...typography.caption,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
     marginTop: 2,
   },
   addToCartButton: {
@@ -1404,6 +1409,6 @@ const styles = StyleSheet.create({
   addToCartText: {
     ...typography.callout,
     fontWeight: '700',
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
   },
 });

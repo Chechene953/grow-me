@@ -11,7 +11,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { ModernHeader } from '../components/ModernHeader';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, shadows, typography } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
+import { colors as defaultColors, spacing, borderRadius, shadows, typography } from '../theme';
 
 type TabType = 'terms' | 'privacy';
 
@@ -108,6 +109,7 @@ const PRIVACY_SECTIONS: Section[] = [
 
 export const TermsPrivacyScreen = () => {
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
   const [activeTab, setActiveTab] = useState<TabType>('terms');
   const [expandedSection, setExpandedSection] = useState<number | null>(0);
 
@@ -125,7 +127,7 @@ export const TermsPrivacyScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.neutral[50] }]}>
       <ModernHeader title="Legal" />
 
       <ScrollView
@@ -137,7 +139,7 @@ export const TermsPrivacyScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         {/* Tab Switcher */}
-        <View style={styles.tabContainer}>
+        <View style={[styles.tabContainer, { backgroundColor: colors.neutral[0] }]}>
           <TouchableOpacity
             style={[styles.tab, activeTab === 'terms' && styles.tabActive]}
             onPress={() => handleTabChange('terms')}
@@ -189,9 +191,9 @@ export const TermsPrivacyScreen = () => {
         </LinearGradient>
 
         {/* Info Banner */}
-        <View style={styles.infoBanner}>
+        <View style={[styles.infoBanner, { backgroundColor: colors.primary[50] }]}>
           <MaterialCommunityIcons name="information" size={20} color={colors.primary[600]} />
-          <Text style={styles.infoBannerText}>
+          <Text style={[styles.infoBannerText, { color: colors.primary[700] }]}>
             {activeTab === 'terms'
               ? 'By using GrowMe, you agree to these terms. Please read them carefully.'
               : 'Your privacy is important to us. This policy explains how we handle your data.'}
@@ -203,15 +205,15 @@ export const TermsPrivacyScreen = () => {
           {sections.map((section, index) => (
             <TouchableOpacity
               key={index}
-              style={styles.sectionCard}
+              style={[styles.sectionCard, { backgroundColor: colors.neutral[0] }]}
               onPress={() => toggleSection(index)}
               activeOpacity={0.7}
             >
               <View style={styles.sectionHeader}>
-                <View style={styles.sectionNumber}>
-                  <Text style={styles.sectionNumberText}>{index + 1}</Text>
+                <View style={[styles.sectionNumber, { backgroundColor: colors.primary[100] }]}>
+                  <Text style={[styles.sectionNumberText, { color: colors.primary[600] }]}>{index + 1}</Text>
                 </View>
-                <Text style={styles.sectionTitle}>
+                <Text style={[styles.sectionTitle, { color: colors.neutral[900] }]}>
                   {section.title.replace(/^\d+\.\s/, '')}
                 </Text>
                 <MaterialCommunityIcons
@@ -221,17 +223,17 @@ export const TermsPrivacyScreen = () => {
                 />
               </View>
               {expandedSection === index && (
-                <Text style={styles.sectionContent}>{section.content}</Text>
+                <Text style={[styles.sectionContent, { color: colors.neutral[600], borderTopColor: colors.neutral[100] }]}>{section.content}</Text>
               )}
             </TouchableOpacity>
           ))}
         </View>
 
         {/* Footer */}
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>
+        <View style={[styles.footer, { backgroundColor: colors.neutral[100] }]}>
+          <Text style={[styles.footerText, { color: colors.neutral[600] }]}>
             If you have any questions about these {activeTab === 'terms' ? 'terms' : 'policies'}, please contact us at{' '}
-            <Text style={styles.footerLink}>legal@growme.app</Text>
+            <Text style={[styles.footerLink, { color: colors.primary[600] }]}>legal@growme.app</Text>
           </Text>
         </View>
 
@@ -276,7 +278,7 @@ export const TermsPrivacyScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.neutral[50],
+    backgroundColor: defaultColors.neutral[50],
   },
   scrollView: {
     flex: 1,
@@ -288,7 +290,7 @@ const styles = StyleSheet.create({
   // Tabs
   tabContainer: {
     flexDirection: 'row',
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderRadius: borderRadius.xl,
     padding: spacing.xs,
     marginBottom: spacing.lg,
@@ -304,15 +306,15 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   tabActive: {
-    backgroundColor: colors.primary[600],
+    backgroundColor: defaultColors.primary[600],
   },
   tabText: {
     ...typography.footnote,
     fontWeight: '600',
-    color: colors.neutral[600],
+    color: defaultColors.neutral[600],
   },
   tabTextActive: {
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
   },
 
   // Hero
@@ -333,7 +335,7 @@ const styles = StyleSheet.create({
   },
   heroTitle: {
     ...typography.title1,
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
     marginBottom: spacing.xs,
   },
   heroSubtitle: {
@@ -345,7 +347,7 @@ const styles = StyleSheet.create({
   infoBanner: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: colors.primary[50],
+    backgroundColor: defaultColors.primary[50],
     borderRadius: borderRadius.lg,
     padding: spacing.md,
     marginBottom: spacing.lg,
@@ -353,7 +355,7 @@ const styles = StyleSheet.create({
   },
   infoBannerText: {
     ...typography.footnote,
-    color: colors.primary[700],
+    color: defaultColors.primary[700],
     flex: 1,
     lineHeight: 20,
   },
@@ -363,7 +365,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   sectionCard: {
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderRadius: borderRadius.xl,
     padding: spacing.lg,
     ...shadows.sm,
@@ -377,46 +379,46 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: colors.primary[100],
+    backgroundColor: defaultColors.primary[100],
     justifyContent: 'center',
     alignItems: 'center',
   },
   sectionNumberText: {
     ...typography.footnote,
     fontWeight: '700',
-    color: colors.primary[600],
+    color: defaultColors.primary[600],
   },
   sectionTitle: {
     ...typography.callout,
     fontWeight: '600',
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     flex: 1,
   },
   sectionContent: {
     ...typography.footnote,
-    color: colors.neutral[600],
+    color: defaultColors.neutral[600],
     lineHeight: 22,
     marginTop: spacing.md,
     paddingTop: spacing.md,
     borderTopWidth: 1,
-    borderTopColor: colors.neutral[100],
+    borderTopColor: defaultColors.neutral[100],
   },
 
   // Footer
   footer: {
     marginTop: spacing.xl,
     padding: spacing.lg,
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
     borderRadius: borderRadius.xl,
   },
   footerText: {
     ...typography.footnote,
-    color: colors.neutral[600],
+    color: defaultColors.neutral[600],
     textAlign: 'center',
     lineHeight: 20,
   },
   footerLink: {
-    color: colors.primary[600],
+    color: defaultColors.primary[600],
     fontWeight: '600',
   },
 
@@ -437,6 +439,6 @@ const styles = StyleSheet.create({
   quickLinkText: {
     ...typography.footnote,
     fontWeight: '600',
-    color: colors.primary[600],
+    color: defaultColors.primary[600],
   },
 });

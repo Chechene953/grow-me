@@ -16,7 +16,8 @@ import * as Haptics from 'expo-haptics';
 import { ModernHeader } from '../components/ModernHeader';
 import { useAuthStore } from '../stores/authStore';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, shadows, typography } from '../theme';
+import { colors as defaultColors, spacing, borderRadius, shadows, typography } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface Message {
   id: string;
@@ -122,6 +123,7 @@ const INITIAL_MESSAGE: Message = {
 export const LiveChatScreen = () => {
   const insets = useSafeAreaInsets();
   const { user } = useAuthStore();
+  const { colors } = useTheme();
   const scrollViewRef = useRef<ScrollView>(null);
   const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
   const [inputText, setInputText] = useState('');
@@ -191,7 +193,7 @@ export const LiveChatScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.neutral[50] }]}>
       <ModernHeader title="Live Chat" />
 
       <KeyboardAvoidingView
@@ -209,18 +211,18 @@ export const LiveChatScreen = () => {
           showsVerticalScrollIndicator={false}
         >
           {/* Bot Avatar Header */}
-          <View style={styles.botHeader}>
+          <View style={[styles.botHeader, { borderBottomColor: colors.neutral[100] }]}>
             <LinearGradient
               colors={[colors.primary[500], colors.primary[700]]}
               style={styles.botAvatar}
             >
-              <MaterialCommunityIcons name="leaf" size={24} color={colors.neutral[0]} />
+              <MaterialCommunityIcons name="leaf" size={24} color={defaultColors.neutral[0]} />
             </LinearGradient>
             <View style={styles.botInfo}>
-              <Text style={styles.botName}>Leaf</Text>
+              <Text style={[styles.botName, { color: colors.neutral[900] }]}>Leaf</Text>
               <View style={styles.onlineStatus}>
-                <View style={styles.onlineDot} />
-                <Text style={styles.onlineText}>Online</Text>
+                <View style={[styles.onlineDot, { backgroundColor: colors.semantic.success }]} />
+                <Text style={[styles.onlineText, { color: colors.semantic.success }]}>Online</Text>
               </View>
             </View>
           </View>
@@ -235,25 +237,29 @@ export const LiveChatScreen = () => {
                 ]}
               >
                 {message.isBot && (
-                  <View style={styles.messageBotAvatar}>
+                  <View style={[styles.messageBotAvatar, { backgroundColor: colors.primary[50] }]}>
                     <MaterialCommunityIcons name="leaf" size={16} color={colors.primary[600]} />
                   </View>
                 )}
                 <View
                   style={[
                     styles.messageBubble,
-                    message.isBot ? styles.messageBubbleBot : styles.messageBubbleUser,
+                    message.isBot
+                      ? [styles.messageBubbleBot, { backgroundColor: colors.neutral[0] }]
+                      : [styles.messageBubbleUser, { backgroundColor: colors.primary[600] }],
                   ]}
                 >
                   <Text
                     style={[
                       styles.messageText,
-                      message.isBot ? styles.messageTextBot : styles.messageTextUser,
+                      message.isBot
+                        ? [styles.messageTextBot, { color: colors.neutral[800] }]
+                        : [styles.messageTextUser, { color: defaultColors.neutral[0] }],
                     ]}
                   >
                     {message.text}
                   </Text>
-                  <Text style={styles.messageTime}>{formatTime(message.timestamp)}</Text>
+                  <Text style={[styles.messageTime, { color: colors.neutral[400] }]}>{formatTime(message.timestamp)}</Text>
                 </View>
               </View>
 
@@ -263,11 +269,11 @@ export const LiveChatScreen = () => {
                   {message.quickReplies.map((reply) => (
                     <TouchableOpacity
                       key={reply}
-                      style={styles.quickReplyButton}
+                      style={[styles.quickReplyButton, { backgroundColor: colors.neutral[0], borderColor: colors.primary[500] }]}
                       onPress={() => handleQuickReply(reply)}
                       activeOpacity={0.7}
                     >
-                      <Text style={styles.quickReplyText}>{reply}</Text>
+                      <Text style={[styles.quickReplyText, { color: colors.primary[600] }]}>{reply}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -278,10 +284,10 @@ export const LiveChatScreen = () => {
           {/* Typing Indicator */}
           {isTyping && (
             <View style={[styles.messageRow, styles.messageRowBot]}>
-              <View style={styles.messageBotAvatar}>
+              <View style={[styles.messageBotAvatar, { backgroundColor: colors.primary[50] }]}>
                 <MaterialCommunityIcons name="leaf" size={16} color={colors.primary[600]} />
               </View>
-              <View style={[styles.messageBubble, styles.messageBubbleBot, styles.typingBubble]}>
+              <View style={[styles.messageBubble, styles.messageBubbleBot, styles.typingBubble, { backgroundColor: colors.neutral[0] }]}>
                 <TypingIndicator />
               </View>
             </View>
@@ -289,10 +295,10 @@ export const LiveChatScreen = () => {
         </ScrollView>
 
         {/* Input Area */}
-        <View style={[styles.inputArea, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
-          <View style={styles.inputContainer}>
+        <View style={[styles.inputArea, { paddingBottom: Math.max(insets.bottom, spacing.md), backgroundColor: colors.neutral[0], borderTopColor: colors.neutral[100] }]}>
+          <View style={[styles.inputContainer, { backgroundColor: colors.neutral[50], borderColor: colors.neutral[200] }]}>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { color: colors.neutral[900] }]}
               placeholder="Type a message..."
               placeholderTextColor={colors.neutral[400]}
               value={inputText}
@@ -301,7 +307,7 @@ export const LiveChatScreen = () => {
               maxLength={500}
             />
             <TouchableOpacity
-              style={[styles.sendButton, !inputText.trim() && styles.sendButtonDisabled]}
+              style={[styles.sendButton, { backgroundColor: colors.primary[600] }, !inputText.trim() && [styles.sendButtonDisabled, { backgroundColor: colors.neutral[200] }]]}
               onPress={handleSend}
               disabled={!inputText.trim()}
               activeOpacity={0.7}
@@ -309,7 +315,7 @@ export const LiveChatScreen = () => {
               <MaterialCommunityIcons
                 name="send"
                 size={20}
-                color={inputText.trim() ? colors.neutral[0] : colors.neutral[400]}
+                color={inputText.trim() ? defaultColors.neutral[0] : colors.neutral[400]}
               />
             </TouchableOpacity>
           </View>
@@ -384,7 +390,7 @@ const TypingIndicator: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.neutral[50],
+    backgroundColor: defaultColors.neutral[50],
   },
   keyboardView: {
     flex: 1,
@@ -403,7 +409,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xl,
     paddingBottom: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.neutral[100],
+    borderBottomColor: defaultColors.neutral[100],
   },
   botAvatar: {
     width: 48,
@@ -417,7 +423,7 @@ const styles = StyleSheet.create({
   },
   botName: {
     ...typography.title3,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
   },
   onlineStatus: {
     flexDirection: 'row',
@@ -428,12 +434,12 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: colors.semantic.success,
+    backgroundColor: defaultColors.semantic.success,
     marginRight: spacing.xs,
   },
   onlineText: {
     ...typography.caption,
-    color: colors.semantic.success,
+    color: defaultColors.semantic.success,
   },
 
   // Messages
@@ -452,7 +458,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: colors.primary[50],
+    backgroundColor: defaultColors.primary[50],
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.sm,
@@ -463,12 +469,12 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.lg,
   },
   messageBubbleBot: {
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderBottomLeftRadius: 4,
     ...shadows.sm,
   },
   messageBubbleUser: {
-    backgroundColor: colors.primary[600],
+    backgroundColor: defaultColors.primary[600],
     borderBottomRightRadius: 4,
   },
   messageText: {
@@ -476,14 +482,14 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   messageTextBot: {
-    color: colors.neutral[800],
+    color: defaultColors.neutral[800],
   },
   messageTextUser: {
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
   },
   messageTime: {
     ...typography.caption,
-    color: colors.neutral[400],
+    color: defaultColors.neutral[400],
     marginTop: spacing.xs,
     textAlign: 'right',
   },
@@ -497,9 +503,9 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   quickReplyButton: {
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderWidth: 1.5,
-    borderColor: colors.primary[500],
+    borderColor: defaultColors.primary[500],
     borderRadius: borderRadius.pill,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
@@ -507,7 +513,7 @@ const styles = StyleSheet.create({
   quickReplyText: {
     ...typography.footnote,
     fontWeight: '600',
-    color: colors.primary[600],
+    color: defaultColors.primary[600],
   },
 
   // Typing
@@ -522,32 +528,32 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: colors.neutral[400],
+    backgroundColor: defaultColors.neutral[400],
   },
 
   // Input
   inputArea: {
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
     borderTopWidth: 1,
-    borderTopColor: colors.neutral[100],
+    borderTopColor: defaultColors.neutral[100],
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    backgroundColor: colors.neutral[50],
+    backgroundColor: defaultColors.neutral[50],
     borderRadius: borderRadius.xl,
     paddingLeft: spacing.md,
     paddingRight: spacing.xs,
     paddingVertical: spacing.xs,
     borderWidth: 1,
-    borderColor: colors.neutral[200],
+    borderColor: defaultColors.neutral[200],
   },
   input: {
     flex: 1,
     ...typography.body,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     maxHeight: 100,
     paddingVertical: spacing.sm,
   },
@@ -555,11 +561,11 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.primary[600],
+    backgroundColor: defaultColors.primary[600],
     justifyContent: 'center',
     alignItems: 'center',
   },
   sendButtonDisabled: {
-    backgroundColor: colors.neutral[200],
+    backgroundColor: defaultColors.neutral[200],
   },
 });

@@ -18,13 +18,15 @@ import { Button } from '../components/Button';
 import { orderService } from '../services/orderService';
 import { useAuthStore } from '../stores/authStore';
 import { Order } from '../types';
-import { colors, spacing, borderRadius, shadows, typography } from '../theme';
+import { colors as defaultColors, spacing, borderRadius, shadows, typography } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
 
 export const OrderConfirmationScreen = () => {
   const { id: orderId } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { user } = useAuthStore();
+  const { colors } = useTheme();
 
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
@@ -86,14 +88,14 @@ export const OrderConfirmationScreen = () => {
 
   if (loading) {
     return (
-      <View style={[styles.container, styles.loadingContainer]}>
+      <View style={[styles.container, styles.loadingContainer, { backgroundColor: colors.neutral[50] }]}>
         <ActivityIndicator size="large" color={colors.primary[600]} />
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.neutral[50] }]}>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={[
@@ -108,44 +110,44 @@ export const OrderConfirmationScreen = () => {
             colors={[colors.semantic.success, '#45a049']}
             style={styles.successCircle}
           >
-            <MaterialCommunityIcons name="check" size={56} color={colors.neutral[0]} />
+            <MaterialCommunityIcons name="check" size={56} color={defaultColors.neutral[0]} />
           </LinearGradient>
         </Animated.View>
 
         {/* Success Message */}
-        <Text style={styles.title}>Order Confirmed!</Text>
-        <Text style={styles.subtitle}>
+        <Text style={[styles.title, { color: colors.neutral[900] }]}>Order Confirmed!</Text>
+        <Text style={[styles.subtitle, { color: colors.neutral[600] }]}>
           Thank you for your purchase. Your order has been placed successfully.
         </Text>
 
         {/* Order Number */}
-        <Animated.View style={[styles.orderNumberCard, { opacity: cardOpacity, transform: [{ translateY: cardTranslateY }] }]}>
-          <Text style={styles.orderNumberLabel}>Order Number</Text>
-          <Text style={styles.orderNumber}>#{orderId?.slice(-8).toUpperCase()}</Text>
+        <Animated.View style={[styles.orderNumberCard, { opacity: cardOpacity, transform: [{ translateY: cardTranslateY }], backgroundColor: colors.primary[50] }]}>
+          <Text style={[styles.orderNumberLabel, { color: colors.primary[600] }]}>Order Number</Text>
+          <Text style={[styles.orderNumber, { color: colors.primary[700] }]}>#{orderId?.slice(-8).toUpperCase()}</Text>
         </Animated.View>
 
         {/* Email Notification */}
-        <Animated.View style={[styles.infoCard, { opacity: cardOpacity, transform: [{ translateY: cardTranslateY }] }]}>
-          <View style={styles.infoIconContainer}>
+        <Animated.View style={[styles.infoCard, { opacity: cardOpacity, transform: [{ translateY: cardTranslateY }], backgroundColor: colors.neutral[0] }]}>
+          <View style={[styles.infoIconContainer, { backgroundColor: colors.primary[50] }]}>
             <MaterialCommunityIcons name="email-check-outline" size={28} color={colors.primary[600]} />
           </View>
           <View style={styles.infoContent}>
-            <Text style={styles.infoTitle}>Confirmation Email Sent</Text>
-            <Text style={styles.infoText}>
+            <Text style={[styles.infoTitle, { color: colors.neutral[900] }]}>Confirmation Email Sent</Text>
+            <Text style={[styles.infoText, { color: colors.neutral[600] }]}>
               We've sent a confirmation email to{' '}
-              <Text style={styles.infoEmail}>{user?.email || 'your email'}</Text> with your order details and receipt.
+              <Text style={[styles.infoEmail, { color: colors.primary[600] }]}>{user?.email || 'your email'}</Text> with your order details and receipt.
             </Text>
           </View>
         </Animated.View>
 
         {/* Tracking Info */}
-        <Animated.View style={[styles.infoCard, { opacity: cardOpacity, transform: [{ translateY: cardTranslateY }] }]}>
+        <Animated.View style={[styles.infoCard, { opacity: cardOpacity, transform: [{ translateY: cardTranslateY }], backgroundColor: colors.neutral[0] }]}>
           <View style={[styles.infoIconContainer, { backgroundColor: colors.accent.gold + '20' }]}>
             <MaterialCommunityIcons name="truck-fast-outline" size={28} color={colors.accent.gold} />
           </View>
           <View style={styles.infoContent}>
-            <Text style={styles.infoTitle}>Track Your Order</Text>
-            <Text style={styles.infoText}>
+            <Text style={[styles.infoTitle, { color: colors.neutral[900] }]}>Track Your Order</Text>
+            <Text style={[styles.infoText, { color: colors.neutral[600] }]}>
               You can track your order status anytime from the "My Orders" section in your profile.
             </Text>
           </View>
@@ -153,50 +155,50 @@ export const OrderConfirmationScreen = () => {
 
         {/* Order Summary */}
         {order && (
-          <Animated.View style={[styles.summaryCard, { opacity: cardOpacity, transform: [{ translateY: cardTranslateY }] }]}>
-            <Text style={styles.sectionTitle}>Order Summary</Text>
+          <Animated.View style={[styles.summaryCard, { opacity: cardOpacity, transform: [{ translateY: cardTranslateY }], backgroundColor: colors.neutral[0] }]}>
+            <Text style={[styles.sectionTitle, { color: colors.neutral[900] }]}>Order Summary</Text>
 
             {/* Items */}
             <View style={styles.itemsList}>
               {order.items.map((item, index) => (
                 <View key={index} style={styles.orderItem}>
-                  <Image source={{ uri: item.plant.images[0] }} style={styles.itemImage} />
+                  <Image source={{ uri: item.plant.images[0] }} style={[styles.itemImage, { backgroundColor: colors.neutral[100] }]} />
                   <View style={styles.itemDetails}>
-                    <Text style={styles.itemName}>{item.plant.name}</Text>
-                    <Text style={styles.itemMeta}>
+                    <Text style={[styles.itemName, { color: colors.neutral[900] }]}>{item.plant.name}</Text>
+                    <Text style={[styles.itemMeta, { color: colors.neutral[500] }]}>
                       {item.size} / {item.potColor.name} / Qty: {item.quantity}
                     </Text>
                   </View>
-                  <Text style={styles.itemPrice}>${item.price.toFixed(2)}</Text>
+                  <Text style={[styles.itemPrice, { color: colors.neutral[800] }]}>${item.price.toFixed(2)}</Text>
                 </View>
               ))}
             </View>
 
-            <View style={styles.divider} />
+            <View style={[styles.divider, { backgroundColor: colors.neutral[200] }]} />
 
             {/* Totals */}
             <View style={styles.totalsContainer}>
               <View style={styles.totalRow}>
-                <Text style={styles.totalLabel}>Subtotal</Text>
-                <Text style={styles.totalValue}>${order.subtotal.toFixed(2)}</Text>
+                <Text style={[styles.totalLabel, { color: colors.neutral[600] }]}>Subtotal</Text>
+                <Text style={[styles.totalValue, { color: colors.neutral[800] }]}>${order.subtotal.toFixed(2)}</Text>
               </View>
               <View style={styles.totalRow}>
-                <Text style={styles.totalLabel}>Delivery</Text>
-                <Text style={[styles.totalValue, order.deliveryFee === 0 && styles.freeText]}>
+                <Text style={[styles.totalLabel, { color: colors.neutral[600] }]}>Delivery</Text>
+                <Text style={[styles.totalValue, { color: colors.neutral[800] }, order.deliveryFee === 0 && { color: colors.semantic.success }]}>
                   {order.deliveryFee === 0 ? 'FREE' : `$${order.deliveryFee.toFixed(2)}`}
                 </Text>
               </View>
-              <View style={styles.divider} />
+              <View style={[styles.divider, { backgroundColor: colors.neutral[200] }]} />
               <View style={styles.totalRow}>
-                <Text style={styles.grandTotalLabel}>Total</Text>
-                <Text style={styles.grandTotalValue}>${order.total.toFixed(2)}</Text>
+                <Text style={[styles.grandTotalLabel, { color: colors.neutral[900] }]}>Total</Text>
+                <Text style={[styles.grandTotalValue, { color: colors.primary[700] }]}>${order.total.toFixed(2)}</Text>
               </View>
             </View>
 
             {/* Shipping Address */}
-            <View style={styles.addressContainer}>
-              <Text style={styles.addressTitle}>Shipping To</Text>
-              <Text style={styles.addressText}>
+            <View style={[styles.addressContainer, { borderTopColor: colors.neutral[100] }]}>
+              <Text style={[styles.addressTitle, { color: colors.neutral[600] }]}>Shipping To</Text>
+              <Text style={[styles.addressText, { color: colors.neutral[800] }]}>
                 {order.address.street}{'\n'}
                 {order.address.city}, {order.address.state} {order.address.zipCode}{'\n'}
                 {order.address.country}
@@ -206,11 +208,11 @@ export const OrderConfirmationScreen = () => {
         )}
 
         {/* Estimated Delivery */}
-        <Animated.View style={[styles.deliveryCard, { opacity: cardOpacity, transform: [{ translateY: cardTranslateY }] }]}>
+        <Animated.View style={[styles.deliveryCard, { opacity: cardOpacity, transform: [{ translateY: cardTranslateY }], backgroundColor: colors.primary[50] }]}>
           <MaterialCommunityIcons name="calendar-clock" size={24} color={colors.primary[600]} />
           <View style={styles.deliveryContent}>
-            <Text style={styles.deliveryTitle}>Estimated Delivery</Text>
-            <Text style={styles.deliveryDate}>
+            <Text style={[styles.deliveryTitle, { color: colors.primary[600] }]}>Estimated Delivery</Text>
+            <Text style={[styles.deliveryDate, { color: colors.primary[800] }]}>
               {new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', {
                 weekday: 'long',
                 month: 'long',
@@ -235,7 +237,7 @@ export const OrderConfirmationScreen = () => {
           />
           <TouchableOpacity style={styles.secondaryButton} onPress={handleContinueShopping}>
             <MaterialCommunityIcons name="shopping" size={20} color={colors.primary[600]} />
-            <Text style={styles.secondaryButtonText}>Continue Shopping</Text>
+            <Text style={[styles.secondaryButtonText, { color: colors.primary[600] }]}>Continue Shopping</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

@@ -514,7 +514,7 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 50,
     borderWidth: 4,
-    borderColor: colors.neutral[0],
+    borderColor: defaultColors.neutral[0],
   },
   avatarPlaceholder: {
     width: 100,
@@ -523,7 +523,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 4,
-    borderColor: colors.neutral[0],
+    borderColor: defaultColors.neutral[0],
   },
   avatarBadge: {
     position: 'absolute',
@@ -536,7 +536,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 3,
-    borderColor: colors.neutral[0],
+    borderColor: defaultColors.neutral[0],
   },
   name: {
     ...typography.title2,
@@ -622,7 +622,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     ...Platform.select({
       ios: {
-        shadowColor: colors.neutral[900],
+        shadowColor: defaultColors.neutral[900],
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.06,
         shadowRadius: 8,
@@ -647,10 +647,10 @@ const styles = StyleSheet.create({
     marginRight: spacing.md,
   },
   menuIconContainerDanger: {
-    backgroundColor: `${colors.semantic.error}15`,
+    backgroundColor: `${defaultColors.semantic.error}15`,
   },
   menuIconContainerPremium: {
-    backgroundColor: `${colors.accent.gold}20`,
+    backgroundColor: `${defaultColors.accent.gold}20`,
   },
   menuTextContainer: {
     flex: 1,

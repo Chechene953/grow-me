@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
     borderWidth: 4,
-    borderColor: colors.neutral[0],
+    borderColor: defaultColors.neutral[0],
     ...shadows.md,
   },
   avatarPlaceholder: {
@@ -416,7 +416,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 4,
-    borderColor: colors.neutral[0],
+    borderColor: defaultColors.neutral[0],
     ...shadows.md,
   },
   cameraButton: {
@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 3,
-    borderColor: colors.neutral[0],
+    borderColor: defaultColors.neutral[0],
   },
   avatarHint: {
     ...typography.footnote,

@@ -14,7 +14,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { ModernHeader } from '../components/ModernHeader';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, shadows, typography } from '../theme';
+import { colors as defaultColors, spacing, borderRadius, shadows, typography } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface FAQItem {
   question: string;
@@ -106,32 +107,36 @@ const FAQAccordion: React.FC<{
   item: FAQItem;
   isExpanded: boolean;
   onToggle: () => void;
-}> = ({ item, isExpanded, onToggle }) => (
-  <TouchableOpacity
-    style={styles.faqItem}
-    onPress={() => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      onToggle();
-    }}
-    activeOpacity={0.7}
-  >
-    <View style={styles.faqHeader}>
-      <Text style={styles.faqQuestion}>{item.question}</Text>
-      <MaterialCommunityIcons
-        name={isExpanded ? 'chevron-up' : 'chevron-down'}
-        size={22}
-        color={colors.neutral[400]}
-      />
-    </View>
-    {isExpanded && (
-      <Text style={styles.faqAnswer}>{item.answer}</Text>
-    )}
-  </TouchableOpacity>
-);
+}> = ({ item, isExpanded, onToggle }) => {
+  const { colors } = useTheme();
+  return (
+    <TouchableOpacity
+      style={[styles.faqItem, { borderBottomColor: colors.neutral[100] }]}
+      onPress={() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        onToggle();
+      }}
+      activeOpacity={0.7}
+    >
+      <View style={styles.faqHeader}>
+        <Text style={[styles.faqQuestion, { color: colors.neutral[800] }]}>{item.question}</Text>
+        <MaterialCommunityIcons
+          name={isExpanded ? 'chevron-up' : 'chevron-down'}
+          size={22}
+          color={colors.neutral[400]}
+        />
+      </View>
+      {isExpanded && (
+        <Text style={[styles.faqAnswer, { color: colors.neutral[600] }]}>{item.answer}</Text>
+      )}
+    </TouchableOpacity>
+  );
+};
 
 export const HelpCenterScreen = () => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { colors } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedCategory, setExpandedCategory] = useState<number | null>(0);
   const [expandedFAQ, setExpandedFAQ] = useState<string | null>(null);
@@ -158,7 +163,7 @@ export const HelpCenterScreen = () => {
     : FAQ_DATA;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.neutral[50] }]}>
       <ModernHeader title="Help Center" />
 
       <ScrollView
@@ -171,10 +176,10 @@ export const HelpCenterScreen = () => {
         keyboardShouldPersistTaps="handled"
       >
         {/* Search Bar */}
-        <View style={styles.searchContainer}>
+        <View style={[styles.searchContainer, { backgroundColor: colors.neutral[0] }]}>
           <MaterialCommunityIcons name="magnify" size={22} color={colors.neutral[400]} />
           <TextInput
-            style={styles.searchInput}
+            style={[styles.searchInput, { color: colors.neutral[900] }]}
             placeholder="Search for help..."
             placeholderTextColor={colors.neutral[400]}
             value={searchQuery}
@@ -189,14 +194,14 @@ export const HelpCenterScreen = () => {
 
         {/* Quick Actions */}
         <View style={styles.quickActions}>
-          <TouchableOpacity style={styles.quickAction} onPress={handleContact}>
+          <TouchableOpacity style={[styles.quickAction, { backgroundColor: colors.neutral[0] }]} onPress={handleContact}>
             <View style={[styles.quickActionIcon, { backgroundColor: colors.primary[50] }]}>
               <MaterialCommunityIcons name="email-outline" size={24} color={colors.primary[600]} />
             </View>
-            <Text style={styles.quickActionText}>Email Us</Text>
+            <Text style={[styles.quickActionText, { color: colors.neutral[800] }]}>Email Us</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.quickAction}
+            style={[styles.quickAction, { backgroundColor: colors.neutral[0] }]}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               Linking.openURL('tel:+18001234567');
@@ -205,31 +210,31 @@ export const HelpCenterScreen = () => {
             <View style={[styles.quickActionIcon, { backgroundColor: colors.semantic.success + '20' }]}>
               <MaterialCommunityIcons name="phone-outline" size={24} color={colors.semantic.success} />
             </View>
-            <Text style={styles.quickActionText}>Call Us</Text>
+            <Text style={[styles.quickActionText, { color: colors.neutral[800] }]}>Call Us</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.quickAction}
+            style={[styles.quickAction, { backgroundColor: colors.neutral[0] }]}
             onPress={handleLiveChat}
           >
             <View style={[styles.quickActionIcon, { backgroundColor: colors.accent.gold + '20' }]}>
               <MaterialCommunityIcons name="chat-outline" size={24} color={colors.accent.gold} />
             </View>
-            <Text style={styles.quickActionText}>Live Chat</Text>
+            <Text style={[styles.quickActionText, { color: colors.neutral[800] }]}>Live Chat</Text>
           </TouchableOpacity>
         </View>
 
         {/* FAQ Categories */}
-        <Text style={styles.sectionTitle}>Frequently Asked Questions</Text>
+        <Text style={[styles.sectionTitle, { color: colors.neutral[900] }]}>Frequently Asked Questions</Text>
 
         {filteredData.length === 0 ? (
           <View style={styles.noResults}>
             <MaterialCommunityIcons name="magnify-close" size={48} color={colors.neutral[300]} />
-            <Text style={styles.noResultsText}>No results found</Text>
-            <Text style={styles.noResultsSubtext}>Try a different search term</Text>
+            <Text style={[styles.noResultsText, { color: colors.neutral[600] }]}>No results found</Text>
+            <Text style={[styles.noResultsSubtext, { color: colors.neutral[400] }]}>Try a different search term</Text>
           </View>
         ) : (
           filteredData.map((category, catIndex) => (
-            <View key={category.title} style={styles.categoryCard}>
+            <View key={category.title} style={[styles.categoryCard, { backgroundColor: colors.neutral[0] }]}>
               <TouchableOpacity
                 style={styles.categoryHeader}
                 onPress={() => {
@@ -237,12 +242,12 @@ export const HelpCenterScreen = () => {
                   setExpandedCategory(expandedCategory === catIndex ? null : catIndex);
                 }}
               >
-                <View style={styles.categoryIconContainer}>
+                <View style={[styles.categoryIconContainer, { backgroundColor: colors.primary[50] }]}>
                   <MaterialCommunityIcons name={category.icon} size={22} color={colors.primary[600]} />
                 </View>
-                <Text style={styles.categoryTitle}>{category.title}</Text>
-                <View style={styles.categoryBadge}>
-                  <Text style={styles.categoryBadgeText}>{category.faqs.length}</Text>
+                <Text style={[styles.categoryTitle, { color: colors.neutral[900] }]}>{category.title}</Text>
+                <View style={[styles.categoryBadge, { backgroundColor: colors.neutral[100] }]}>
+                  <Text style={[styles.categoryBadgeText, { color: colors.neutral[600] }]}>{category.faqs.length}</Text>
                 </View>
                 <MaterialCommunityIcons
                   name={expandedCategory === catIndex ? 'chevron-up' : 'chevron-down'}
@@ -252,7 +257,7 @@ export const HelpCenterScreen = () => {
               </TouchableOpacity>
 
               {expandedCategory === catIndex && (
-                <View style={styles.faqList}>
+                <View style={[styles.faqList, { borderTopColor: colors.neutral[100] }]}>
                   {category.faqs.map((faq, faqIndex) => (
                     <FAQAccordion
                       key={faqIndex}
@@ -303,7 +308,7 @@ export const HelpCenterScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.neutral[50],
+    backgroundColor: defaultColors.neutral[50],
   },
   scrollView: {
     flex: 1,
@@ -316,7 +321,7 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderRadius: borderRadius.xl,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
@@ -327,7 +332,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     ...typography.body,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
   },
 
   // Quick Actions
@@ -338,7 +343,7 @@ const styles = StyleSheet.create({
   },
   quickAction: {
     flex: 1,
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderRadius: borderRadius.xl,
     padding: spacing.md,
     alignItems: 'center',
@@ -355,13 +360,13 @@ const styles = StyleSheet.create({
   quickActionText: {
     ...typography.footnote,
     fontWeight: '600',
-    color: colors.neutral[800],
+    color: defaultColors.neutral[800],
   },
 
   // Section
   sectionTitle: {
     ...typography.title3,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     marginBottom: spacing.md,
   },
 
@@ -372,18 +377,18 @@ const styles = StyleSheet.create({
   },
   noResultsText: {
     ...typography.title3,
-    color: colors.neutral[600],
+    color: defaultColors.neutral[600],
     marginTop: spacing.md,
   },
   noResultsSubtext: {
     ...typography.footnote,
-    color: colors.neutral[400],
+    color: defaultColors.neutral[400],
     marginTop: spacing.xs,
   },
 
   // Category
   categoryCard: {
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderRadius: borderRadius.xl,
     marginBottom: spacing.md,
     overflow: 'hidden',
@@ -399,18 +404,18 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: colors.primary[50],
+    backgroundColor: defaultColors.primary[50],
     justifyContent: 'center',
     alignItems: 'center',
   },
   categoryTitle: {
     ...typography.callout,
     fontWeight: '600',
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     flex: 1,
   },
   categoryBadge: {
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
     borderRadius: borderRadius.sm,
@@ -418,18 +423,18 @@ const styles = StyleSheet.create({
   categoryBadgeText: {
     ...typography.caption,
     fontWeight: '600',
-    color: colors.neutral[600],
+    color: defaultColors.neutral[600],
   },
 
   // FAQ
   faqList: {
     borderTopWidth: 1,
-    borderTopColor: colors.neutral[100],
+    borderTopColor: defaultColors.neutral[100],
   },
   faqItem: {
     padding: spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: colors.neutral[100],
+    borderBottomColor: defaultColors.neutral[100],
   },
   faqHeader: {
     flexDirection: 'row',
@@ -439,12 +444,12 @@ const styles = StyleSheet.create({
   faqQuestion: {
     ...typography.callout,
     fontWeight: '500',
-    color: colors.neutral[800],
+    color: defaultColors.neutral[800],
     flex: 1,
   },
   faqAnswer: {
     ...typography.footnote,
-    color: colors.neutral[600],
+    color: defaultColors.neutral[600],
     marginTop: spacing.md,
     lineHeight: 22,
   },
@@ -475,7 +480,7 @@ const styles = StyleSheet.create({
   contactBannerTitle: {
     ...typography.callout,
     fontWeight: '700',
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
   },
   contactBannerSubtitle: {
     ...typography.footnote,
@@ -483,7 +488,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   contactBannerButton: {
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.lg,
@@ -491,6 +496,6 @@ const styles = StyleSheet.create({
   contactBannerButtonText: {
     ...typography.footnote,
     fontWeight: '600',
-    color: colors.primary[600],
+    color: defaultColors.primary[600],
   },
 });

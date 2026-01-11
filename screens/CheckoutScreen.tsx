@@ -25,7 +25,7 @@ import { useAuthStore } from '../stores/authStore';
 import { orderService } from '../services/orderService';
 import { Address } from '../types';
 import { useTheme } from '../contexts/ThemeContext';
-import { colors, spacing, borderRadius, shadows, typography } from '../theme';
+import { colors as defaultColors, spacing, borderRadius, shadows, typography } from '../theme';
 
 type PaymentMethod = 'card' | 'google_pay';
 
@@ -777,7 +777,7 @@ const styles = StyleSheet.create({
   addressWarning: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: `${colors.accent.gold}15`,
+    backgroundColor: `${defaultColors.accent.gold}15`,
     padding: spacing.md,
     borderRadius: borderRadius.lg,
     marginBottom: spacing.md,
@@ -801,13 +801,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: defaultColors.neutral[50],
     borderWidth: 1.5,
-    borderColor: colors.neutral[200],
+    borderColor: defaultColors.neutral[200],
     borderRadius: borderRadius.lg,
     padding: spacing.md,
     gap: spacing.sm,
   },
   paymentMethodCardSelected: {
-    borderColor: colors.primary[600],
+    borderColor: defaultColors.primary[600],
     backgroundColor: defaultColors.primary[50],
   },
   paymentMethodIcon: {
@@ -870,7 +870,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     borderTopWidth: 1,
-    borderTopColor: colors.neutral[200],
+    borderTopColor: defaultColors.neutral[200],
   },
   footerContent: {
     paddingHorizontal: spacing.xl,

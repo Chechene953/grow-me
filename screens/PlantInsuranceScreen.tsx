@@ -13,7 +13,8 @@ import * as Haptics from 'expo-haptics';
 import { ModernHeader } from '../components/ModernHeader';
 import { useAuthStore } from '../stores/authStore';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, shadows, typography } from '../theme';
+import { colors as defaultColors, spacing, borderRadius, shadows, typography } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface InsurancePlan {
   id: string;
@@ -92,6 +93,7 @@ const FAQ_ITEMS = [
 export const PlantInsuranceScreen = () => {
   const insets = useSafeAreaInsets();
   const { user } = useAuthStore();
+  const { colors } = useTheme();
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
 
@@ -115,7 +117,7 @@ export const PlantInsuranceScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.neutral[50] }]}>
       <ModernHeader title="Plant Insurance" />
 
       <ScrollView
@@ -132,7 +134,7 @@ export const PlantInsuranceScreen = () => {
           style={styles.heroCard}
         >
           <View style={styles.heroIconContainer}>
-            <MaterialCommunityIcons name="shield-check" size={40} color={colors.neutral[0]} />
+            <MaterialCommunityIcons name="shield-check" size={40} color={defaultColors.neutral[0]} />
           </View>
           <Text style={styles.heroTitle}>Protect Your Plants</Text>
           <Text style={styles.heroSubtitle}>
@@ -146,50 +148,51 @@ export const PlantInsuranceScreen = () => {
             <View style={[styles.benefitIcon, { backgroundColor: colors.primary[50] }]}>
               <MaterialCommunityIcons name="leaf" size={20} color={colors.primary[600]} />
             </View>
-            <Text style={styles.benefitText}>Free Replacements</Text>
+            <Text style={[styles.benefitText, { color: colors.neutral[700] }]}>Free Replacements</Text>
           </View>
           <View style={styles.benefitItem}>
             <View style={[styles.benefitIcon, { backgroundColor: `${colors.semantic.success}20` }]}>
               <MaterialCommunityIcons name="clock-fast" size={20} color={colors.semantic.success} />
             </View>
-            <Text style={styles.benefitText}>Fast Claims</Text>
+            <Text style={[styles.benefitText, { color: colors.neutral[700] }]}>Fast Claims</Text>
           </View>
           <View style={styles.benefitItem}>
             <View style={[styles.benefitIcon, { backgroundColor: `${colors.accent.gold}20` }]}>
               <MaterialCommunityIcons name="headset" size={20} color={colors.accent.gold} />
             </View>
-            <Text style={styles.benefitText}>Expert Support</Text>
+            <Text style={[styles.benefitText, { color: colors.neutral[700] }]}>Expert Support</Text>
           </View>
         </View>
 
         {/* Plans */}
-        <Text style={styles.sectionTitle}>Choose Your Plan</Text>
+        <Text style={[styles.sectionTitle, { color: colors.neutral[900] }]}>Choose Your Plan</Text>
         {INSURANCE_PLANS.map((plan) => (
           <TouchableOpacity
             key={plan.id}
             style={[
               styles.planCard,
-              selectedPlan === plan.id && styles.planCardSelected,
-              plan.recommended && styles.planCardRecommended,
+              { backgroundColor: colors.neutral[0] },
+              selectedPlan === plan.id && [styles.planCardSelected, { borderColor: colors.primary[500], backgroundColor: colors.primary[50] }],
+              plan.recommended && [styles.planCardRecommended, { borderColor: colors.semantic.success }],
             ]}
             onPress={() => handleSelectPlan(plan.id)}
             activeOpacity={0.8}
           >
             {plan.recommended && (
-              <View style={styles.recommendedBadge}>
-                <MaterialCommunityIcons name="star" size={12} color={colors.neutral[0]} />
+              <View style={[styles.recommendedBadge, { backgroundColor: colors.semantic.success }]}>
+                <MaterialCommunityIcons name="star" size={12} color={defaultColors.neutral[0]} />
                 <Text style={styles.recommendedText}>Most Popular</Text>
               </View>
             )}
 
             <View style={styles.planHeader}>
               <View>
-                <Text style={styles.planName}>{plan.name}</Text>
-                <Text style={styles.planCoverage}>Coverage: {plan.coverage}</Text>
+                <Text style={[styles.planName, { color: colors.neutral[900] }]}>{plan.name}</Text>
+                <Text style={[styles.planCoverage, { color: colors.neutral[500] }]}>Coverage: {plan.coverage}</Text>
               </View>
               <View style={styles.planPriceContainer}>
-                <Text style={styles.planPrice}>${plan.price}</Text>
-                <Text style={styles.planPeriod}>/{plan.period}</Text>
+                <Text style={[styles.planPrice, { color: colors.primary[700] }]}>${plan.price}</Text>
+                <Text style={[styles.planPeriod, { color: colors.neutral[500] }]}>/{plan.period}</Text>
               </View>
             </View>
 
@@ -201,7 +204,7 @@ export const PlantInsuranceScreen = () => {
                     size={18}
                     color={colors.semantic.success}
                   />
-                  <Text style={styles.featureText}>{feature}</Text>
+                  <Text style={[styles.featureText, { color: colors.neutral[700] }]}>{feature}</Text>
                 </View>
               ))}
             </View>
@@ -231,17 +234,17 @@ export const PlantInsuranceScreen = () => {
               : [colors.neutral[400], colors.neutral[500]]}
             style={styles.subscribeButtonGradient}
           >
-            <MaterialCommunityIcons name="shield-check" size={20} color={colors.neutral[0]} />
+            <MaterialCommunityIcons name="shield-check" size={20} color={defaultColors.neutral[0]} />
             <Text style={styles.subscribeButtonText}>Start Protection</Text>
           </LinearGradient>
         </TouchableOpacity>
 
         {/* FAQ */}
-        <Text style={styles.sectionTitle}>Frequently Asked Questions</Text>
+        <Text style={[styles.sectionTitle, { color: colors.neutral[900] }]}>Frequently Asked Questions</Text>
         {FAQ_ITEMS.map((faq, index) => (
           <TouchableOpacity
             key={index}
-            style={styles.faqCard}
+            style={[styles.faqCard, { backgroundColor: colors.neutral[0] }]}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               setExpandedFAQ(expandedFAQ === index ? null : index);
@@ -249,7 +252,7 @@ export const PlantInsuranceScreen = () => {
             activeOpacity={0.7}
           >
             <View style={styles.faqHeader}>
-              <Text style={styles.faqQuestion}>{faq.question}</Text>
+              <Text style={[styles.faqQuestion, { color: colors.neutral[900] }]}>{faq.question}</Text>
               <MaterialCommunityIcons
                 name={expandedFAQ === index ? 'chevron-up' : 'chevron-down'}
                 size={22}
@@ -257,7 +260,7 @@ export const PlantInsuranceScreen = () => {
               />
             </View>
             {expandedFAQ === index && (
-              <Text style={styles.faqAnswer}>{faq.answer}</Text>
+              <Text style={[styles.faqAnswer, { color: colors.neutral[600] }]}>{faq.answer}</Text>
             )}
           </TouchableOpacity>
         ))}
@@ -269,7 +272,7 @@ export const PlantInsuranceScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.neutral[50],
+    backgroundColor: defaultColors.neutral[50],
   },
   scrollView: {
     flex: 1,
@@ -296,7 +299,7 @@ const styles = StyleSheet.create({
   },
   heroTitle: {
     ...typography.title1,
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
     marginBottom: spacing.xs,
   },
   heroSubtitle: {
@@ -326,21 +329,21 @@ const styles = StyleSheet.create({
   benefitText: {
     ...typography.caption,
     fontWeight: '600',
-    color: colors.neutral[700],
+    color: defaultColors.neutral[700],
     textAlign: 'center',
   },
 
   // Section
   sectionTitle: {
     ...typography.title3,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     marginBottom: spacing.md,
     marginTop: spacing.md,
   },
 
   // Plans
   planCard: {
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderRadius: borderRadius.xl,
     padding: spacing.lg,
     marginBottom: spacing.md,
@@ -349,11 +352,11 @@ const styles = StyleSheet.create({
     ...shadows.sm,
   },
   planCardSelected: {
-    borderColor: colors.primary[500],
-    backgroundColor: colors.primary[50],
+    borderColor: defaultColors.primary[500],
+    backgroundColor: defaultColors.primary[50],
   },
   planCardRecommended: {
-    borderColor: colors.semantic.success,
+    borderColor: defaultColors.semantic.success,
   },
   recommendedBadge: {
     position: 'absolute',
@@ -361,7 +364,7 @@ const styles = StyleSheet.create({
     right: spacing.lg,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.semantic.success,
+    backgroundColor: defaultColors.semantic.success,
     paddingHorizontal: spacing.sm,
     paddingVertical: 4,
     borderRadius: borderRadius.pill,
@@ -370,7 +373,7 @@ const styles = StyleSheet.create({
   recommendedText: {
     ...typography.caption,
     fontWeight: '700',
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
   },
   planHeader: {
     flexDirection: 'row',
@@ -380,11 +383,11 @@ const styles = StyleSheet.create({
   },
   planName: {
     ...typography.title3,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
   },
   planCoverage: {
     ...typography.footnote,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
     marginTop: 2,
   },
   planPriceContainer: {
@@ -393,11 +396,11 @@ const styles = StyleSheet.create({
   },
   planPrice: {
     ...typography.title2,
-    color: colors.primary[700],
+    color: defaultColors.primary[700],
   },
   planPeriod: {
     ...typography.footnote,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
   },
   planFeatures: {
     gap: spacing.sm,
@@ -409,7 +412,7 @@ const styles = StyleSheet.create({
   },
   featureText: {
     ...typography.footnote,
-    color: colors.neutral[700],
+    color: defaultColors.neutral[700],
     flex: 1,
   },
   selectedIndicator: {
@@ -438,12 +441,12 @@ const styles = StyleSheet.create({
   subscribeButtonText: {
     ...typography.callout,
     fontWeight: '700',
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
   },
 
   // FAQ
   faqCard: {
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderRadius: borderRadius.xl,
     padding: spacing.lg,
     marginBottom: spacing.sm,
@@ -457,13 +460,13 @@ const styles = StyleSheet.create({
   faqQuestion: {
     ...typography.callout,
     fontWeight: '600',
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     flex: 1,
     marginRight: spacing.sm,
   },
   faqAnswer: {
     ...typography.footnote,
-    color: colors.neutral[600],
+    color: defaultColors.neutral[600],
     marginTop: spacing.md,
     lineHeight: 22,
   },

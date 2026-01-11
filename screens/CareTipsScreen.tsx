@@ -12,7 +12,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { ModernHeader } from '../components/ModernHeader';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, shadows, typography } from '../theme';
+import { colors as defaultColors, spacing, borderRadius, shadows, typography } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface CareTip {
   category: string;
@@ -95,6 +96,7 @@ const TipCard: React.FC<{
   isExpanded: boolean;
   onToggle: () => void;
 }> = ({ tip, isExpanded, onToggle }) => {
+  const { colors } = useTheme();
   const rotateAnim = useRef(new Animated.Value(isExpanded ? 1 : 0)).current;
 
   const handleToggle = () => {
@@ -114,7 +116,7 @@ const TipCard: React.FC<{
   });
 
   return (
-    <View style={styles.tipCard}>
+    <View style={[styles.tipCard, { backgroundColor: colors.neutral[0] }]}>
       <TouchableOpacity
         style={styles.tipCardHeader}
         onPress={handleToggle}
@@ -124,8 +126,8 @@ const TipCard: React.FC<{
           <MaterialCommunityIcons name={tip.icon} size={24} color={tip.color} />
         </View>
         <View style={styles.tipHeaderText}>
-          <Text style={styles.tipCategory}>{tip.category}</Text>
-          <Text style={styles.tipCount}>{tip.tips.length} tips</Text>
+          <Text style={[styles.tipCategory, { color: colors.neutral[900] }]}>{tip.category}</Text>
+          <Text style={[styles.tipCount, { color: colors.neutral[500] }]}>{tip.tips.length} tips</Text>
         </View>
         <Animated.View style={{ transform: [{ rotate: rotation }] }}>
           <MaterialCommunityIcons
@@ -137,21 +139,22 @@ const TipCard: React.FC<{
       </TouchableOpacity>
 
       {isExpanded && (
-        <View style={styles.tipCardContent}>
+        <View style={[styles.tipCardContent, { borderTopColor: colors.neutral[100] }]}>
           {tip.tips.map((item, index) => (
             <View
               key={index}
               style={[
                 styles.tipItem,
+                { borderBottomColor: colors.neutral[100] },
                 index === tip.tips.length - 1 && styles.tipItemLast,
               ]}
             >
               <View style={[styles.tipBullet, { backgroundColor: tip.color }]}>
-                <Text style={styles.tipBulletText}>{index + 1}</Text>
+                <Text style={[styles.tipBulletText, { color: defaultColors.neutral[0] }]}>{index + 1}</Text>
               </View>
               <View style={styles.tipItemContent}>
-                <Text style={styles.tipTitle}>{item.title}</Text>
-                <Text style={styles.tipDescription}>{item.description}</Text>
+                <Text style={[styles.tipTitle, { color: colors.neutral[900] }]}>{item.title}</Text>
+                <Text style={[styles.tipDescription, { color: colors.neutral[500] }]}>{item.description}</Text>
               </View>
             </View>
           ))}
@@ -162,6 +165,7 @@ const TipCard: React.FC<{
 };
 
 export const CareTipsScreen = () => {
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
 
@@ -170,7 +174,7 @@ export const CareTipsScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.neutral[50] }]}>
       <ModernHeader title="Plant Care Tips" />
 
       <ScrollView
@@ -187,29 +191,29 @@ export const CareTipsScreen = () => {
           style={styles.heroCard}
         >
           <View style={styles.heroIconContainer}>
-            <MaterialCommunityIcons name="leaf" size={32} color={colors.neutral[0]} />
+            <MaterialCommunityIcons name="leaf" size={32} color={defaultColors.neutral[0]} />
           </View>
-          <Text style={styles.heroTitle}>Grow Like a Pro</Text>
+          <Text style={[styles.heroTitle, { color: defaultColors.neutral[0] }]}>Grow Like a Pro</Text>
           <Text style={styles.heroSubtitle}>
             Essential tips to keep your plants thriving all year round
           </Text>
         </LinearGradient>
 
         {/* Quick Stats */}
-        <View style={styles.statsContainer}>
+        <View style={[styles.statsContainer, { backgroundColor: colors.neutral[0] }]}>
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>6</Text>
-            <Text style={styles.statLabel}>Categories</Text>
+            <Text style={[styles.statNumber, { color: colors.primary[600] }]}>6</Text>
+            <Text style={[styles.statLabel, { color: colors.neutral[500] }]}>Categories</Text>
           </View>
-          <View style={styles.statDivider} />
+          <View style={[styles.statDivider, { backgroundColor: colors.neutral[100] }]} />
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>24</Text>
-            <Text style={styles.statLabel}>Tips</Text>
+            <Text style={[styles.statNumber, { color: colors.primary[600] }]}>24</Text>
+            <Text style={[styles.statLabel, { color: colors.neutral[500] }]}>Tips</Text>
           </View>
-          <View style={styles.statDivider} />
+          <View style={[styles.statDivider, { backgroundColor: colors.neutral[100] }]} />
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>5</Text>
-            <Text style={styles.statLabel}>Min Read</Text>
+            <Text style={[styles.statNumber, { color: colors.primary[600] }]}>5</Text>
+            <Text style={[styles.statLabel, { color: colors.neutral[500] }]}>Min Read</Text>
           </View>
         </View>
 
@@ -226,13 +230,13 @@ export const CareTipsScreen = () => {
         </View>
 
         {/* Pro Tip Banner */}
-        <View style={styles.proTipBanner}>
-          <View style={styles.proTipIcon}>
+        <View style={[styles.proTipBanner, { backgroundColor: `${colors.accent.gold}15` }]}>
+          <View style={[styles.proTipIcon, { backgroundColor: `${colors.accent.gold}20` }]}>
             <MaterialCommunityIcons name="lightbulb-on" size={24} color={colors.accent.gold} />
           </View>
           <View style={styles.proTipContent}>
-            <Text style={styles.proTipTitle}>Pro Tip</Text>
-            <Text style={styles.proTipText}>
+            <Text style={[styles.proTipTitle, { color: colors.neutral[900] }]}>Pro Tip</Text>
+            <Text style={[styles.proTipText, { color: colors.neutral[600] }]}>
               Consistency is key! Set reminders to check on your plants at the same time each week.
             </Text>
           </View>
@@ -245,7 +249,7 @@ export const CareTipsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.neutral[50],
+    backgroundColor: defaultColors.neutral[50],
   },
   scrollView: {
     flex: 1,
@@ -272,7 +276,7 @@ const styles = StyleSheet.create({
   },
   heroTitle: {
     ...typography.title1,
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
     marginBottom: spacing.xs,
   },
   heroSubtitle: {
@@ -284,7 +288,7 @@ const styles = StyleSheet.create({
   // Stats
   statsContainer: {
     flexDirection: 'row',
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderRadius: borderRadius.xl,
     padding: spacing.lg,
     marginBottom: spacing.lg,
@@ -296,16 +300,16 @@ const styles = StyleSheet.create({
   },
   statDivider: {
     width: 1,
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
   },
   statNumber: {
     ...typography.title1,
-    color: colors.primary[600],
+    color: defaultColors.primary[600],
     marginBottom: 2,
   },
   statLabel: {
     ...typography.caption,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
   },
 
   // Tips
@@ -313,7 +317,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   tipCard: {
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderRadius: borderRadius.xl,
     overflow: 'hidden',
     ...shadows.sm,
@@ -336,25 +340,25 @@ const styles = StyleSheet.create({
   },
   tipCategory: {
     ...typography.title3,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
   },
   tipCount: {
     ...typography.footnote,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
     marginTop: 2,
   },
   tipCardContent: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.lg,
     borderTopWidth: 1,
-    borderTopColor: colors.neutral[100],
+    borderTopColor: defaultColors.neutral[100],
     paddingTop: spacing.md,
   },
   tipItem: {
     flexDirection: 'row',
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.neutral[100],
+    borderBottomColor: defaultColors.neutral[100],
     gap: spacing.md,
   },
   tipItemLast: {
@@ -370,7 +374,7 @@ const styles = StyleSheet.create({
   tipBulletText: {
     ...typography.footnote,
     fontWeight: '700',
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
   },
   tipItemContent: {
     flex: 1,
@@ -378,19 +382,19 @@ const styles = StyleSheet.create({
   tipTitle: {
     ...typography.callout,
     fontWeight: '600',
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     marginBottom: 2,
   },
   tipDescription: {
     ...typography.footnote,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
     lineHeight: 20,
   },
 
   // Pro Tip
   proTipBanner: {
     flexDirection: 'row',
-    backgroundColor: `${colors.accent.gold}15`,
+    backgroundColor: `${defaultColors.accent.gold}15`,
     borderRadius: borderRadius.xl,
     padding: spacing.lg,
     marginTop: spacing.lg,
@@ -401,7 +405,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: `${colors.accent.gold}20`,
+    backgroundColor: `${defaultColors.accent.gold}20`,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -411,12 +415,12 @@ const styles = StyleSheet.create({
   proTipTitle: {
     ...typography.callout,
     fontWeight: '700',
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     marginBottom: 4,
   },
   proTipText: {
     ...typography.footnote,
-    color: colors.neutral[600],
+    color: defaultColors.neutral[600],
     lineHeight: 20,
   },
 });

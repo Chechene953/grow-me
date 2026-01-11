@@ -16,7 +16,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { ModernHeader } from '../components/ModernHeader';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, shadows, typography } from '../theme';
+import { colors as defaultColors, spacing, borderRadius, shadows, typography } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface ContactMethod {
   icon: keyof typeof MaterialCommunityIcons.glyphMap;
@@ -32,21 +33,21 @@ const CONTACT_METHODS: ContactMethod[] = [
     title: 'Email',
     value: 'support@growme.app',
     action: () => Linking.openURL('mailto:support@growme.app'),
-    color: colors.primary[600],
+    color: defaultColors.primary[600],
   },
   {
     icon: 'phone-outline',
     title: 'Phone',
     value: '+1 (800) 123-4567',
     action: () => Linking.openURL('tel:+18001234567'),
-    color: colors.semantic.success,
+    color: defaultColors.semantic.success,
   },
   {
     icon: 'map-marker-outline',
     title: 'Address',
     value: '123 Plant Street, Garden City, CA 90210',
     action: () => Linking.openURL('https://maps.google.com/?q=Garden+City+CA'),
-    color: colors.semantic.warning,
+    color: defaultColors.semantic.warning,
   },
 ];
 
@@ -59,6 +60,7 @@ const SOCIAL_LINKS = [
 
 export const ContactScreen = () => {
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [subject, setSubject] = useState('');
@@ -103,7 +105,7 @@ export const ContactScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.neutral[50] }]}>
       <ModernHeader title="Contact Us" />
 
       <KeyboardAvoidingView
@@ -126,21 +128,21 @@ export const ContactScreen = () => {
             style={styles.heroCard}
           >
             <View style={styles.heroIconContainer}>
-              <MaterialCommunityIcons name="message-text" size={32} color={colors.neutral[0]} />
+              <MaterialCommunityIcons name="message-text" size={32} color={defaultColors.neutral[0]} />
             </View>
-            <Text style={styles.heroTitle}>Get in Touch</Text>
+            <Text style={[styles.heroTitle, { color: defaultColors.neutral[0] }]}>Get in Touch</Text>
             <Text style={styles.heroSubtitle}>
               We'd love to hear from you. Our team typically responds within 24 hours.
             </Text>
           </LinearGradient>
 
           {/* Contact Methods */}
-          <Text style={styles.sectionTitle}>Quick Contact</Text>
+          <Text style={[styles.sectionTitle, { color: colors.neutral[900] }]}>Quick Contact</Text>
           <View style={styles.contactMethods}>
             {CONTACT_METHODS.map((method) => (
               <TouchableOpacity
                 key={method.title}
-                style={styles.contactMethod}
+                style={[styles.contactMethod, { backgroundColor: colors.neutral[0] }]}
                 onPress={() => handleContactMethod(method)}
                 activeOpacity={0.7}
               >
@@ -148,8 +150,8 @@ export const ContactScreen = () => {
                   <MaterialCommunityIcons name={method.icon} size={24} color={method.color} />
                 </View>
                 <View style={styles.contactMethodInfo}>
-                  <Text style={styles.contactMethodTitle}>{method.title}</Text>
-                  <Text style={styles.contactMethodValue}>{method.value}</Text>
+                  <Text style={[styles.contactMethodTitle, { color: colors.neutral[900] }]}>{method.title}</Text>
+                  <Text style={[styles.contactMethodValue, { color: colors.neutral[500] }]}>{method.value}</Text>
                 </View>
                 <MaterialCommunityIcons name="chevron-right" size={20} color={colors.neutral[400]} />
               </TouchableOpacity>
@@ -157,14 +159,14 @@ export const ContactScreen = () => {
           </View>
 
           {/* Contact Form */}
-          <Text style={styles.sectionTitle}>Send a Message</Text>
-          <View style={styles.formCard}>
+          <Text style={[styles.sectionTitle, { color: colors.neutral[900] }]}>Send a Message</Text>
+          <View style={[styles.formCard, { backgroundColor: colors.neutral[0] }]}>
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Name *</Text>
-              <View style={styles.inputContainer}>
+              <Text style={[styles.inputLabel, { color: colors.neutral[700] }]}>Name *</Text>
+              <View style={[styles.inputContainer, { backgroundColor: colors.neutral[50], borderColor: colors.neutral[200] }]}>
                 <MaterialCommunityIcons name="account-outline" size={20} color={colors.neutral[400]} />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: colors.neutral[900] }]}
                   placeholder="Your name"
                   placeholderTextColor={colors.neutral[400]}
                   value={name}
@@ -174,11 +176,11 @@ export const ContactScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Email *</Text>
-              <View style={styles.inputContainer}>
+              <Text style={[styles.inputLabel, { color: colors.neutral[700] }]}>Email *</Text>
+              <View style={[styles.inputContainer, { backgroundColor: colors.neutral[50], borderColor: colors.neutral[200] }]}>
                 <MaterialCommunityIcons name="email-outline" size={20} color={colors.neutral[400]} />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: colors.neutral[900] }]}
                   placeholder="your@email.com"
                   placeholderTextColor={colors.neutral[400]}
                   value={email}
@@ -190,11 +192,11 @@ export const ContactScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Subject</Text>
-              <View style={styles.inputContainer}>
+              <Text style={[styles.inputLabel, { color: colors.neutral[700] }]}>Subject</Text>
+              <View style={[styles.inputContainer, { backgroundColor: colors.neutral[50], borderColor: colors.neutral[200] }]}>
                 <MaterialCommunityIcons name="tag-outline" size={20} color={colors.neutral[400]} />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: colors.neutral[900] }]}
                   placeholder="What's this about?"
                   placeholderTextColor={colors.neutral[400]}
                   value={subject}
@@ -204,10 +206,10 @@ export const ContactScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Message *</Text>
-              <View style={[styles.inputContainer, styles.textAreaContainer]}>
+              <Text style={[styles.inputLabel, { color: colors.neutral[700] }]}>Message *</Text>
+              <View style={[styles.inputContainer, styles.textAreaContainer, { backgroundColor: colors.neutral[50], borderColor: colors.neutral[200] }]}>
                 <TextInput
-                  style={[styles.input, styles.textArea]}
+                  style={[styles.input, styles.textArea, { color: colors.neutral[900] }]}
                   placeholder="How can we help you?"
                   placeholderTextColor={colors.neutral[400]}
                   value={message}
@@ -232,11 +234,11 @@ export const ContactScreen = () => {
                 style={styles.submitButtonGradient}
               >
                 {isSending ? (
-                  <Text style={styles.submitButtonText}>Sending...</Text>
+                  <Text style={[styles.submitButtonText, { color: defaultColors.neutral[0] }]}>Sending...</Text>
                 ) : (
                   <>
-                    <MaterialCommunityIcons name="send" size={18} color={colors.neutral[0]} />
-                    <Text style={styles.submitButtonText}>Send Message</Text>
+                    <MaterialCommunityIcons name="send" size={18} color={defaultColors.neutral[0]} />
+                    <Text style={[styles.submitButtonText, { color: defaultColors.neutral[0] }]}>Send Message</Text>
                   </>
                 )}
               </LinearGradient>
@@ -295,7 +297,7 @@ export const ContactScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.neutral[50],
+    backgroundColor: defaultColors.neutral[50],
   },
   scrollView: {
     flex: 1,
@@ -322,7 +324,7 @@ const styles = StyleSheet.create({
   },
   heroTitle: {
     ...typography.title1,
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
     marginBottom: spacing.xs,
   },
   heroSubtitle: {
@@ -334,7 +336,7 @@ const styles = StyleSheet.create({
   // Section
   sectionTitle: {
     ...typography.title3,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     marginBottom: spacing.md,
     marginTop: spacing.md,
   },
@@ -346,7 +348,7 @@ const styles = StyleSheet.create({
   contactMethod: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderRadius: borderRadius.xl,
     padding: spacing.lg,
     gap: spacing.md,
@@ -365,17 +367,17 @@ const styles = StyleSheet.create({
   contactMethodTitle: {
     ...typography.callout,
     fontWeight: '600',
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
   },
   contactMethodValue: {
     ...typography.footnote,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
     marginTop: 2,
   },
 
   // Form
   formCard: {
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderRadius: borderRadius.xl,
     padding: spacing.lg,
     ...shadows.sm,
@@ -386,24 +388,24 @@ const styles = StyleSheet.create({
   inputLabel: {
     ...typography.footnote,
     fontWeight: '600',
-    color: colors.neutral[700],
+    color: defaultColors.neutral[700],
     marginBottom: spacing.sm,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.neutral[50],
+    backgroundColor: defaultColors.neutral[50],
     borderRadius: borderRadius.lg,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     gap: spacing.sm,
     borderWidth: 1,
-    borderColor: colors.neutral[200],
+    borderColor: defaultColors.neutral[200],
   },
   input: {
     flex: 1,
     ...typography.body,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     paddingVertical: spacing.xs,
   },
   textAreaContainer: {
@@ -432,12 +434,12 @@ const styles = StyleSheet.create({
   submitButtonText: {
     ...typography.callout,
     fontWeight: '700',
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
   },
 
   // Hours
   hoursCard: {
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderRadius: borderRadius.xl,
     padding: spacing.lg,
     marginTop: spacing.lg,
@@ -450,11 +452,11 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     paddingBottom: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.neutral[100],
+    borderBottomColor: defaultColors.neutral[100],
   },
   hoursTitle: {
     ...typography.title3,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
   },
   hoursList: {
     gap: spacing.sm,
@@ -466,11 +468,11 @@ const styles = StyleSheet.create({
   },
   hoursDay: {
     ...typography.callout,
-    color: colors.neutral[700],
+    color: defaultColors.neutral[700],
   },
   hoursTime: {
     ...typography.footnote,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
   },
 
   // Social
