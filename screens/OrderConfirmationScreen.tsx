@@ -248,7 +248,7 @@ export const OrderConfirmationScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.neutral[50],
+    backgroundColor: defaultColors.neutral[50],
   },
   loadingContainer: {
     justifyContent: 'center',
@@ -278,13 +278,13 @@ const styles = StyleSheet.create({
   // Title
   title: {
     ...typography.largeTitle,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     textAlign: 'center',
     marginBottom: spacing.sm,
   },
   subtitle: {
     ...typography.body,
-    color: colors.neutral[600],
+    color: defaultColors.neutral[600],
     textAlign: 'center',
     marginBottom: spacing.xl,
     paddingHorizontal: spacing.lg,
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
 
   // Order Number Card
   orderNumberCard: {
-    backgroundColor: colors.primary[50],
+    backgroundColor: defaultColors.primary[50],
     borderRadius: borderRadius.xl,
     padding: spacing.lg,
     alignItems: 'center',
@@ -300,19 +300,19 @@ const styles = StyleSheet.create({
   },
   orderNumberLabel: {
     ...typography.footnote,
-    color: colors.primary[600],
+    color: defaultColors.primary[600],
     marginBottom: spacing.xs,
   },
   orderNumber: {
     ...typography.title1,
-    color: colors.primary[700],
+    color: defaultColors.primary[700],
     fontWeight: '700',
   },
 
   // Info Cards
   infoCard: {
     flexDirection: 'row',
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderRadius: borderRadius.xl,
     padding: spacing.lg,
     marginBottom: spacing.md,
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 16,
-    backgroundColor: colors.primary[50],
+    backgroundColor: defaultColors.primary[50],
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.md,
@@ -333,22 +333,22 @@ const styles = StyleSheet.create({
   infoTitle: {
     ...typography.callout,
     fontWeight: '600',
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     marginBottom: spacing.xs,
   },
   infoText: {
     ...typography.footnote,
-    color: colors.neutral[600],
+    color: defaultColors.neutral[600],
     lineHeight: 20,
   },
   infoEmail: {
     fontWeight: '600',
-    color: colors.primary[600],
+    color: defaultColors.primary[600],
   },
 
   // Summary Card
   summaryCard: {
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderRadius: borderRadius.xl,
     padding: spacing.lg,
     marginBottom: spacing.md,
@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     ...typography.title3,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     marginBottom: spacing.md,
   },
   itemsList: {
@@ -370,7 +370,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: borderRadius.lg,
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
   },
   itemDetails: {
     flex: 1,
@@ -379,21 +379,21 @@ const styles = StyleSheet.create({
   itemName: {
     ...typography.callout,
     fontWeight: '600',
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
   },
   itemMeta: {
     ...typography.caption,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
     marginTop: 2,
   },
   itemPrice: {
     ...typography.callout,
     fontWeight: '600',
-    color: colors.neutral[800],
+    color: defaultColors.neutral[800],
   },
   divider: {
     height: 1,
-    backgroundColor: colors.neutral[200],
+    backgroundColor: defaultColors.neutral[200],
     marginVertical: spacing.md,
   },
   totalsContainer: {
@@ -406,40 +406,40 @@ const styles = StyleSheet.create({
   },
   totalLabel: {
     ...typography.body,
-    color: colors.neutral[600],
+    color: defaultColors.neutral[600],
   },
   totalValue: {
     ...typography.body,
     fontWeight: '500',
-    color: colors.neutral[800],
+    color: defaultColors.neutral[800],
   },
   freeText: {
-    color: colors.semantic.success,
+    color: defaultColors.semantic.success,
   },
   grandTotalLabel: {
     ...typography.title3,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
   },
   grandTotalValue: {
     ...typography.title2,
-    color: colors.primary[700],
+    color: defaultColors.primary[700],
     fontWeight: '700',
   },
   addressContainer: {
     marginTop: spacing.lg,
     paddingTop: spacing.md,
     borderTopWidth: 1,
-    borderTopColor: colors.neutral[100],
+    borderTopColor: defaultColors.neutral[100],
   },
   addressTitle: {
     ...typography.footnote,
     fontWeight: '600',
-    color: colors.neutral[600],
+    color: defaultColors.neutral[600],
     marginBottom: spacing.xs,
   },
   addressText: {
     ...typography.body,
-    color: colors.neutral[800],
+    color: defaultColors.neutral[800],
     lineHeight: 22,
   },
 
@@ -447,7 +447,7 @@ const styles = StyleSheet.create({
   deliveryCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.primary[50],
+    backgroundColor: defaultColors.primary[50],
     borderRadius: borderRadius.xl,
     padding: spacing.lg,
     marginBottom: spacing.xl,
@@ -459,13 +459,13 @@ const styles = StyleSheet.create({
   deliveryTitle: {
     ...typography.footnote,
     fontWeight: '600',
-    color: colors.primary[600],
+    color: defaultColors.primary[600],
     marginBottom: 2,
   },
   deliveryDate: {
     ...typography.body,
     fontWeight: '600',
-    color: colors.primary[800],
+    color: defaultColors.primary[800],
   },
 
   // Buttons
@@ -482,6 +482,6 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     ...typography.body,
     fontWeight: '600',
-    color: colors.primary[600],
+    color: defaultColors.primary[600],
   },
 });

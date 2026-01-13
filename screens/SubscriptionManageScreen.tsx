@@ -17,7 +17,8 @@ import { ModernHeader } from '../components/ModernHeader';
 import { useAuthStore } from '../stores/authStore';
 import { stripeService } from '../services/stripeService';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, shadows, typography } from '../theme';
+import { colors as defaultColors, spacing, borderRadius, shadows, typography } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface PlanFeature {
   icon: keyof typeof MaterialCommunityIcons.glyphMap;
@@ -69,6 +70,7 @@ export const SubscriptionManageScreen = () => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { user } = useAuthStore();
+  const { colors } = useTheme();
   const [loading, setLoading] = useState(false);
   const [autoRenew, setAutoRenew] = useState(true);
 
@@ -133,7 +135,7 @@ export const SubscriptionManageScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.neutral[50] }]}>
       <ModernHeader title="Subscription" />
 
       <ScrollView
@@ -153,20 +155,20 @@ export const SubscriptionManageScreen = () => {
             style={styles.planCard}
           >
             <View style={styles.planBadge}>
-              <MaterialCommunityIcons name="crown" size={16} color={colors.neutral[900]} />
-              <Text style={styles.planBadgeText}>PREMIUM</Text>
+              <MaterialCommunityIcons name="crown" size={16} color={defaultColors.neutral[900]} />
+              <Text style={[styles.planBadgeText, { color: defaultColors.neutral[900] }]}>PREMIUM</Text>
             </View>
             <View style={styles.planHeader}>
               <View>
-                <Text style={styles.planName}>Assisted Monitoring</Text>
-                <Text style={styles.planPrice}>
+                <Text style={[styles.planName, { color: defaultColors.neutral[900] }]}>Assisted Monitoring</Text>
+                <Text style={[styles.planPrice, { color: defaultColors.neutral[900] }]}>
                   ${user?.subscription?.pricePerMonth}
                   <Text style={styles.planPeriod}>/month</Text>
                 </Text>
               </View>
               <View style={styles.planStatusBadge}>
-                <View style={styles.statusDot} />
-                <Text style={styles.planStatus}>Active</Text>
+                <View style={[styles.statusDot, { backgroundColor: colors.semantic.success }]} />
+                <Text style={[styles.planStatus, { color: defaultColors.neutral[900] }]}>Active</Text>
               </View>
             </View>
             <View style={styles.planDetails}>
@@ -185,12 +187,12 @@ export const SubscriptionManageScreen = () => {
             </View>
           </LinearGradient>
         ) : (
-          <View style={styles.noPlanCard}>
-            <View style={styles.noPlanIconContainer}>
+          <View style={[styles.noPlanCard, { backgroundColor: colors.neutral[0] }]}>
+            <View style={[styles.noPlanIconContainer, { backgroundColor: colors.neutral[100] }]}>
               <MaterialCommunityIcons name="crown-outline" size={48} color={colors.neutral[300]} />
             </View>
-            <Text style={styles.noPlanTitle}>No Active Subscription</Text>
-            <Text style={styles.noPlanSubtitle}>
+            <Text style={[styles.noPlanTitle, { color: colors.neutral[900] }]}>No Active Subscription</Text>
+            <Text style={[styles.noPlanSubtitle, { color: colors.neutral[500] }]}>
               Upgrade to Premium for exclusive benefits and expert plant care support
             </Text>
           </View>
@@ -198,27 +200,27 @@ export const SubscriptionManageScreen = () => {
 
         {/* Features Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
+          <Text style={[styles.sectionTitle, { color: colors.neutral[900] }]}>
             {hasSubscription ? 'Your Premium Benefits' : 'Premium Benefits'}
           </Text>
           <View style={styles.featuresGrid}>
             {PLAN_FEATURES.map((feature, index) => (
-              <View key={index} style={styles.featureCard}>
-                <View style={[styles.featureIconContainer, hasSubscription && styles.featureIconContainerActive]}>
+              <View key={index} style={[styles.featureCard, { backgroundColor: colors.neutral[0] }]}>
+                <View style={[styles.featureIconContainer, { backgroundColor: colors.neutral[100] }, hasSubscription && { backgroundColor: colors.primary[50] }]}>
                   <MaterialCommunityIcons
                     name={feature.icon}
                     size={24}
                     color={hasSubscription ? colors.primary[600] : colors.neutral[400]}
                   />
                 </View>
-                <Text style={[styles.featureTitle, hasSubscription && styles.featureTitleActive]}>
+                <Text style={[styles.featureTitle, { color: colors.neutral[400] }, hasSubscription && { color: colors.neutral[900] }]}>
                   {feature.title}
                 </Text>
-                <Text style={styles.featureDescription}>{feature.description}</Text>
+                <Text style={[styles.featureDescription, { color: colors.neutral[500] }]}>{feature.description}</Text>
                 {hasSubscription && (
                   <View style={styles.includedBadge}>
                     <MaterialCommunityIcons name="check-circle" size={14} color={colors.semantic.success} />
-                    <Text style={styles.includedText}>Included</Text>
+                    <Text style={[styles.includedText, { color: colors.semantic.success }]}>Included</Text>
                   </View>
                 )}
               </View>
@@ -229,14 +231,14 @@ export const SubscriptionManageScreen = () => {
         {/* Settings Section (for subscribers) */}
         {hasSubscription && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Subscription Settings</Text>
-            <View style={styles.settingsCard}>
+            <Text style={[styles.sectionTitle, { color: colors.neutral[900] }]}>Subscription Settings</Text>
+            <View style={[styles.settingsCard, { backgroundColor: colors.neutral[0] }]}>
               <View style={styles.settingRow}>
                 <View style={styles.settingInfo}>
                   <MaterialCommunityIcons name="autorenew" size={22} color={colors.neutral[600]} />
                   <View style={styles.settingText}>
-                    <Text style={styles.settingTitle}>Auto-Renewal</Text>
-                    <Text style={styles.settingSubtitle}>Automatically renew subscription</Text>
+                    <Text style={[styles.settingTitle, { color: colors.neutral[800] }]}>Auto-Renewal</Text>
+                    <Text style={[styles.settingSubtitle, { color: colors.neutral[500] }]}>Automatically renew subscription</Text>
                   </View>
                 </View>
                 <Switch
@@ -249,7 +251,7 @@ export const SubscriptionManageScreen = () => {
                   thumbColor={autoRenew ? colors.primary[600] : colors.neutral[0]}
                 />
               </View>
-              <View style={styles.settingDivider} />
+              <View style={[styles.settingDivider, { backgroundColor: colors.neutral[100] }]} />
               <TouchableOpacity
                 style={styles.settingRow}
                 onPress={openBillingPortal}
@@ -258,13 +260,13 @@ export const SubscriptionManageScreen = () => {
                 <View style={styles.settingInfo}>
                   <MaterialCommunityIcons name="credit-card-outline" size={22} color={colors.neutral[600]} />
                   <View style={styles.settingText}>
-                    <Text style={styles.settingTitle}>Payment Method</Text>
-                    <Text style={styles.settingSubtitle}>Update your billing information</Text>
+                    <Text style={[styles.settingTitle, { color: colors.neutral[800] }]}>Payment Method</Text>
+                    <Text style={[styles.settingSubtitle, { color: colors.neutral[500] }]}>Update your billing information</Text>
                   </View>
                 </View>
                 <MaterialCommunityIcons name="chevron-right" size={22} color={colors.neutral[300]} />
               </TouchableOpacity>
-              <View style={styles.settingDivider} />
+              <View style={[styles.settingDivider, { backgroundColor: colors.neutral[100] }]} />
               <TouchableOpacity
                 style={styles.settingRow}
                 onPress={() => {
@@ -276,8 +278,8 @@ export const SubscriptionManageScreen = () => {
                 <View style={styles.settingInfo}>
                   <MaterialCommunityIcons name="receipt" size={22} color={colors.neutral[600]} />
                   <View style={styles.settingText}>
-                    <Text style={styles.settingTitle}>Billing History</Text>
-                    <Text style={styles.settingSubtitle}>View invoices and receipts</Text>
+                    <Text style={[styles.settingTitle, { color: colors.neutral[800] }]}>Billing History</Text>
+                    <Text style={[styles.settingSubtitle, { color: colors.neutral[500] }]}>View invoices and receipts</Text>
                   </View>
                 </View>
                 <MaterialCommunityIcons name="chevron-right" size={22} color={colors.neutral[300]} />
@@ -302,8 +304,8 @@ export const SubscriptionManageScreen = () => {
                   end={{ x: 1, y: 0 }}
                   style={styles.manageButtonGradient}
                 >
-                  <MaterialCommunityIcons name="cog-outline" size={20} color={colors.neutral[0]} />
-                  <Text style={styles.manageButtonText}>
+                  <MaterialCommunityIcons name="cog-outline" size={20} color={defaultColors.neutral[0]} />
+                  <Text style={[styles.manageButtonText, { color: defaultColors.neutral[0] }]}>
                     {loading ? 'Opening...' : 'Manage Subscription'}
                   </Text>
                 </LinearGradient>
@@ -313,7 +315,7 @@ export const SubscriptionManageScreen = () => {
                 onPress={handleCancelSubscription}
                 activeOpacity={0.7}
               >
-                <Text style={styles.cancelButtonText}>Cancel Subscription</Text>
+                <Text style={[styles.cancelButtonText, { color: colors.semantic.error }]}>Cancel Subscription</Text>
               </TouchableOpacity>
             </>
           ) : (
@@ -329,14 +331,14 @@ export const SubscriptionManageScreen = () => {
                   end={{ x: 1, y: 0 }}
                   style={styles.subscribeButtonGradient}
                 >
-                  <MaterialCommunityIcons name="crown" size={22} color={colors.neutral[900]} />
+                  <MaterialCommunityIcons name="crown" size={22} color={defaultColors.neutral[900]} />
                   <View style={styles.subscribeButtonText}>
-                    <Text style={styles.subscribeTitle}>Upgrade to Premium</Text>
+                    <Text style={[styles.subscribeTitle, { color: defaultColors.neutral[900] }]}>Upgrade to Premium</Text>
                     <Text style={styles.subscribePrice}>$9.99/month</Text>
                   </View>
                 </LinearGradient>
               </TouchableOpacity>
-              <Text style={styles.cancelAnytime}>Cancel anytime. No commitments.</Text>
+              <Text style={[styles.cancelAnytime, { color: colors.neutral[500] }]}>Cancel anytime. No commitments.</Text>
             </>
           )}
         </View>
@@ -351,7 +353,7 @@ export const SubscriptionManageScreen = () => {
           activeOpacity={0.7}
         >
           <MaterialCommunityIcons name="help-circle-outline" size={20} color={colors.primary[600]} />
-          <Text style={styles.faqLinkText}>Subscription FAQ</Text>
+          <Text style={[styles.faqLinkText, { color: colors.primary[600] }]}>Subscription FAQ</Text>
           <MaterialCommunityIcons name="chevron-right" size={18} color={colors.primary[600]} />
         </TouchableOpacity>
       </ScrollView>
@@ -362,7 +364,7 @@ export const SubscriptionManageScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.neutral[50],
+    backgroundColor: defaultColors.neutral[50],
   },
   scrollView: {
     flex: 1,
@@ -391,7 +393,7 @@ const styles = StyleSheet.create({
   planBadgeText: {
     ...typography.caption,
     fontWeight: '800',
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
   },
   planHeader: {
     flexDirection: 'row',
@@ -401,13 +403,13 @@ const styles = StyleSheet.create({
   },
   planName: {
     ...typography.title2,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     marginBottom: 4,
   },
   planPrice: {
     fontSize: 28,
     fontWeight: '800',
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
   },
   planPeriod: {
     fontSize: 14,
@@ -427,12 +429,12 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: colors.semantic.success,
+    backgroundColor: defaultColors.semantic.success,
   },
   planStatus: {
     ...typography.footnote,
     fontWeight: '600',
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
   },
   planDetails: {
     gap: spacing.sm,
@@ -449,7 +451,7 @@ const styles = StyleSheet.create({
 
   // No Plan Card
   noPlanCard: {
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderRadius: borderRadius.xl,
     padding: spacing.xl,
     alignItems: 'center',
@@ -460,19 +462,19 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.md,
   },
   noPlanTitle: {
     ...typography.title3,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     marginBottom: spacing.xs,
   },
   noPlanSubtitle: {
     ...typography.body,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
     textAlign: 'center',
     lineHeight: 22,
   },
@@ -483,7 +485,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     ...typography.title3,
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
     marginBottom: spacing.md,
   },
 
@@ -495,7 +497,7 @@ const styles = StyleSheet.create({
   },
   featureCard: {
     width: '47%',
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderRadius: borderRadius.xl,
     padding: spacing.md,
     ...shadows.sm,
@@ -504,26 +506,26 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 12,
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.sm,
   },
   featureIconContainerActive: {
-    backgroundColor: colors.primary[50],
+    backgroundColor: defaultColors.primary[50],
   },
   featureTitle: {
     ...typography.footnote,
     fontWeight: '600',
-    color: colors.neutral[400],
+    color: defaultColors.neutral[400],
     marginBottom: 2,
   },
   featureTitleActive: {
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
   },
   featureDescription: {
     ...typography.caption,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
     lineHeight: 16,
   },
   includedBadge: {
@@ -534,13 +536,13 @@ const styles = StyleSheet.create({
   },
   includedText: {
     ...typography.caption,
-    color: colors.semantic.success,
+    color: defaultColors.semantic.success,
     fontWeight: '600',
   },
 
   // Settings
   settingsCard: {
-    backgroundColor: colors.neutral[0],
+    backgroundColor: defaultColors.neutral[0],
     borderRadius: borderRadius.xl,
     overflow: 'hidden',
     ...shadows.sm,
@@ -563,16 +565,16 @@ const styles = StyleSheet.create({
   settingTitle: {
     ...typography.callout,
     fontWeight: '600',
-    color: colors.neutral[800],
+    color: defaultColors.neutral[800],
   },
   settingSubtitle: {
     ...typography.caption,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
     marginTop: 2,
   },
   settingDivider: {
     height: 1,
-    backgroundColor: colors.neutral[100],
+    backgroundColor: defaultColors.neutral[100],
     marginLeft: spacing.lg + 22 + spacing.md,
   },
 
@@ -596,7 +598,7 @@ const styles = StyleSheet.create({
   manageButtonText: {
     ...typography.callout,
     fontWeight: '700',
-    color: colors.neutral[0],
+    color: defaultColors.neutral[0],
   },
   cancelButton: {
     alignItems: 'center',
@@ -604,7 +606,7 @@ const styles = StyleSheet.create({
   },
   cancelButtonText: {
     ...typography.callout,
-    color: colors.semantic.error,
+    color: defaultColors.semantic.error,
     fontWeight: '600',
   },
   subscribeButton: {
@@ -625,7 +627,7 @@ const styles = StyleSheet.create({
   subscribeTitle: {
     ...typography.callout,
     fontWeight: '700',
-    color: colors.neutral[900],
+    color: defaultColors.neutral[900],
   },
   subscribePrice: {
     ...typography.footnote,
@@ -634,7 +636,7 @@ const styles = StyleSheet.create({
   },
   cancelAnytime: {
     ...typography.footnote,
-    color: colors.neutral[500],
+    color: defaultColors.neutral[500],
     textAlign: 'center',
   },
 
@@ -648,7 +650,7 @@ const styles = StyleSheet.create({
   },
   faqLinkText: {
     ...typography.callout,
-    color: colors.primary[600],
+    color: defaultColors.primary[600],
     fontWeight: '600',
   },
 });

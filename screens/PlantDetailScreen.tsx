@@ -109,11 +109,11 @@ const QuantitySelector: React.FC<{
   };
 
   return (
-    <View style={styles.quantityContainer}>
-      <Text style={styles.quantityLabel}>Quantity</Text>
+    <View style={[styles.quantityContainer, { backgroundColor: colors.neutral[100] }]}>
+      <Text style={[styles.quantityLabel, { color: colors.neutral[800] }]}>Quantity</Text>
       <View style={styles.quantityControls}>
         <TouchableOpacity
-          style={[styles.quantityBtn, quantity <= 1 && styles.quantityBtnDisabled]}
+          style={[styles.quantityBtn, { backgroundColor: colors.neutral[0], borderColor: colors.neutral[200] }, quantity <= 1 && styles.quantityBtnDisabled]}
           onPress={handleDecrease}
           disabled={quantity <= 1}
           activeOpacity={0.7}
@@ -125,10 +125,10 @@ const QuantitySelector: React.FC<{
           />
         </TouchableOpacity>
         <View style={styles.quantityValue}>
-          <Text style={styles.quantityText}>{quantity}</Text>
+          <Text style={[styles.quantityText, { color: colors.neutral[900] }]}>{quantity}</Text>
         </View>
         <TouchableOpacity
-          style={[styles.quantityBtn, quantity >= max && styles.quantityBtnDisabled]}
+          style={[styles.quantityBtn, { backgroundColor: colors.neutral[0], borderColor: colors.neutral[200] }, quantity >= max && styles.quantityBtnDisabled]}
           onPress={handleIncrease}
           disabled={quantity >= max}
           activeOpacity={0.7}
@@ -169,7 +169,11 @@ const SizeSelector: React.FC<{
             style={styles.sizeCard}
           >
             <View style={styles.sizeIconContainer}>
-              <View style={[styles.sizeIconCircle, isSelected && styles.sizeIconCircleSelected]}>
+              <View style={[
+                styles.sizeIconCircle,
+                { backgroundColor: colors.neutral[100] },
+                isSelected && { backgroundColor: colors.primary[100] }
+              ]}>
                 <MaterialCommunityIcons
                   name={size === 'Small' ? 'pot-outline' : size === 'Medium' ? 'pot' : 'pot-mix-outline'}
                   size={24}
@@ -177,11 +181,19 @@ const SizeSelector: React.FC<{
                 />
               </View>
             </View>
-            <Text style={[styles.sizeName, isSelected && styles.sizeNameSelected]}>{info.label}</Text>
-            <Text style={styles.sizeHeight}>{info.height}</Text>
-            <Text style={styles.sizePot}>{info.pot}</Text>
-            <View style={styles.sizePriceTag}>
-              <Text style={[styles.sizePrice, isSelected && styles.sizePriceSelected]}>
+            <Text style={[
+              styles.sizeName,
+              { color: colors.neutral[800] },
+              isSelected && { color: colors.primary[700] }
+            ]}>{info.label}</Text>
+            <Text style={[styles.sizeHeight, { color: colors.neutral[500] }]}>{info.height}</Text>
+            <Text style={[styles.sizePot, { color: colors.neutral[400] }]}>{info.pot}</Text>
+            <View style={[styles.sizePriceTag, { backgroundColor: colors.neutral[100] }]}>
+              <Text style={[
+                styles.sizePrice,
+                { color: colors.neutral[600] },
+                isSelected && { color: colors.primary[700] }
+              ]}>
                 ${price.toFixed(0)}
               </Text>
             </View>
@@ -230,14 +242,18 @@ const PotColorSelector: React.FC<{
               </View>
               <View style={[styles.colorShadow, { backgroundColor: color.hexCode }]} />
             </View>
-            <Text style={[styles.colorName, isSelected && styles.colorNameSelected]}>
+            <Text style={[
+              styles.colorName,
+              { color: colors.neutral[800] },
+              isSelected && { color: colors.primary[700] }
+            ]}>
               {color.name}
             </Text>
-            <View style={styles.materialTag}>
-              <Text style={styles.materialText}>{color.material}</Text>
+            <View style={[styles.materialTag, { backgroundColor: colors.neutral[100] }]}>
+              <Text style={[styles.materialText, { color: colors.neutral[500] }]}>{color.material}</Text>
             </View>
             {color.priceModifier > 0 && (
-              <Text style={styles.colorModifier}>+${color.priceModifier}</Text>
+              <Text style={[styles.colorModifier, { color: colors.primary[600] }]}>+${color.priceModifier}</Text>
             )}
           </AnimatedOptionCard>
         );
@@ -265,8 +281,16 @@ const AccessoryItem: React.FC<{
       onPress={handlePress}
       style={({ pressed }) => [{ transform: [{ scale: pressed ? 0.97 : 1 }] }]}
     >
-      <View style={[styles.accessoryCard, selected && styles.accessoryCardSelected]}>
-        <View style={[styles.accessoryIconContainer, selected && styles.accessoryIconContainerSelected]}>
+      <View style={[
+        styles.accessoryCard,
+        { backgroundColor: colors.neutral[0], borderColor: colors.neutral[200] },
+        selected && { borderColor: colors.primary[400], backgroundColor: colors.primary[50] }
+      ]}>
+        <View style={[
+          styles.accessoryIconContainer,
+          { backgroundColor: colors.neutral[100] },
+          selected && { backgroundColor: colors.primary[100] }
+        ]}>
           <MaterialCommunityIcons
             name={iconName as any}
             size={24}
@@ -274,16 +298,28 @@ const AccessoryItem: React.FC<{
           />
         </View>
         <View style={styles.accessoryInfo}>
-          <Text style={[styles.accessoryTitle, selected && styles.accessoryTitleSelected]}>
+          <Text style={[
+            styles.accessoryTitle,
+            { color: colors.neutral[900] },
+            selected && { color: colors.primary[700] }
+          ]}>
             {accessory.name}
           </Text>
-          <Text style={styles.accessoryDesc}>{accessory.description}</Text>
+          <Text style={[styles.accessoryDesc, { color: colors.neutral[500] }]}>{accessory.description}</Text>
         </View>
         <View style={styles.accessoryRight}>
-          <Text style={[styles.accessoryPriceText, selected && styles.accessoryPriceTextSelected]}>
+          <Text style={[
+            styles.accessoryPriceText,
+            { color: colors.neutral[600] },
+            selected && { color: colors.primary[600] }
+          ]}>
             +${accessory.price.toFixed(2)}
           </Text>
-          <View style={[styles.accessoryCheck, selected && styles.accessoryCheckSelected]}>
+          <View style={[
+            styles.accessoryCheck,
+            { borderColor: colors.neutral[300] },
+            selected && { backgroundColor: colors.primary[600], borderColor: colors.primary[600] }
+          ]}>
             {selected && <MaterialCommunityIcons name="check" size={14} color={colors.neutral[0]} />}
           </View>
         </View>
