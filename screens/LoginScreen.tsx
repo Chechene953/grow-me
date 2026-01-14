@@ -76,7 +76,7 @@ export const LoginScreen = () => {
           setError(getFirebaseErrorMessage({ message: errorMessage }));
         }
       } else if (response?.type === 'cancel' || response?.type === 'dismiss') {
-        // User cancelled the auth flow
+
       }
     };
     run();
@@ -167,7 +167,7 @@ export const LoginScreen = () => {
                   return;
                 }
                 if (googleLoading) {
-                  return; // Prevent multiple calls
+                  return;
                 }
                 setGoogleLoading(true);
                 promptAsync().catch(() => setGoogleLoading(false));

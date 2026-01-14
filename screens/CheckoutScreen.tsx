@@ -48,7 +48,6 @@ export const CheckoutScreen = () => {
   const router = useRouter();
   const { colors } = useTheme();
 
-  // Address state
   const [street, setStreet] = useState(user?.address?.street || '');
   const [city, setCity] = useState(user?.address?.city || '');
   const [state, setState] = useState(user?.address?.state || '');
